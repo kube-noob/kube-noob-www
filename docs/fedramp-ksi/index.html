@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for · kube-noob</title>
+<meta name="description" content="Dataset: FedRAMP Consolidated Rules for 2026 version 2026.11.02.01 ( last_updated 2026-11-02), the KSI section of fedramp-consolidated-rules.json in…">
+<link rel="canonical" href="https://kube-noob.com/docs/fedramp-ksi/">
+<meta property="og:title" content="FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for · kube-noob">
+<meta property="og:description" content="Dataset: FedRAMP Consolidated Rules for 2026 version 2026.11.02.01 ( last_updated 2026-11-02), the KSI section of fedramp-consolidated-rules.json in…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/fedramp-ksi/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/" aria-current="page">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><a href="/docs/website-updates/">Website: what is out of date</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="fedramp-20x-key-security-indicators-what-kube-noobs-findings-are-evidence-for">FedRAMP 20x Key Security Indicators: what kube-noob's findings are evidence for</h1>
+<p>Dataset: <strong>FedRAMP Consolidated Rules for 2026</strong> version <strong>2026.11.02.01</strong> (<code>last_updated</code> 2026-11-02), the KSI section of <a href="https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json"><code>fedramp-consolidated-rules.json</code></a> in <a href="https://github.com/FedRAMP/rules">FedRAMP/rules</a>, retrieved 2026-11-05. The vendored extract is <code>vendor/fedramp/fedramp-ksi.json</code>; its sha256 is <code>d9988ec9120659811af4941f9ed5523a6a4b7c786d1fa9b40a6492993485c9f4</code> and the upstream file's is <code>782faecae3eee4aa2aa9d32cdb0de4c929524f2e41dc1f3d143a94a9ca64c4e3</code>, both asserted by <code>tests/test_fedramp_ksi.py</code>.</p>
+<p>A mapping is evidence, never a compliance claim. kube-noob reads configuration and says what it found; an assessment decides whether an indicator is met, and only an authorising body decides whether a system is authorised. Nothing here is an assertion by or on behalf of FedRAMP.</p>
+<p>FedRAMP's own repository tells a reader to "account for framework applicability, service class, document status, and effective dates" when interpreting the rules (FedRAMP/rules README, "Using The Information", retrieved 2026-11-05 -- the README is not vendored here, so that citation is dated rather than hash-checked, unlike the dataset itself). Five indicators carry a <code>varies_by_class</code> block instead of one statement, and for class b the statement is marked optional -- so the same configuration evidence can speak to a required indicator for one service class and an optional one for another. kube-noob does not know a system's service class and never infers it.</p>
+<p>An indicator and a rule meet here only because they name the same NIST control, and a shared control is not shared subject matter. FedRAMP cites broad control sets -- <code>KSI-IAM-SNU</code> (non-user authentication) cites <code>ac-4</code>, Information Flow Enforcement -- and kube-noob maps its NetworkPolicy rules to <code>ac-4</code> because that is what <code>ac-4</code> is. The join is then arithmetically correct and about nothing: eight network and RBAC rules reported under an indicator about how service credentials are issued. Entries below marked <code>onSubject: False</code> are exactly that case, and saying so is the only honest thing a crosswalk can do about it.</p>
+<h2 id="coverage-28-of-kube-noobs-30-controls-are-cited-by-an-indicator">Coverage: 28 of kube-noob's 30 controls are cited by an indicator</h2>
+<p>2 are cited by none, so no finding of kube-noob's is evidence for any indicator through them: <strong>SC-36</strong> (Distributed Processing and Storage), <strong>SC-6</strong> (Resource Availability).</p>
+<p>In the other direction, 15 of the 46 indicators have no kube-noob rule behind them at all. Those rows carry <code>evidenced: false</code> and no counts: a zero in a findings column reads as a pass, and an indicator kube-noob cannot see has not passed anything. They are <code>KSI-CED-RAT</code>, <code>KSI-CNA-OFA</code>, <code>KSI-IAM-AAM</code>, <code>KSI-IAM-SUS</code>, <code>KSI-INR-AAR</code>, <code>KSI-INR-RIR</code>, <code>KSI-INR-RPI</code>, <code>KSI-MLA-ALA</code>, <code>KSI-PIY-GIV</code>, <code>KSI-PIY-RES</code>, <code>KSI-PIY-RVD</code>, <code>KSI-SCR-MON</code>, <code>KSI-SVC-ASM</code>, <code>KSI-SVC-RUD</code>, <code>KSI-SVC-VCM</code>.</p>
+<h2 id="the-16-indicators-a-kube-noob-finding-speaks-to-directly">The 16 indicators a kube-noob finding speaks to directly</h2>
+<p>One line each on what the evidence shows and, more importantly, what it does not. An indicator is a statement about an organisation's practice; kube-noob reads configuration. The gap is not a detail.</p>
+<h3 id="ksi-cmt-rmv-redeploying-vs-modifying-change-management">KSI-CMT-RMV — Redeploying vs Modifying (Change Management)</h3>
+<ul>
+<li><strong>Shows:</strong> whether a workload could be redeployed to a known state at all -- a mutable image reference (KN-S012), a pull secret that exists only in another namespace (KN-C013), a replica count fighting an HPA (KN-C014), a resource claim no object in the bundle defines (KN-C015), a request above its limit (KN-C006).</li>
+<li><strong>Does not show:</strong> how changes reach the cluster, which is what the indicator is about. This is the widest row in the table because it cites <code>cm-6</code> (Configuration Settings) and a third of kube-noob's rules are evidence about <code>cm-6</code>, so the count here is a weak signal and the named findings are the useful part.</li>
+<li>kube-noob controls: CM-2, CM-6, CM-7</li>
+<li>Rules that are evidence (49), of which the sentences above name 5: <code>KN-C006</code>, <code>KN-C013</code>, <code>KN-C014</code>, <code>KN-C015</code>, <code>KN-N005</code>, <code>KN-N009</code>, <code>KN-N010</code>, <code>KN-N011</code>, <code>KN-S001</code>, <code>KN-S002</code>, <code>KN-S003</code>, <code>KN-S004</code> and 37 more</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S012</code></td>
+<td>Mutable image reference</td>
+</tr>
+<tr>
+<td><code>KN-C013</code></td>
+<td>Pull secret exists only in another namespace</td>
+</tr>
+<tr>
+<td><code>KN-C014</code></td>
+<td>Workload scaled by an HPA also sets spec.replicas</td>
+</tr>
+<tr>
+<td><code>KN-C015</code></td>
+<td>Pod names a resource claim that is not in this bundle</td>
+</tr>
+<tr>
+<td><code>KN-C006</code></td>
+<td>Request exceeds limit</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-cna-mat-minimizing-attack-surface-cloud-native-architecture">KSI-CNA-MAT — Minimizing Attack Surface (Cloud Native Architecture)</h3>
+<ul>
+<li><strong>Shows:</strong> the traffic surface the bundle declares and the paths it passes through: a namespace with workloads and no NetworkPolicy (KN-N001), a policy allowing all ingress (KN-N007), a policy selecting no pod (KN-N012), an admin policy the CNI does not enforce (KN-N014), a Service with externalIPs (KN-N008), a shadowed EgressFirewall rule (KN-N006), and shell or traversal characters in a subPath or PersistentVolume path (KN-S025, KN-ST006).</li>
+<li><strong>Does not show:</strong> the host-level surface, which is the first thing most readers mean by attack surface: privileged containers, host namespaces, hostPath and added capabilities are evidence about <code>ac-6</code>, <code>cm-7</code> and <code>sc-39</code>, and this indicator cites none of those -- they reach KSI-IAM-ELP and KSI-IAM-JIT instead. Nor anything about lateral movement at runtime, or a cloud security group kube-noob cannot see.</li>
+<li>kube-noob controls: SC-7(5), SC-8, SI-10</li>
+<li>Rules that are evidence (12), of which the sentences above name 8: <code>KN-N001</code>, <code>KN-N002</code>, <code>KN-N003</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N008</code>, <code>KN-N011</code>, <code>KN-N012</code>, <code>KN-N014</code>, <code>KN-S025</code>, <code>KN-ST006</code>, <code>KN-V016</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-N001</code></td>
+<td>Namespace has workloads but no NetworkPolicy</td>
+</tr>
+<tr>
+<td><code>KN-N007</code></td>
+<td>NetworkPolicy allows all ingress</td>
+</tr>
+<tr>
+<td><code>KN-N012</code></td>
+<td>NetworkPolicy selects no pod in this bundle</td>
+</tr>
+<tr>
+<td><code>KN-N014</code></td>
+<td>Admin network policy the cluster's CNI does not enforce</td>
+</tr>
+<tr>
+<td><code>KN-N008</code></td>
+<td>Service uses externalIPs</td>
+</tr>
+<tr>
+<td><code>KN-N006</code></td>
+<td>EgressFirewall rule is shadowed</td>
+</tr>
+<tr>
+<td><code>KN-S025</code></td>
+<td>volumeMount subPath carries shell or PowerShell characters</td>
+</tr>
+<tr>
+<td><code>KN-ST006</code></td>
+<td>PersistentVolume path carries command or traversal characters</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-cna-rnt-restricting-network-traffic-cloud-native-architecture">KSI-CNA-RNT — Restricting Network Traffic (Cloud Native Architecture)</h3>
+<ul>
+<li><strong>Shows:</strong> that traffic rules exist and are coherent: a namespace with no NetworkPolicy (KN-N001), one that allows all ingress (KN-N007), one that selects no pod in the bundle (KN-N012), a shadowed EgressFirewall rule (KN-N006), and -- the case this indicator most needs -- an AdminNetworkPolicy the cluster's CNI does not enforce (KN-N014), which is a rule that exists and does nothing.</li>
+<li><strong>Does not show:</strong> egress as such. The DNS hole a deny-all egress policy leaves behind (KN-N013) is evidence about <code>sc-7</code> and <code>cp-10</code>, and this indicator cites <code>sc-7.5</code> and <code>si-10</code>, so that finding reaches KSI-CNA-ULN and not this row -- the indicator names inbound and outbound traffic, and only the inbound half arrives here.</li>
+<li>kube-noob controls: SC-7(5), SI-10</li>
+<li>Rules that are evidence (8), of which the sentences above name 5: <code>KN-N001</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N011</code>, <code>KN-N012</code>, <code>KN-N014</code>, <code>KN-S025</code>, <code>KN-ST006</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-N001</code></td>
+<td>Namespace has workloads but no NetworkPolicy</td>
+</tr>
+<tr>
+<td><code>KN-N007</code></td>
+<td>NetworkPolicy allows all ingress</td>
+</tr>
+<tr>
+<td><code>KN-N012</code></td>
+<td>NetworkPolicy selects no pod in this bundle</td>
+</tr>
+<tr>
+<td><code>KN-N014</code></td>
+<td>Admin network policy the cluster's CNI does not enforce</td>
+</tr>
+<tr>
+<td><code>KN-N006</code></td>
+<td>EgressFirewall rule is shadowed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-cna-rvp-reviewing-protections-cloud-native-architecture">KSI-CNA-RVP — Reviewing Protections (Cloud Native Architecture)</h3>
+<ul>
+<li><strong>Shows:</strong> the three settings that decide whether one workload can exhaust a node: a container with no memory limit (KN-C005), a namespace with workloads and no ResourceQuota or LimitRange (KN-C016), and an aggressive liveness probe that restarts a pod under load (KN-C003).</li>
+<li><strong>Does not show:</strong> CPU. No rule reports a missing CPU limit; KN-C004 is about missing requests and is evidence about <code>sc-6</code>, which no indicator in the dataset cites. Nor any protection in front of the cluster, nor the review the indicator asks for -- whether a denial-of-service defence works is measured, not read.</li>
+<li>kube-noob controls: SC-5</li>
+<li>Rules that are evidence (3), of which the sentences above name 3: <code>KN-C003</code>, <code>KN-C005</code>, <code>KN-C016</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-C005</code></td>
+<td>Missing memory limit</td>
+</tr>
+<tr>
+<td><code>KN-C016</code></td>
+<td>Namespace has workloads but no ResourceQuota or LimitRange</td>
+</tr>
+<tr>
+<td><code>KN-C003</code></td>
+<td>Liveness probe is aggressive</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-cna-uln-using-logical-networking-cloud-native-architecture">KSI-CNA-ULN — Using Logical Networking (Cloud Native Architecture)</h3>
+<ul>
+<li><strong>Shows:</strong> where a workload reaches around the cluster's own networking: a NodePort Service (KN-N005), a LoadBalancer open to the internet (KN-N004), externalIPs (KN-N008), a hostPort (KN-S011), a probe or lifecycle handler pointed at a host (KN-S029), egress denied without allowing cluster DNS (KN-N013), an EgressFirewall under the wrong name and so not applied (KN-V015), and risky ingress-nginx annotations (KN-N009).</li>
+<li><strong>Does not show:</strong> the host network itself -- sharing the node's namespaces (KN-S009) is evidence about <code>ac-6</code> and <code>sc-39</code>, which this indicator does not cite -- and nothing about the network underneath: which CNI is installed, which mode it runs in, or what the provider's subnets permit.</li>
+<li>kube-noob controls: SC-4, SC-7, SC-8</li>
+<li>Rules that are evidence (17), of which the sentences above name 8: <code>KN-N001</code>, <code>KN-N002</code>, <code>KN-N003</code>, <code>KN-N004</code>, <code>KN-N005</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N008</code>, <code>KN-N009</code>, <code>KN-N012</code>, <code>KN-N013</code>, <code>KN-N014</code> and 5 more</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-N005</code></td>
+<td>NodePort Service</td>
+</tr>
+<tr>
+<td><code>KN-N004</code></td>
+<td>LoadBalancer Service open to the internet</td>
+</tr>
+<tr>
+<td><code>KN-N008</code></td>
+<td>Service uses externalIPs</td>
+</tr>
+<tr>
+<td><code>KN-S011</code></td>
+<td>hostPort used</td>
+</tr>
+<tr>
+<td><code>KN-S029</code></td>
+<td>Probe or lifecycle handler with a host</td>
+</tr>
+<tr>
+<td><code>KN-N013</code></td>
+<td>Egress is denied without allowing cluster DNS</td>
+</tr>
+<tr>
+<td><code>KN-V015</code></td>
+<td>EgressFirewall must be named 'default'</td>
+</tr>
+<tr>
+<td><code>KN-N009</code></td>
+<td>Ingress uses a risky ingress-nginx annotation</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-iam-elp-ensuring-least-privilege-identity-and-access-management">KSI-IAM-ELP — Ensuring Least Privilege (Identity and Access Management)</h3>
+<ul>
+<li><strong>Shows:</strong> the privileges a workload asks the cluster for and the ones RBAC hands out: privileged containers (KN-S001), escalation left on (KN-S002), running as root (KN-S003), capabilities added or not dropped (KN-S005, KN-S006), host namespaces and hostPath (KN-S009, KN-S010), a service-account token mounted where nothing uses it (KN-S014), wildcard grants (KN-S015), bindings to cluster-admin (KN-S016), escalation paths through RBAC (KN-S017), a role granted to everyone (KN-S028), and a namespace enforcing no pod security level (KN-S032).</li>
+<li><strong>Does not show:</strong> anything about people. No identity provider, no MFA, no joiner-mover-leaver process, and no evidence that the privileges that are declared were ever reviewed by anyone.</li>
+<li>kube-noob controls: AC-14, AC-3, AC-4, AC-6, SC-39, SC-4</li>
+<li>Rules that are evidence (31), of which the sentences above name 13: <code>KN-N001</code>, <code>KN-N004</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N008</code>, <code>KN-N012</code>, <code>KN-N014</code>, <code>KN-S001</code>, <code>KN-S002</code>, <code>KN-S003</code>, <code>KN-S004</code>, <code>KN-S005</code> and 19 more</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S001</code></td>
+<td>Privileged container</td>
+</tr>
+<tr>
+<td><code>KN-S002</code></td>
+<td>Privilege escalation not disabled</td>
+</tr>
+<tr>
+<td><code>KN-S003</code></td>
+<td>Container may run as root</td>
+</tr>
+<tr>
+<td><code>KN-S005</code></td>
+<td>Dangerous Linux capabilities added</td>
+</tr>
+<tr>
+<td><code>KN-S006</code></td>
+<td>Capabilities not dropped</td>
+</tr>
+<tr>
+<td><code>KN-S009</code></td>
+<td>Host namespaces shared</td>
+</tr>
+<tr>
+<td><code>KN-S010</code></td>
+<td>hostPath volume</td>
+</tr>
+<tr>
+<td><code>KN-S014</code></td>
+<td>ServiceAccount token automounted</td>
+</tr>
+<tr>
+<td><code>KN-S015</code></td>
+<td>RBAC wildcard grants</td>
+</tr>
+<tr>
+<td><code>KN-S016</code></td>
+<td>Binding to cluster-admin</td>
+</tr>
+<tr>
+<td><code>KN-S017</code></td>
+<td>RBAC privilege-escalation paths</td>
+</tr>
+<tr>
+<td><code>KN-S028</code></td>
+<td>RBAC binding grants a role to everyone</td>
+</tr>
+<tr>
+<td><code>KN-S032</code></td>
+<td>Namespace does not enforce a pod security level</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-iam-jit-authorizing-just-in-time-identity-and-access-management">KSI-IAM-JIT — Authorizing Just-in-Time (Identity and Access Management)</h3>
+<ul>
+<li><strong>Shows:</strong> standing authorisation written into manifests: wildcard verbs and resources (KN-S015), a binding to cluster-admin (KN-S016), roles permitting escalate, bind or impersonate (KN-S017), a role granted to every authenticated user (KN-S028), and a permissive SecurityContextConstraints (KN-S019).</li>
+<li><strong>Does not show:</strong> whether access is time-bound, which is the whole substance of just-in-time. A manifest records a grant, not when it was requested, who approved it, or when it expires.</li>
+<li>kube-noob controls: AC-3, AC-4, AC-5, AC-6, AC-6(10), AC-6(5), CM-7, SC-39</li>
+<li>Rules that are evidence (39), of which the sentences above name 5: <code>KN-N001</code>, <code>KN-N004</code>, <code>KN-N005</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N008</code>, <code>KN-N009</code>, <code>KN-N010</code>, <code>KN-N011</code>, <code>KN-N012</code>, <code>KN-N014</code>, <code>KN-S001</code> and 27 more</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S015</code></td>
+<td>RBAC wildcard grants</td>
+</tr>
+<tr>
+<td><code>KN-S016</code></td>
+<td>Binding to cluster-admin</td>
+</tr>
+<tr>
+<td><code>KN-S017</code></td>
+<td>RBAC privilege-escalation paths</td>
+</tr>
+<tr>
+<td><code>KN-S028</code></td>
+<td>RBAC binding grants a role to everyone</td>
+</tr>
+<tr>
+<td><code>KN-S019</code></td>
+<td>Permissive SecurityContextConstraints</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-iam-snu-securing-non-user-authentication-identity-and-access-management">KSI-IAM-SNU — Securing Non-User Authentication (Identity and Access Management)</h3>
+<blockquote>
+<p><strong>These rules reach this indicator only through a shared control.</strong> Read the row as a warning, not as evidence.</p>
+</blockquote>
+<ul>
+<li><strong>Shows:</strong> nothing about authentication, and this row should be read as a warning rather than as evidence. The indicator cites <code>ac-4</code> and <code>ac-6.5</code>; what reaches it from kube-noob is seven traffic rules -- no NetworkPolicy in a namespace with workloads (KN-N001), a LoadBalancer open to the internet (KN-N004), a shadowed EgressFirewall rule (KN-N006), a policy allowing all ingress (KN-N007), externalIPs (KN-N008), a policy selecting no pod (KN-N012), an admin policy the CNI does not enforce (KN-N014) -- plus the cluster-admin binding rule (KN-S016). Those are real findings about traffic and about one RBAC grant, and none of them is about how a non-user credential is issued.</li>
+<li><strong>Does not show:</strong> the indicator's actual subject. Service-account token mounting (KN-S014), a legacy token Secret (KN-S027) and credentials in environment values (KN-S013) are the findings a reader expects here, and all three are evidence about controls this indicator does not cite, so they arrive under KSI-IAM-ELP and KSI-SVC-SIN instead. Nor does kube-noob ever read a Secret's value, so it cannot tell a short-lived projected token from a static one.</li>
+<li>kube-noob controls: AC-4, AC-6(5)</li>
+<li>Rules that are evidence (8), of which the sentences above name 8: <code>KN-N001</code>, <code>KN-N004</code>, <code>KN-N006</code>, <code>KN-N007</code>, <code>KN-N008</code>, <code>KN-N012</code>, <code>KN-N014</code>, <code>KN-S016</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-N001</code></td>
+<td>Namespace has workloads but no NetworkPolicy</td>
+</tr>
+<tr>
+<td><code>KN-N004</code></td>
+<td>LoadBalancer Service open to the internet</td>
+</tr>
+<tr>
+<td><code>KN-N006</code></td>
+<td>EgressFirewall rule is shadowed</td>
+</tr>
+<tr>
+<td><code>KN-N007</code></td>
+<td>NetworkPolicy allows all ingress</td>
+</tr>
+<tr>
+<td><code>KN-N008</code></td>
+<td>Service uses externalIPs</td>
+</tr>
+<tr>
+<td><code>KN-N012</code></td>
+<td>NetworkPolicy selects no pod in this bundle</td>
+</tr>
+<tr>
+<td><code>KN-N014</code></td>
+<td>Admin network policy the cluster's CNI does not enforce</td>
+</tr>
+<tr>
+<td><code>KN-S016</code></td>
+<td>Binding to cluster-admin</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-mla-let-logging-event-types-monitoring-logging-and-auditing">KSI-MLA-LET — Logging Event Types (Monitoring, Logging, and Auditing)</h3>
+<ul>
+<li><strong>Shows:</strong> whether the cluster is configured to record API requests at all, and whether a <code>customRules</code> entry quietly exempts a group from being recorded (KN-S035). That is the event-type question this indicator asks, read from <code>spec.audit</code> on the OpenShift <code>APIServer</code> singleton -- configuration, never an audit event and never anything about a person.</li>
+<li><strong>Does not show:</strong> whether the events the profile selects are the events this system needs, and nothing at all off OpenShift: upstream Kubernetes keeps its audit policy in a file on the control-plane host, which no read-only client can reach. A healthy profile is evidence that logging is on, not that the right things are logged.</li>
+<li>kube-noob controls: AU-12, AU-2</li>
+<li>Rules that are evidence (1), of which the sentences above name 1: <code>KN-S035</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S035</code></td>
+<td>Cluster audit logging is turned off, for everyone or for one group</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-mla-osm-operating-siem-capability-monitoring-logging-and-auditing">KSI-MLA-OSM — Operating SIEM Capability (Monitoring, Logging, and Auditing)</h3>
+<blockquote>
+<p><strong>These rules reach this indicator only through a shared control.</strong> Read the row as a warning, not as evidence.</p>
+</blockquote>
+<ul>
+<li><strong>Shows:</strong> nothing about a SIEM. This indicator is about operating a centralised, tamper-resistant logging capability, and what reaches it from kube-noob is one rule about whether the API server records requests (KN-S035) -- which both sides happen to call <code>au-2</code>.</li>
+<li><strong>Does not show:</strong> the subject. Whether logs are forwarded anywhere, whether the destination is tamper-resistant, whether retention holds, whether the pipeline is healthy. All of it needs credentials for a system kube-noob has none for, and holds none by design.</li>
+<li>kube-noob controls: AU-2</li>
+<li>Rules that are evidence (1), of which the sentences above name 1: <code>KN-S035</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S035</code></td>
+<td>Cluster audit logging is turned off, for everyone or for one group</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-mla-rvl-reviewing-logs-monitoring-logging-and-auditing">KSI-MLA-RVL — Reviewing Logs (Monitoring, Logging, and Auditing)</h3>
+<blockquote>
+<p><strong>These rules reach this indicator only through a shared control.</strong> Read the row as a warning, not as evidence.</p>
+</blockquote>
+<ul>
+<li><strong>Shows:</strong> nothing about review. The one rule that reaches this indicator (KN-S035) says whether requests are recorded; this indicator asks whether somebody looks at them.</li>
+<li><strong>Does not show:</strong> any human activity. Who reviewed, when, what they found, what they escalated. A configuration scanner cannot produce evidence of an organisation's practice, and a crosswalk that implied otherwise would be this file's own failure mode.</li>
+<li>kube-noob controls: AU-2</li>
+<li>Rules that are evidence (1), of which the sentences above name 1: <code>KN-S035</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S035</code></td>
+<td>Cluster audit logging is turned off, for everyone or for one group</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-rpl-abo-aligning-backups-with-objectives-recovery-planning">KSI-RPL-ABO — Aligning Backups with Objectives (Recovery Planning)</h3>
+<blockquote>
+<p><strong>These rules reach this indicator only through a shared control.</strong> Read the row as a warning, not as evidence.</p>
+</blockquote>
+<ul>
+<li><strong>Shows:</strong> the resilience settings a recovery objective depends on, reached through <code>cp-10</code> alone: a single replica (KN-C007), a missing PodDisruptionBudget or one that blocks every voluntary eviction (KN-C008, KN-C009), missing probes (KN-C001, KN-C002), a zero termination grace period (KN-C011), and a ReadWriteOnce volume shared by a rolling Deployment (KN-ST002).</li>
+<li><strong>Does not show:</strong> backups. Not their schedule, not a restore test, not an RPO or an RTO, and nothing about the alignment the indicator's name asks about. These rules are about surviving the loss of a pod or a node, which is a different thing, and reading this row as backup evidence is the mistake this table exists to prevent.</li>
+<li>kube-noob controls: CP-10</li>
+<li>Rules that are evidence (9), of which the sentences above name 7: <code>KN-C001</code>, <code>KN-C002</code>, <code>KN-C003</code>, <code>KN-C007</code>, <code>KN-C008</code>, <code>KN-C009</code>, <code>KN-C011</code>, <code>KN-N013</code>, <code>KN-ST002</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-C007</code></td>
+<td>Single replica</td>
+</tr>
+<tr>
+<td><code>KN-C008</code></td>
+<td>No PodDisruptionBudget</td>
+</tr>
+<tr>
+<td><code>KN-C009</code></td>
+<td>PodDisruptionBudget blocks all voluntary evictions</td>
+</tr>
+<tr>
+<td><code>KN-C001</code></td>
+<td>No readiness probe</td>
+</tr>
+<tr>
+<td><code>KN-C002</code></td>
+<td>No liveness probe</td>
+</tr>
+<tr>
+<td><code>KN-C011</code></td>
+<td>terminationGracePeriodSeconds is 0</td>
+</tr>
+<tr>
+<td><code>KN-ST002</code></td>
+<td>ReadWriteOnce volume shared by a rolling Deployment</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-scr-mit-mitigating-supply-chain-risk-supply-chain-risk">KSI-SCR-MIT — Mitigating Supply Chain Risk (Supply Chain Risk)</h3>
+<ul>
+<li><strong>Shows:</strong> components the bundle depends on that are past their support, through <code>sa-22</code>: an ingress-nginx controller image below the fixed releases (KN-S024), an API removed or deprecated in the target version (KN-V005, KN-V006), a DeploymentConfig (KN-V008), and an Ingress still targeting the retired ingress-nginx (KN-V019).</li>
+<li><strong>Does not show:</strong> vulnerabilities. <code>ksi</code> takes no scanner report, and a gate's scanner findings carry the CVE id as their rule id, which is in no control mapping, so they reach no indicator by any route. Nor anything about suppliers: no vendor assessment, no registry provenance, no SBOM completeness check -- a component a report omits cannot be found in it.</li>
+<li>kube-noob controls: SA-22</li>
+<li>Rules that are evidence (5), of which the sentences above name 5: <code>KN-S024</code>, <code>KN-V005</code>, <code>KN-V006</code>, <code>KN-V008</code>, <code>KN-V019</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S024</code></td>
+<td>ingress-nginx controller image below the fixed releases</td>
+</tr>
+<tr>
+<td><code>KN-V005</code></td>
+<td>API removed in the target Kubernetes version</td>
+</tr>
+<tr>
+<td><code>KN-V006</code></td>
+<td>Deprecated API in the target Kubernetes version</td>
+</tr>
+<tr>
+<td><code>KN-V008</code></td>
+<td>DeploymentConfig is deprecated</td>
+</tr>
+<tr>
+<td><code>KN-V019</code></td>
+<td>Ingress targets the retired ingress-nginx</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-svc-acm-automating-configuration-management-service-configuration">KSI-SVC-ACM — Automating Configuration Management (Service Configuration)</h3>
+<ul>
+<li><strong>Shows:</strong> the settings most often changed by hand, through <code>cm-2</code> and <code>cm-6</code>: a mutable image tag (KN-S012), a replica count fighting an HPA (KN-C014), a request above its limit (KN-C006), a container that may run as root (KN-S003), no seccomp profile (KN-S008), and ReadWriteMany asked of a StorageClass that only offers ReadWriteOnce (KN-ST001).</li>
+<li><strong>Does not show:</strong> drift, and whether automation made the change. kube-noob does measure drift -- <code>posture diff</code> names every object whose configuration changed between two snapshots and reports standing per control -- but that output does not feed this view, so nothing in this row is evidence of drift over time. It is one audit of one bundle, like every other row.</li>
+<li>kube-noob controls: CM-2, CM-6</li>
+<li>Rules that are evidence (33), of which the sentences above name 6: <code>KN-C006</code>, <code>KN-C013</code>, <code>KN-C014</code>, <code>KN-C015</code>, <code>KN-N010</code>, <code>KN-S003</code>, <code>KN-S004</code>, <code>KN-S008</code>, <code>KN-S012</code>, <code>KN-S032</code>, <code>KN-S036</code>, <code>KN-ST001</code> and 21 more</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S012</code></td>
+<td>Mutable image reference</td>
+</tr>
+<tr>
+<td><code>KN-C014</code></td>
+<td>Workload scaled by an HPA also sets spec.replicas</td>
+</tr>
+<tr>
+<td><code>KN-C006</code></td>
+<td>Request exceeds limit</td>
+</tr>
+<tr>
+<td><code>KN-S003</code></td>
+<td>Container may run as root</td>
+</tr>
+<tr>
+<td><code>KN-S008</code></td>
+<td>Seccomp profile not set to RuntimeDefault</td>
+</tr>
+<tr>
+<td><code>KN-ST001</code></td>
+<td>ReadWriteMany requested from a ReadWriteOnce-only StorageClass</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-svc-sin-securing-information-service-configuration">KSI-SVC-SIN — Securing Information (Service Configuration)</h3>
+<ul>
+<li><strong>Shows:</strong> where the bundle leaves information in the clear: a Route or Ingress with no TLS (KN-N002, KN-N003), a Route whose TLS configuration is invalid and so does not do what it says (KN-V016), a secret value hard-coded in an environment variable (KN-S013), secret material committed in a manifest (KN-S018), and a credential stored in a ConfigMap (KN-S026).</li>
+<li><strong>Does not show:</strong> data at rest, despite the indicator citing <code>sc-28</code>. No rule in the catalogue checks a volume, a claim or a StorageClass for encryption, so nothing here is evidence about it. Nor cipher suites, key custody, KMS configuration or the provider's own at-rest encryption.</li>
+<li>kube-noob controls: SC-28, SC-4, SC-8, SC-8(1)</li>
+<li>Rules that are evidence (8), of which the sentences above name 6: <code>KN-N002</code>, <code>KN-N003</code>, <code>KN-N008</code>, <code>KN-S013</code>, <code>KN-S018</code>, <code>KN-S026</code>, <code>KN-S031</code>, <code>KN-V016</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-N002</code></td>
+<td>Route without TLS</td>
+</tr>
+<tr>
+<td><code>KN-N003</code></td>
+<td>Ingress without TLS</td>
+</tr>
+<tr>
+<td><code>KN-V016</code></td>
+<td>Route TLS configuration is invalid</td>
+</tr>
+<tr>
+<td><code>KN-S013</code></td>
+<td>Secret value hard-coded in environment</td>
+</tr>
+<tr>
+<td><code>KN-S018</code></td>
+<td>Secret material committed in manifests</td>
+</tr>
+<tr>
+<td><code>KN-S026</code></td>
+<td>Credential stored in a ConfigMap</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ksi-svc-vri-validating-resource-integrity-service-configuration">KSI-SVC-VRI — Validating Resource Integrity (Service Configuration)</h3>
+<ul>
+<li><strong>Shows:</strong> the integrity controls the bundle declares, through <code>si-7</code>: an image referenced by a mutable tag rather than a digest (KN-S012), a writable root filesystem (KN-S007), and an admission webhook whose failure policy lets unchecked objects through (KN-S030).</li>
+<li><strong>Does not show:</strong> whether any signature verifies. kube-noob fetches no image, no signature and no attestation, so a digest-pinned image is evidence of intent and not of a validated artefact.</li>
+<li>kube-noob controls: SI-7</li>
+<li>Rules that are evidence (4), of which the sentences above name 3: <code>KN-S007</code>, <code>KN-S012</code>, <code>KN-S030</code>, <code>KN-S036</code></li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule named above</th>
+<th>Its own title, so the sentence can be checked against it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KN-S012</code></td>
+<td>Mutable image reference</td>
+</tr>
+<tr>
+<td><code>KN-S007</code></td>
+<td>Writable root filesystem</td>
+</tr>
+<tr>
+<td><code>KN-S030</code></td>
+<td>Admission webhook fails open</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="all-46-indicators-and-the-kube-noob-controls-each-cites">All 46 indicators, and the kube-noob controls each cites</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Indicator</th>
+<th>Family</th>
+<th>Name</th>
+<th>kube-noob controls</th>
+<th>Varies by class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KSI-CED-RAT</td>
+<td>CED</td>
+<td>Reviewing All Training</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CMT-LMC</td>
+<td>CMT</td>
+<td>Logging Changes</td>
+<td>AU-2, CM-3(2), CM-6</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CMT-RMV</td>
+<td>CMT</td>
+<td>Redeploying vs Modifying</td>
+<td>CM-2, CM-6, CM-7</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CMT-RVP</td>
+<td>CMT</td>
+<td>Reviewing Change Procedures</td>
+<td>CM-3(2)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CMT-VTD</td>
+<td>CMT</td>
+<td>Validating Throughout Deployment</td>
+<td>CM-3(2), SI-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-DFP</td>
+<td>CNA</td>
+<td>Defining Functionality and Privileges</td>
+<td>CM-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-EIS</td>
+<td>CNA</td>
+<td>Enforcing Intended State</td>
+<td>SI-7</td>
+<td>b, c</td>
+</tr>
+<tr>
+<td>KSI-CNA-IBP</td>
+<td>CNA</td>
+<td>Implementing Best Practices</td>
+<td>CM-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-MAT</td>
+<td>CNA</td>
+<td>Minimizing Attack Surface</td>
+<td>SC-7(5), SC-8, SI-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-OFA</td>
+<td>CNA</td>
+<td>Optimizing for Availability</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-RNT</td>
+<td>CNA</td>
+<td>Restricting Network Traffic</td>
+<td>SC-7(5), SI-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-RVP</td>
+<td>CNA</td>
+<td>Reviewing Protections</td>
+<td>SC-5</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-CNA-ULN</td>
+<td>CNA</td>
+<td>Using Logical Networking</td>
+<td>SC-4, SC-7, SC-8</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-AAM</td>
+<td>IAM</td>
+<td>Automating Account Management</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-APM</td>
+<td>IAM</td>
+<td>Adopting Passwordless Methods</td>
+<td>AC-3, IA-5</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-ELP</td>
+<td>IAM</td>
+<td>Ensuring Least Privilege</td>
+<td>AC-14, AC-3, AC-4, AC-6, SC-39, SC-4</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-JIT</td>
+<td>IAM</td>
+<td>Authorizing Just-in-Time</td>
+<td>AC-3, AC-4, AC-5, AC-6, AC-6(10), AC-6(5), CM-7, SC-39</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-SNU</td>
+<td>IAM</td>
+<td>Securing Non-User Authentication</td>
+<td>AC-4, AC-6(5)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-IAM-SUS</td>
+<td>IAM</td>
+<td>Responding to Suspicious Activity</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-INR-AAR</td>
+<td>INR</td>
+<td>Generating After Action Reports</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-INR-RIR</td>
+<td>INR</td>
+<td>Reviewing Incident Response Procedures</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-INR-RPI</td>
+<td>INR</td>
+<td>Reviewing Past Incidents</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-MLA-ALA</td>
+<td>MLA</td>
+<td>Authorizing Log Access</td>
+<td>—</td>
+<td>b, c</td>
+</tr>
+<tr>
+<td>KSI-MLA-EVC</td>
+<td>MLA</td>
+<td>Evaluating Configurations</td>
+<td>CM-2, CM-6</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-MLA-LET</td>
+<td>MLA</td>
+<td>Logging Event Types</td>
+<td>AU-12, AU-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-MLA-OSM</td>
+<td>MLA</td>
+<td>Operating SIEM Capability</td>
+<td>AU-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-MLA-RVL</td>
+<td>MLA</td>
+<td>Reviewing Logs</td>
+<td>AU-2</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-PIY-GIV</td>
+<td>PIY</td>
+<td>Generating Inventories</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-PIY-RES</td>
+<td>PIY</td>
+<td>Reviewing Executive Support</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-PIY-RIS</td>
+<td>PIY</td>
+<td>Reviewing Investments in Security</td>
+<td>AC-5</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-PIY-RSD</td>
+<td>PIY</td>
+<td>Reviewing Security in the SDLC</td>
+<td>AC-5, IA-5(7), SC-4, SI-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-PIY-RVD</td>
+<td>PIY</td>
+<td>Reviewing Vulnerability Disclosures</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-RPL-ABO</td>
+<td>RPL</td>
+<td>Aligning Backups with Objectives</td>
+<td>CP-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-RPL-ARP</td>
+<td>RPL</td>
+<td>Aligning Recovery Plan</td>
+<td>CP-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-RPL-RRO</td>
+<td>RPL</td>
+<td>Reviewing Recovery Objectives</td>
+<td>CP-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-RPL-TRC</td>
+<td>RPL</td>
+<td>Testing Recovery Capabilities</td>
+<td>CP-10</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SCR-MIT</td>
+<td>SCR</td>
+<td>Mitigating Supply Chain Risk</td>
+<td>SA-22</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SCR-MON</td>
+<td>SCR</td>
+<td>Monitoring Supply Chain Risk</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SVC-ACM</td>
+<td>SVC</td>
+<td>Automating Configuration Management</td>
+<td>CM-2, CM-6</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SVC-ASM</td>
+<td>SVC</td>
+<td>Automating Secret Management</td>
+<td>—</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SVC-EIS</td>
+<td>SVC</td>
+<td>Evaluating and Improving Security</td>
+<td>SC-39, SC-7</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SVC-PRR</td>
+<td>SVC</td>
+<td>Preventing Residual Risk</td>
+<td>SC-4</td>
+<td>b, c</td>
+</tr>
+<tr>
+<td>KSI-SVC-RUD</td>
+<td>SVC</td>
+<td>Removing Unwanted Data</td>
+<td>—</td>
+<td>b, c</td>
+</tr>
+<tr>
+<td>KSI-SVC-SIN</td>
+<td>SVC</td>
+<td>Securing Information</td>
+<td>SC-28, SC-4, SC-8, SC-8(1)</td>
+<td>no</td>
+</tr>
+<tr>
+<td>KSI-SVC-VCM</td>
+<td>SVC</td>
+<td>Validating Communications</td>
+<td>—</td>
+<td>b, c</td>
+</tr>
+<tr>
+<td>KSI-SVC-VRI</td>
+<td>SVC</td>
+<td>Validating Resource Integrity</td>
+<td>SI-7</td>
+<td>no</td>
+</tr>
+</tbody>
+</table></div><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/fedramp-ksi.md">docs/fedramp-ksi.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.9.2 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>What kube-noob cannot tell you · kube-noob</title>
+<meta name="description" content="Most security tools document what they find. This page documents what they miss, because a finding you trust for the wrong reason is worse than no…">
+<link rel="canonical" href="https://kube-noob.com/docs/limits/">
+<meta property="og:title" content="What kube-noob cannot tell you · kube-noob">
+<meta property="og:description" content="Most security tools document what they find. This page documents what they miss, because a finding you trust for the wrong reason is worse than no…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/limits/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/" aria-current="page">What kube-noob cannot tell you</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><a href="/docs/website-updates/">Website: what is out of date</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="what-kube-noob-cannot-tell-you">What kube-noob cannot tell you</h1>
+<p>Most security tools document what they find. This page documents what they miss, because a finding you trust for the
+wrong reason is worse than no finding. Everything here is a deliberate boundary, not a backlog item.</p>
+<p>If you are evaluating kube-noob against another tool, read this page first and ask the other tool for its equivalent.</p>
+<h2 id="the-one-sentence-version">The one-sentence version</h2>
+<p>kube-noob reads manifests. It can tell you what you <strong>declared</strong>. It cannot tell you what your cluster <strong>runs</strong>, and
+those differ for reasons that have nothing to do with the quality of the analysis.</p>
+<h2 id="four-claims-that-are-not-the-same-thing">Four claims that are not the same thing</h2>
+<p>Treating these as interchangeable is the commonest way to over-read a clean report.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Claim</th>
+<th>What establishes it</th>
+<th>Does kube-noob establish it?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>This is what the manifest declares</td>
+<td>Static analysis of the files</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>The API server would accept this</td>
+<td>Submitting it to a real API server</td>
+<td>Partly — <code>admission review</code> evaluates offline, which is not the same as the server's answer</td>
+</tr>
+<tr>
+<td>Admission actually enforces this</td>
+<td>The full admission chain, in your cluster, in order</td>
+<td>No</td>
+</tr>
+<tr>
+<td>The workload behaves this way at runtime</td>
+<td>Observation of the running cluster</td>
+<td>No</td>
+</tr>
+</tbody>
+</table></div>
+<p>A clean audit is evidence about the first row. It is not evidence about the fourth.</p>
+<h2 id="rules-that-cannot-be-enforced-at-admission">Rules that cannot be enforced at admission</h2>
+<p><code>kube-noob policy generate</code> emits admission policies for about half the rules on Kubernetes and rather more on
+OpenShift, and lists the rest in the header of every generated file with the reason for each. The table below is
+generated by <code>scripts/doc_numbers.py</code>, so it moves when the rules do. How many depends on the platform, because several rules are OpenShift
+specific and generate there but have nothing to match on plain Kubernetes:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Rules generated</th>
+<th>Not generated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>kubernetes</td>
+<td>47</td>
+<td>46</td>
+</tr>
+<tr>
+<td>openshift 4.20</td>
+<td>54</td>
+<td>39</td>
+</tr>
+</tbody>
+</table></div>
+<p>Run <code>kube-noob policy generate --platform &lt;your platform&gt;</code> and read the header for the list that applies to you.
+The reasons fall into three honest categories:</p>
+<ul>
+<li><strong>The API server already refuses it.</strong> Generating a policy would duplicate a check the cluster performs anyway.</li>
+<li><strong>The rule needs objects admission cannot see.</strong> Admission evaluates one object. "No NetworkPolicy selects this
+  workload" is a fact about a namespace, not about the object being admitted. <code>kube-noob audit</code> checks these over the
+  whole bundle instead.</li>
+<li><strong>The rule belongs in CI, not at admission.</strong> A secret committed to Git is a property of the repository. Every
+  Secret in a running cluster carries its data legitimately.</li>
+</ul>
+<p>This is not a coverage gap being explained away. The rules on that list are ones an admission policy <em>should not</em>
+implement, and a tool that generated a policy for every rule would be producing policies that are wrong. (The two
+counts that used to be in this sentence are gone on purpose: they were hand-kept, they were platform-dependent, and
+one of them was still 78 when the code had 89 rules. The command's own header counts them for your platform.)</p>
+<h2 id="network-reachability-a-policy-verdict-is-not-a-packet">Network reachability: a policy verdict is not a packet</h2>
+<p><code>kube-noob policy reach</code> evaluates AdminNetworkPolicy, NetworkPolicy and BaselineAdminNetworkPolicy in cluster
+precedence order and names the tier, policy and rule that decided. That is a statement about <strong>declared policy</strong>.</p>
+<p>It is not a statement that a packet will or will not arrive. Three separate things must hold, and kube-noob can only
+speak to the first:</p>
+<ol>
+<li><strong>Policy decision</strong> — what the declared policies permit. kube-noob answers this.</li>
+<li><strong>Enforcement capability</strong> — whether the installed network plugin actually enforces those semantics. Kubernetes
+   requires a supporting plugin for NetworkPolicy to do anything at all; installing policy objects on a cluster whose
+   CNI ignores them restricts nothing. For the two admin tiers kube-noob now answers part of this when you name the
+   CNI: <code>--cni calico:3.32</code> reports every <code>AdminNetworkPolicy</code> and <code>BaselineAdminNetworkPolicy</code> in the input as not
+   enforced (Calico removed support in 3.32 and stops applying them silently) and lets the NetworkPolicies decide,
+   and a CNI whose support is undocumented makes the verdict <code>undetermined</code>. NetworkPolicy enforcement itself is
+   still outside what kube-noob can see.</li>
+<li><strong>Observed connectivity</strong> — whether a connection actually succeeded. That needs the running cluster.</li>
+</ol>
+<p>Where kube-noob cannot see a policy that could change the answer — a ClusterNetworkPolicy, a Cilium or Calico
+cluster-scoped policy, a pod on the host network, an egress firewall outside the cluster — it returns
+<strong>UNDETERMINED</strong> and names what it could not read. It does not return <code>allowed</code>.</p>
+<p>That matters more than it sounds. A checker that evaluates the NetworkPolicies it can see and stays quiet about the
+rest gives you a confident answer that is wrong in exactly the environments where cluster-wide guardrails exist. An
+<code>allowed</code> that silently ignored an unread policy is not a weaker answer than UNDETERMINED; it is a false one.</p>
+<p>The same rule applies to malformed input: a policy document that cannot be parsed is <strong>not</strong> the same as a policy
+that does not exist. Skipping it would make the computed connectivity more permissive than reality.</p>
+<h2 id="the-knowledge-ceiling">The knowledge ceiling</h2>
+<p>Rules are checked against Kubernetes versions up to a recorded ceiling (<code>CHECKED_THROUGH</code> in
+<code>src/kube_noob/catalog.py</code>). Ask for a version beyond it and the report says so, in the output, rather than answering
+confidently for a version nobody verified.</p>
+<p>An absent warning means the version was checked. It does not mean the cluster matches the manifest.</p>
+<h2 id="what-is-never-read">What is never read</h2>
+<p>kube-noob does not read Secret data, and no flag enables it. A rule about secret material therefore reasons about
+<em>references</em> — a literal value in an env var, a missing <code>secretKeyRef</code> — never about the value itself. A finding will
+name the field; it will not print the credential.</p>
+<h2 id="out-of-scope-entirely">Out of scope entirely</h2>
+<p>Not gaps to be filled later. Different tools:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Not covered</th>
+<th>Use instead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vulnerabilities inside image layers, SBOM extraction</td>
+<td>Trivy, Grype</td>
+</tr>
+<tr>
+<td>Runtime syscalls, process execution, file integrity</td>
+<td>Falco, and the commercial runtime products</td>
+</tr>
+<tr>
+<td>Cloud IAM, VPC and managed control-plane posture</td>
+<td>A CSPM</td>
+</tr>
+<tr>
+<td>Helm's own error messages and template line numbers</td>
+<td>Nothing, currently — the broken line numbers originate in Helm's renderer, and a tool reading post-render output inherits them. kube-noob audits the rendered manifests and says so.</td>
+</tr>
+<tr>
+<td>Whether a cluster is compliant with a framework</td>
+<td>A mapping is not an attestation. See below.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="compliance-mappings-are-evidence-not-conclusions">Compliance mappings are evidence, not conclusions</h2>
+<p>kube-noob maps findings to NIST SP 800-53 controls and names the matching RHACS policies. That is traceable technical
+evidence an assessor can follow to a control.</p>
+<p>It is not a statement that your organization satisfies that control. Most controls have organizational and process
+components that no manifest contains. A tool that told you otherwise would be selling you a risk, not reducing one.</p>
+<h2 id="why-this-page-exists">Why this page exists</h2>
+<p>The three-valued verdict, the documented 31, and the knowledge ceiling are the same design decision applied in three
+places: say what you do not know, in the output, where it cannot be missed. This page is that decision applied to the
+product as a whole.</p>
+<p>If something on this page is wrong, that is a bug worth reporting.</p><p class="edit-link">Source: <a href="https://github.com/aashishmahajan/kube-noob/blob/main/docs/limits.md">docs/limits.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.9.2 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

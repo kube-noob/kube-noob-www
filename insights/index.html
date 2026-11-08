@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Insights · kube-noob</title>
+<meta name="description" content="kube-noob&#x27;s rules, playbooks, tests and coverage, by the numbers.">
+<link rel="canonical" href="https://kube-noob.com/insights/">
+<meta property="og:title" content="Insights · kube-noob">
+<meta property="og:description" content="kube-noob&#x27;s rules, playbooks, tests and coverage, by the numbers.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/insights/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/journey/">Journey</a><a href="/playground/">Playground</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a><a href="/licensing/">Licensing</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/aashishmahajan/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="prose" style="max-width:900px"><span class="eyebrow">Insights</span><h1>kube-noob by the numbers</h1><p class="lead">Computed from the code when this site was built (2026-11-08). Built-in knowledge reviewed 2026-10-27 (Kubernetes up to 1.35, OpenShift up to 4.22); release-note issues as of 2026-10-27; update risks as of 2026-10-29 (cincinnati-graph-data 7572174a5515, targets 4.18 to 4.22.17). Newer facts come only from web lookups you enable, and those are marked as external.</p></div><section class="band"><div class="stats"><div class="stat"><div class="n">0.9.2</div><div class="l">Version</div></div><div class="stat"><div class="n">93</div><div class="l">Audit rules</div></div><div class="stat"><div class="n">67</div><div class="l">Offline playbooks</div></div><div class="stat"><div class="n">9</div><div class="l">Red-team scenarios</div></div><div class="stat"><div class="n">48</div><div class="l">MCP tools (default)</div></div><div class="stat"><div class="n">65</div><div class="l">Knowledge documents</div></div><div class="stat"><div class="n">957</div><div class="l">Release-note issues</div></div><div class="stat"><div class="n">21</div><div class="l">NIST controls mapped</div></div><div class="stat"><div class="n">63/63</div><div class="l">Self-test</div></div><div class="stat"><div class="n">1988</div><div class="l">Tests in the suite</div></div><div class="stat"><div class="n">5</div><div class="l">Learning tracks</div></div><div class="stat"><div class="n">1.35</div><div class="l">Kubernetes schema</div></div></div></section><section class="band"><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(360px,1fr))"><div class="card"><h3>Audit rules by category</h3><div class="bars" role="table" aria-label="Audit rules by category"><div class="bar-row" title="security: 22"><span>security</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">22</span></div><div class="bar-row" title="network: 16"><span>network</span><div class="track"><div class="fill" style="width:72.7%"></div></div><span class="v">16</span></div><div class="bar-row" title="wiring: 6"><span>wiring</span><div class="track"><div class="fill" style="width:27.3%"></div></div><span class="v">6</span></div><div class="bar-row" title="storage: 6"><span>storage</span><div class="track"><div class="fill" style="width:27.3%"></div></div><span class="v">6</span></div><div class="bar-row" title="schema: 6"><span>schema</span><div class="track"><div class="fill" style="width:27.3%"></div></div><span class="v">6</span></div><div class="bar-row" title="reliability: 5"><span>reliability</span><div class="track"><div class="fill" style="width:22.7%"></div></div><span class="v">5</span></div><div class="bar-row" title="resources: 5"><span>resources</span><div class="track"><div class="fill" style="width:22.7%"></div></div><span class="v">5</span></div><div class="bar-row" title="availability: 5"><span>availability</span><div class="track"><div class="fill" style="width:22.7%"></div></div><span class="v">5</span></div><div class="bar-row" title="platform: 5"><span>platform</span><div class="track"><div class="fill" style="width:22.7%"></div></div><span class="v">5</span></div><div class="bar-row" title="supply-chain: 4"><span>supply-chain</span><div class="track"><div class="fill" style="width:18.2%"></div></div><span class="v">4</span></div><div class="bar-row" title="secrets: 4"><span>secrets</span><div class="track"><div class="fill" style="width:18.2%"></div></div><span class="v">4</span></div><div class="bar-row" title="rbac: 4"><span>rbac</span><div class="track"><div class="fill" style="width:18.2%"></div></div><span class="v">4</span></div><div class="bar-row" title="deprecation: 4"><span>deprecation</span><div class="track"><div class="fill" style="width:18.2%"></div></div><span class="v">4</span></div><div class="bar-row" title="api: 1"><span>api</span><div class="track"><div class="fill" style="width:4.5%"></div></div><span class="v">1</span></div></div></div><div class="card"><h3>Audit rules by default severity</h3><div class="bars" role="table" aria-label="Audit rules by default severity"><div class="bar-row" title="critical: 7"><span>critical</span><div class="track"><div class="fill" style="width:15.2%"></div></div><span class="v">7</span></div><div class="bar-row" title="high: 46"><span>high</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">46</span></div><div class="bar-row" title="medium: 29"><span>medium</span><div class="track"><div class="fill" style="width:63.0%"></div></div><span class="v">29</span></div><div class="bar-row" title="low: 11"><span>low</span><div class="track"><div class="fill" style="width:23.9%"></div></div><span class="v">11</span></div></div></div><div class="card"><h3>Self-test score by area (%)</h3><div class="bars" role="table" aria-label="Self-test score by area (%)"><div class="bar-row" title="everyday: 100%"><span>everyday</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div><div class="bar-row" title="helm: 100%"><span>helm</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div><div class="bar-row" title="kubernetes: 100%"><span>kubernetes</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div><div class="bar-row" title="openshift: 100%"><span>openshift</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div><div class="bar-row" title="rhacs: 100%"><span>rhacs</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div><div class="bar-row" title="rosa-hcp: 100%"><span>rosa-hcp</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">100</span></div></div></div><div class="card"><h3>Release-note issues by OpenShift release</h3><div class="bars" role="table" aria-label="Release-note issues by OpenShift release"><div class="bar-row" title="4.20 fixed: 387"><span>4.20 fixed</span><div class="track"><div class="fill" style="width:100.0%"></div></div><span class="v">387</span></div><div class="bar-row" title="4.20 known: 27"><span>4.20 known</span><div class="track"><div class="fill" style="width:7.0%"></div></div><span class="v">27</span></div><div class="bar-row" title="4.21 fixed: 256"><span>4.21 fixed</span><div class="track"><div class="fill" style="width:66.1%"></div></div><span class="v">256</span></div><div class="bar-row" title="4.21 known: 9"><span>4.21 known</span><div class="track"><div class="fill" style="width:2.3%"></div></div><span class="v">9</span></div><div class="bar-row" title="4.22 fixed: 260"><span>4.22 fixed</span><div class="track"><div class="fill" style="width:67.2%"></div></div><span class="v">260</span></div><div class="bar-row" title="4.22 known: 18"><span>4.22 known</span><div class="track"><div class="fill" style="width:4.7%"></div></div><span class="v">18</span></div></div></div></div></section><section class="band prose" style="max-width:none"><h2>Roadmap status</h2><p>Everything below is in the released code unless the row says otherwise. Dates are release dates.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Status</th>
+<th>Release</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offline lock, <code>doctor</code>, web GET-only and text-only; diagnose-first playbooks; redacted bundle</td>
+<td>Done</td>
+<td>0.2.0</td>
+</tr>
+<tr>
+<td>"No AI inside" stated and enforced by a test; plugin runs bundled source from a hash-pinned <code>uv.lock</code>; PRIVACY.md</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>CI on Kubernetes 1.33-1.37 (OpenShift 4.20, 4.21, 4.22, next); sidecar under Pod Security restricted</td>
+<td>Done</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td>Chart: generated token, namespace-scoped RBAC, optional EgressFirewall, signed OCI chart; Homebrew</td>
+<td>Done</td>
+<td>0.2.1-0.2.3</td>
+</tr>
+<tr>
+<td>Reported issues matched to the OpenShift release notes with link, fix version and workaround</td>
+<td>Done</td>
+<td>0.3.0</td>
+</tr>
+<tr>
+<td>Audit findings name their NIST SP 800-53 Rev. 5 controls; <code>doctor</code> reports FIPS mode; FedRAMP High deployment guide</td>
+<td>Done</td>
+<td>0.3.1</td>
+</tr>
+<tr>
+<td>Policy debugging: six admission systems explained from a denial, with the smallest fix; NetworkPolicy reachability</td>
+<td>Done</td>
+<td>0.3.1</td>
+</tr>
+<tr>
+<td>Incident watch: always-on read-only detection, each incident explained once with what changed before it</td>
+<td>Done</td>
+<td>0.4.0</td>
+</tr>
+<tr>
+<td>Red Hat Jira copy and known-issue answers that say what became of the ticket</td>
+<td>Done</td>
+<td>0.5.0</td>
+</tr>
+<tr>
+<td>Playbooks for the weakest technologies; triage tuned on a training set and checked on real posts</td>
+<td>Done</td>
+<td>0.6.0</td>
+</tr>
+<tr>
+<td><code>policy migrate-check</code> for legacy Kyverno; generated safety contract and scorecard; Ceph health codes</td>
+<td>Done</td>
+<td>0.7.0</td>
+</tr>
+<tr>
+<td>HTTP server hardening: connection-burst 503, per-caller state, health-endpoint abuse, body limit, nesting guard</td>
+<td>Done</td>
+<td>0.7.1</td>
+</tr>
+<tr>
+<td>ANP -&gt; NetworkPolicy -&gt; BANP precedence evaluated offline, naming the deciding tier, policy and rule</td>
+<td>Done</td>
+<td>0.7.1</td>
+</tr>
+<tr>
+<td>An unread cluster-scoped policy is <code>undetermined</code> and exit 1, for a pasted file and for <code>policy reach</code> against the cluster. That covers <code>ClusterNetworkPolicy</code>, <code>CiliumClusterwideNetworkPolicy</code> (<code>cilium.io/v2</code>) and Calico <code>GlobalNetworkPolicy</code> (<code>crd.projectcalico.org/v1</code>). None of those is parsed. A namespace <code>CiliumNetworkPolicy</code> still does not flip pod-to-pod traffic</td>
+<td>Done</td>
+<td>Unreleased</td>
+</tr>
+<tr>
+<td>Zero-install path proven: <code>kubectl apply 2&gt;&amp;1 \| uvx --from kube-noob kube-noob policy explain</code>, 9 s cold</td>
+<td>Done</td>
+<td>Unreleased</td>
+</tr>
+<tr>
+<td>OpenShift Helm catalog (community) submission</td>
+<td><strong>Not started.</strong> The <code>OWNERS</code> pull request has never merged; nothing is in <code>charts.openshift.io</code>. Blocks the chart PR behind it</td>
+<td>after 0.8.0</td>
+</tr>
+<tr>
+<td>Claude plugin directory listing</td>
+<td><strong>Held, not actionable.</strong> Ten versions, all "In review". The hold is <code>Runs a pinned npx or uvx package</code>, which the directory's own checklist lists as held by design for any launcher. Escalated</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Admission under a real <code>restricted-v2</code> SCC in CI</td>
+<td>At risk: needs an OpenShift cluster for CI</td>
+<td>Next</td>
+</tr>
+<tr>
+<td><code>corpus-refresh</code>, <code>db-image</code> scheduled workflows</td>
+<td><strong>One of the two is fixed; the other is not.</strong> Verified 2026-11-05 from the run history. <code>corpus-refresh</code> failed every run from 2026-10-31 to 2026-11-03 12:50Z and has been green on both due runs since (2026-11-03 22:35Z and 2026-11-05 13:15Z, the second taking 46 minutes, so it did the work): the 123 person-shaped findings were mostly a false positive the gate manufactured itself by scanning <code>text + " " + title</code>, so a pattern could match across the join between two separately scrubbed fields and flag a leak that existed in neither (G179, G182). This row also used to say the scrubber MISSES bare Atlassian account ids; it does not -- <code>BARE_ACCOUNT_ID</code> has matched them since it was written, and the live problem is that it over-matches onto <code>sha256:</code> digest fragments, which <a href="/docs/operations/">operations.md</a> says not to narrow for cosmetics. <code>db-image</code> has failed five runs in a row through 2026-11-05: the bundler still packs a VEX member its own 300 MB checker rejects, and sharding versus filtering versus compressing is the owner's decision, not a fix. <strong>And a third thing, found while checking the first two:</strong> with <code>JIRA_EVERY_DAYS=2</code> (the default since #35) a not-due run skips every step and reports <strong>success</strong>, so a run that did nothing is indistinguishable in <code>gh run list</code>, in the badge and in a glance from one that fetched and passed the privacy gate -- a skipped check reading as a pass, which is the defect this project exists to catch, in its own CI. Three ways out, each with a cost: express the cadence in the cron itself and delete the runtime skip (honest, loses the 1-or-2 repository variable); have a not-due run verify the restored copy instead of nothing (honest and keeps the variable, but runs the privacy gate daily and so fails on more days); or leave it and accept that the green means "not due" half the time. The first is recommended</td>
+<td>0.8.0</td>
+</tr>
+</tbody>
+</table></div><p><a href="/docs/roadmap/">Full roadmap</a></p></section>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.9.2 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/aashishmahajan/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>
