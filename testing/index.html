@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>How it is tested · kube-noob</title>
+<meta name="description" content="The rule that an absence must never read as a pass, the false-pass cases, the one output boundary and the twenty-six defect classes the adversarial reviews keep finding.">
+<link rel="canonical" href="https://kube-noob.com/testing/">
+<meta property="og:title" content="How it is tested · kube-noob">
+<meta property="og:description" content="The rule that an absence must never read as a pass, the false-pass cases, the one output boundary and the twenty-six defect classes the adversarial reviews keep finding.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/testing/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">How it is tested</span>
+<h1>How do you know it is not quietly passing?</h1>
+<p class="lead">One rule decides most of this project's tests: <b>an absence, an unknown or an unrecognised shape
+must never read as a pass, a zero, or "complete".</b> Verdicts are three-valued, and what was not read is part of
+the answer -- in the text view, in JSON and YAML, and in the MCP result alike.</p></div>
+<section class="band"><div class="stats">
+  <div class="stat"><div class="n">63/63</div><div class="l">Self-test, run at this build</div></div>
+  <div class="stat"><div class="n">4093</div><div class="l">Tests in the suite</div></div>
+  <div class="stat"><div class="n">26</div>
+  <div class="l">Defect classes the reviews keep finding</div></div>
+  <div class="stat absence"><div class="n">8</div><div class="l">Tests in
+  <code>test_false_clean.py</code>, over the places below</div></div>
+</div></section>
+<section class="band"><h2>The false-pass cases</h2>
+<p class="sub">Four places that reported a clean result without having checked anything. Each is the same shape -- silence read as satisfaction -- and each was
+found by asking what the output asserts, not what the code does. The 8 tests below hold them, several
+of them the negative control: the entry has to be <i>absent</i> when the check really did run, or it is noise that
+trains people to skip it.</p>
+<ul class="trust"><li><code>test_the_gate_says_the_manifest_audit_did_not_run_when_it_had_nothing_to_audit</code></li><li><code>test_the_gate_still_lists_nothing_when_everything_ran</code></li><li><code>test_an_assertion_with_no_recognised_operator_is_refused_not_passed</code></li><li><code>test_an_assertion_that_only_checks_presence_is_still_allowed</code></li><li><code>test_the_shipped_benchmark_assertions_all_carry_a_recognised_operator</code></li><li><code>test_the_jira_scrubber_is_at_least_as_strong_as_the_detector_that_gates_it</code></li><li><code>test_the_scrubber_leaves_ordinary_text_alone</code></li><li><code>test_the_bundle_checks_its_own_size_caps_instead_of_leaving_them_to_the_reader</code></li></ul>
+<p class="note">The first of them is why <code>kube-noob gate</code> has a "Not run" section that is never present
+and empty: a pipeline whose manifest glob stopped matching used to keep passing, exit 0, and print an empty
+section -- which positively asserts that nothing was left out.</p></section>
+<section class="band"><h2>One output boundary, and you can see it work</h2>
+<p class="sub">Every text kube-noob writes -- stdout and stderr, every command but the three servers -- goes
+through one place that marks what a reader cannot see and defuses what a CI runner would execute. Always: not only
+under <code>GITHUB_ACTIONS</code> and not only off a terminal, because a log is replayed and the same input has to
+give the same bytes. The rows below are real calls into that boundary, made while this page was built.</p>
+<div class="table-wrap"><table><thead><tr><th>In the input</th><th>On your screen</th><th>Why</th></tr></thead>
+<tbody><tr><td><code>openshift​-etcd</code></td><td><code>openshift&lt;U+200B&gt;-etcd</code></td><td>A zero-width space inside a name is marked, never spliced out: two different objects must not print as one.</td></tr><tr><td><code>##[set-output name=result]passed</code></td><td><code>##&lt;U+005B&gt;set-output name=result]passed</code></td><td>A CI runner reads that anywhere in a line. A name in a manifest cannot set a step output.</td></tr><tr><td><code>::error title=gate::All checks passed</code></td><td><code>&lt;U+003A&gt;:error title=gate::All checks passed</code></td><td>Nor forge an annotation in the step that printed it.</td></tr></tbody></table></div>
+<p class="note">Marked, never removed: a character taken out silently turns two different names into one, which is
+the bug in the other direction. Azure Pipelines (<code>##vso[</code>) and TeamCity (<code>##teamcity[</code>) read
+theirs anywhere in a line too, and are treated the same. Documents stay lossless -- JSON writes the bracket as
+<code>\u005b</code>.</p></section>
+<section class="band"><h2>The twenty-six classes</h2>
+<p class="sub">Eleven branches, about thirty read-only adversarial review rounds, about three hundred confirmed
+defects. Every branch had passed the full gate and had tests; every defect was a shape the author's tests had not
+tried. The table is in the repository so the next change is tested against it -- and it is the most useful page here
+if you are deciding whether to build on this.
+<a href="/docs/review-classes/">The full document</a>.</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Class</th><th>What it looked like</th>
+<th>The test shape that holds it</th></tr></thead><tbody><tr><td>1</td><td><b>A skipped input reads as complete</b></td><td>A file that could not be parsed, was empty, was a symlink, was over a size cap, or held no object of the expected kind was dropped and the verdict stayed complete, exit 0; a manifest whose <code>apiVersion</code> key was spelled <code>apiversion</code> was given the answer a CI workflow gets, and a privileged pod passed the gate and was allowed before the apply (G325)</td><td>Every skip, at every layer, appears in the answer; a fixture per skip reason asserts the verdict is not &quot;complete&quot;, and a structural test fails when a new skip reason is added without deciding whether it forbids a verdict</td></tr><tr><td>2</td><td><b>Truncation hides the worst item</b></td><td>Caps applied in arrival or alphabetical order cut the most severe finding; the summary was computed after the cut</td><td>Summaries from untruncated data; truncate lowest severity first; the withheld count stated in every format</td></tr><tr><td>3</td><td><b>Substring matching on errors or kinds</b></td><td>Any error containing &quot;not found&quot; read as &quot;API not installed&quot;; <code>kind</code> matched without its group</td><td>Match the backend&#x27;s own whole line; require the group; a foreign kind of the same name is a different kind</td></tr><tr><td>4</td><td><b>An unrecognised value reads as the benign default</b></td><td>A missing <code>status</code>, an unknown phase, a YAML bool where a string was expected, a scalar where a list was expected → &quot;healthy&quot;, &quot;none&quot;, &quot;no problem&quot;</td><td>Unrecognised is not determined, with the field named</td></tr><tr><td>5</td><td><b>Duplicates and ordering</b></td><td>Two objects with one kind/namespace/name: one picked silently by sort or document order; output differed under shuffle</td><td>Conflicts flagged; canonical order before analysis; a shuffled-input test asserts identical bytes</td></tr><tr><td>6</td><td><b>The caveat exists only in JSON</b></td><td>Limitations and not-determined reasons missing from the text view, the diagram, or the sibling command that embeds the result</td><td>Parity test per format for every caveat field</td></tr><tr><td>7</td><td><b>Input-derived strings forge output</b></td><td>A newline in a path forged a row; invisible Unicode (U+061C, U+00AD, the tag block, bidi overrides) reached output</td><td>Every input-derived string through the one output boundary; hidden characters marked, never spliced</td></tr><tr><td>8</td><td><b>Docs claim what the code does not do</b></td><td>CHANGELOG and guidance stated behaviours later defects contradicted</td><td>Every doc sentence written after a test holds it; the guidance row cites that test</td></tr><tr><td>9</td><td><b>A second source of truth</b></td><td>A private copy of a list the audit already owned was a strict subset of it</td><td>Import the shared one; a test asserts there is one list</td></tr><tr><td>10</td><td><b>Tests that fail only in CI</b></td><td>Wall-clock ratios on a shared runner; a hostname substring tripping CodeQL; an identifier containing <code>secret</code> reaching print. Recurred as class 21: G263 fixed two wall-clock budgets and left thirty-four, two of which later blocked merges (G326)</td><td>Count operations, not time; compare whole tokens; name fields the way the module&#x27;s neighbours do. A timing assertion states the shape of the regression it guards and lets <code>tests/bounds.py</code> derive the ceiling; <code>tests/test_timing_assertions.py</code> refuses a new raw one</td></tr><tr><td>11</td><td><b>The object asked about is not the object answered</b></td><td>A Pod anchor was answered from its owner&#x27;s spec</td><td>Score the object the user named; a test with owner and pod disagreeing</td></tr><tr><td>12</td><td><b>Quadratic loops inside caps</b></td><td>An index rebuilt per item made a within-bounds input take minutes</td><td>A test at the cap with a time budget expressed as an operation count</td></tr><tr><td>13</td><td><b>The verdict word contradicts the counts</b></td><td><code>complete: true, exit 0</code> with 0 of 30 items matched; <code>stored: true</code> for a record deleted in the same call; <code>satisfied</code> for a control whose only rule had nothing to look at; a score of 100 beside &quot;containers were NOT audited&quot;</td><td>One predicate decides the headline word and every renderer calls it; a test per renderer that the word agrees with the numbers beside it</td></tr><tr><td>14</td><td><b>A rule about an absent kind counts as evaluated and clean</b></td><td>No Pod in the input is not &quot;pod security clean&quot;</td><td>No subject → not evaluated; every rule declares its subjects and a static test checks the declaration against what the rule reads</td></tr><tr><td>15</td><td><b>A match tier hides what it did not match</b></td><td>&quot;Named: 4 fixed bugs&quot; while 17 open ones used another word for the same thing</td><td>Say what the matcher cannot see, per item; never present a partial match as the list</td></tr><tr><td>16</td><td><b>A crash, an empty stdout or a truncated document is read as an answer</b></td><td>Unexpected exceptions exiting 1; a reader that left mid-document getting a partial file and exit 0</td><td>Unexpected exceptions exit 4; documents are written whole or not at all; a closed pipe is exit 141</td></tr><tr><td>17</td><td><b>Untrusted text in fields that read as the tool&#x27;s own words</b></td><td>Titles, messages, evidence and suggested commands built from input</td><td>Clean it, mark it, never build a command from it</td></tr><tr><td>18</td><td><b>A fixed, guessable delimiter, temp path or id</b></td><td>Heredoc terminators, <code>/tmp/name.txt</code>, sequential ids</td><td>Random delimiters; per-run directories; ids from a hash</td></tr><tr><td>19</td><td><b>A network-reachable endpoint with no time budget</b></td><td>One in-bounds request took a minute and starved the health check</td><td>A budget per request, enforced in a child the parent kills</td></tr><tr><td>20</td><td><b>A default that silently loses data across replicas or sessions</b></td><td>Per-pod storage behind a Service; a shared temp file between sessions</td><td>A test with two replicas or two sessions</td></tr><tr><td>21</td><td><b>Fixing the reported shape, not its neighbours</b></td><td>The fix covered the exact input in the report; the other wrapper, the other type, the other order still failed</td><td>After every fix, list the adjacent inputs and test each before calling it done</td></tr><tr><td>22</td><td><b>Parsing argv or flags without the real parser&#x27;s rules</b></td><td>A value flag swallowed the next token; <code>$(VAR)</code> was a whole token; <code>--version</code> was taken for a server</td><td>Reuse the real parser&#x27;s rules (pflag, cobra, the shell); test the documented corner cases of that parser</td></tr><tr><td>23</td><td><b>The container&#x27;s own metadata is dropped while its contents are checked</b></td><td>A duplicate key on a <code>List</code> wrapper (its items were checked for duplicate keys); the same object under two must-gather directories (each file was checked); a payload&#x27;s <code>truncatedAlerts</code> count (each alert was checked)</td><td>For every container shape, a test that a defect on the wrapper itself is reported</td></tr><tr><td>24</td><td><b>A refusal is read as an absence one layer up</b></td><td><code>audit</code> refused an object and said so in an assumption line; <code>gate</code> read the empty result as &quot;no pod spec in the input&quot; and passed</td><td>A refused object makes the verdict undetermined in every command that embeds the result; the phrase &quot;not in the input&quot; is never printed for an object that was present</td></tr><tr><td>25</td><td><b>A fix applied to one surface, not its siblings</b></td><td>The score was withheld beside a declined rule, but not beside an unread pod spec or a refused group, which are the same kind of record</td><td>Fix the predicate, not the call site; grep every caller of the old predicate and test each</td></tr><tr><td>26</td><td><b>A limit set above the resource it protects</b></td><td>A daily cap of 80 licence mails against a quota of about 100, with a second form drawing on the same quota; a per-address hourly cap when the attacker has unlimited addresses</td><td>Caps expressed as a reserve of the shared resource, tested at the edge (the request that empties it)</td></tr></tbody></table></div></section>
+<section class="band"><h2>Test it on your own problems</h2>
+<p class="sub">Feed it the questions, incident snippets, events, logs, alert payloads and manifests your teams
+actually hit, and get a scorecard. A case with expectations passes or fails; a case without any is run and reported
+as <code>unlabelled</code>, so a list of raw questions is a valid first file. Nothing is learned automatically and
+nothing leaves the machine.</p>
+<div class="run"><pre class="out"><code>$ kube-noob selftest --cases problems.yaml</code></pre></div>
+<p class="note">There is no model to tune, so a failure becomes a change someone reviews -- a playbook, a signal, a
+rule or a team-memory entry. The eval over 25,292 public questions, its held-out sample and what it got wrong are
+in the repository: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/evals/community-questions.md" rel="noopener">docs/evals</a>.
+The rule each change has to cite is in <a href="/docs/guidance/">guidance</a>.</p></section>
+<section class="band"><h2>One question each</h2><p class="sub">Every page below shows the command and the output this build got from it, including what the command said it could not determine.</p><div class="grid features"><a class="card feature" href="/start/"><h3>Start here</h3><p>Install it, then the first five minutes: the example files, the text views, and what it says when it cannot answer.</p><span class="more">Read it</span></a><a class="card feature" href="/blast-radius/"><h3>If this pod is compromised, what can it reach?</h3><p>Five legs -- exposure, token, RBAC, Secrets, node -- each reached, none, or not determined.</p><span class="more">Read it</span></a><a class="card feature" href="/operators/"><h3>Which operators are installed, and are any reported broken?</h3><p>What OLM installed, from manifests or a must-gather, and what the OpenShift release notes say about it.</p><span class="more">Read it</span></a><a class="card feature" href="/evidence/"><h3>What does a reviewer actually open?</h3><p>One self-contained HTML file, an alert turned into a stored evidence report, SARIF and OSCAL.</p><span class="more">Read it</span></a></div></section>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

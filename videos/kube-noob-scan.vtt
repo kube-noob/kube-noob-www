@@ -1,0 +1,66 @@
+WEBVTT
+
+1
+00:00:00.450 --> 00:00:04.119
+A privileged container, 3
+replicas, shipping to production.
+
+2
+00:00:05.950 --> 00:00:06.750
+So scan it.
+
+3
+00:00:06.750 --> 00:00:08.211
+Here is what kube-noob says.
+
+4
+00:00:10.450 --> 00:00:11.279
+0 findings.
+
+5
+00:00:11.279 --> 00:00:14.973
+Critical, high, medium,
+low: every count is zero.
+
+6
+00:00:17.950 --> 00:00:19.631
+But the gate does not pass.
+
+7
+00:00:19.631 --> 00:00:22.494
+It names the object
+nothing read, and exits 1.
+
+8
+00:00:26.450 --> 00:00:28.508
+The container is still privileged.
+
+9
+00:00:28.508 --> 00:00:31.838
+The kind holding it is one
+kube-noob has no reader for,
+
+10
+00:00:31.838 --> 00:00:33.533
+so its pods were never read.
+
+11
+00:00:35.450 --> 00:00:36.910
+That is the whole rule.
+
+12
+00:00:36.910 --> 00:00:41.924
+An absence, an unknown, or a shape it
+does not recognise never reads as a pass,
+
+13
+00:00:41.924 --> 00:00:43.194
+a zero, or complete.
+
+14
+00:00:44.383 --> 00:00:46.677
+Find out what your own gate did not read.
+
+15
+00:00:46.677 --> 00:00:48.244
+Get it at kube-noob dot com.

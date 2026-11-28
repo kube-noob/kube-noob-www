@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Operators · kube-noob</title>
+<meta name="description" content="kube-noob operators inventory and operators issues: what OLM installed, and what the OpenShift release notes report about it.">
+<link rel="canonical" href="https://kube-noob.com/operators/">
+<meta property="og:title" content="Operators · kube-noob">
+<meta property="og:description" content="kube-noob operators inventory and operators issues: what OLM installed, and what the OpenShift release notes report about it.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/operators/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Operators</span>
+<h1>Which operators are installed, and are any of them reported broken?</h1>
+<p class="lead">Two questions, the same input: a directory of manifests, a must-gather, or -- when you turn cluster
+access on -- the cluster itself, read-only, from <code>clusterserviceversions</code> and <code>subscriptions</code>
+and nothing else.</p></div>
+<section class="band"><h2>The input</h2><p class="sub">Three objects: one operator with its Subscription, and one
+ClusterServiceVersion whose Subscription is missing. Collect your own with
+<code>oc get csv,sub,ip,og -A -o yaml &gt; olm.yaml</code>.</p>
+<pre><code>apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: ptp-operator.v4.21.0
+  namespace: openshift-ptp
+spec:
+  version: 4.21.0
+status:
+  phase: Succeeded
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: ptp-operator-subscription
+  namespace: openshift-ptp
+spec:
+  channel: stable
+  name: ptp-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
+status:
+  installedCSV: ptp-operator.v4.21.0
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: rhacs-operator.v4.6.0
+  namespace: rhacs-operator
+spec:
+  version: 4.6.0
+status:
+  phase: Succeeded</code></pre></section>
+<section class="band"><h2>What OLM installed</h2>
+<p class="sub">Package, version, catalog, channel, approval mode, the namespaces it serves and its phase. OLM copies
+a ClusterServiceVersion into every namespace an operator serves; the copies are folded into one operator, never
+counted as more installs.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob operators inventory -f olm.yaml</code></pre><pre class="out"><code>operator inventory (manifests): partial -- 2 operators from OLM data; 1 operator state(s) not determined
+counts: 2 operator(s), 2 installed, 0 upgrade pending, 0 awaiting approval, 0 not installed, 0 without a Subscription, 1 not determined, 0 not Succeeded
+  ptp-operator.v4.21.0  package ptp-operator (from the Subscription)  version 4.21.0  state installed  phase Succeeded
+      namespace openshift-ptp
+      subscription ptp-operator-subscription: catalog redhat-operators in openshift-marketplace, channel stable, approval Automatic
+      evidence: manifest
+  rhacs-operator.v4.6.0  package unknown  version 4.6.0  state subscription-not-read  phase Succeeded
+      namespace rhacs-operator
+      catalog unknown, channel unknown, approval unknown (not determined)
+      note: Subscriptions were not read for its namespace: catalog, channel and approval are not determined
+      evidence: manifest
+not read: installplans (not-read, optional: it only adds detail) no InstallPlan in the input, so it was not read
+not read: operatorgroups (not-read, optional: it only adds detail) no OperatorGroup in the input, so it was not read
+caveat: 1 operator(s) have a state that could not be determined from the input
+not covered: Operators installed without OLM (Helm charts, plain manifests, OLM v1 ClusterExtensions) are outside this inventory: it reads operators.coreos.com objects only.</code></pre></div>
+<p class="note">The answer opens with a verdict, <code>partial</code> here, not with a
+count: an input it could not read is named, and an operator whose state it could not determine is reported as such
+-- never as zero operators. Operators installed without OLM (Helm charts, plain manifests, OLM v1 ClusterExtensions) are outside this inventory: it reads operators.coreos.com objects only. <code>--require-complete</code> exits 5 on anything
+but a complete answer.</p></section>
+<section class="band"><h2>What the release notes say about them</h2>
+<p class="sub"><code>operators issues</code> is a lookup in the bundled OpenShift release notes -- not a
+vulnerability scan, and not a gate. The notes key issues by release and text, not by operator or operator version,
+so the match runs through a table of the names the notes use for each package.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob operators issues -f olm.yaml --openshift-version 4.21.5</code></pre><pre class="out"><code>operator known issues (manifests): partial -- 1 of 2 installed operator(s) were not matched against the release notes; 1 named and 0 only mentioned in the OpenShift 4.21 release notes as of 2026-10-27 (3 open, 5 fixed issue(s)); 0 looked up and named in no issue -- incomplete: the inventory is partial (a release-note lookup, not a vulnerability check)
+complete: no; all matched: no
+cluster: OpenShift 4.21.5 (given); searched 4.21
+release notes: OpenShift release notes (openshift/openshift-docs), known and fixed issues, OpenShift 4.20, 4.21, 4.22, as of 2026-10-27
+counts: 2 operator(s), 2 installed, 1 not matched, 1 named, 0 mentioned, 0 named in no issue, 0 no alias, 1 package unknown, 0 not determined, 0 not installed, 0 catalog unverified, 0 not assessed, 3 open and 5 fixed issue(s)
+  openshift-ptp/ptp-operator.v4.21.0  named: the OpenShift 4.21 release notes name this product in 2 issue(s) and only mention it in 6 more
+      package ptp-operator (from the subscription)  version 4.21.0 (spec.version)  state installed  catalog redhat-operators in openshift-marketplace (red-hat)
+      issues: 3 open, 5 fixed
+      OCPBUGS-62719 [open, mentioned, OpenShift 4.20] listed for OpenShift 4.20; no fix listed since
+        The loss of the upstream clock connection does not trigger the degradation of all clock state metrics due to a bug in the clock degradation logic.
+        via &#x27;ts2phc&#x27;: uses &#x27;ts2phc&#x27;, a component name or abbreviation, not the product&#x27;s name
+        workaround: To work around this issue, rely on &#x27;dpll&#x27; and &#x27;T-BC&#x27; clock state metrics only, and disregard &#x27;ptp4l&#x27; and &#x27;ts2phc&#x27; metrics.
+        no fix listed (installedHasFix: no-fix-listed)
+        https://redhat.atlassian.net/browse/OCPBUGS-62719  source https://github.com/openshift/openshift-docs/blob/a28e76ff671df01eb6d75f305153dc6a01039c60/modules/rn-ocp-release-notes-known-issues.adoc  (as of 2026-10-27)
+      OCPBUGS-63158 [open, mentioned, OpenShift 4.20] listed for OpenShift 4.20; no fix listed since
+        Using a Telecom Time Synchronous Clock (T-TSC) configuration causes the ts2phc metrics to report &quot;unlocked&quot; instead of &quot;locked&quot;.
+        via &#x27;ts2phc&#x27;: uses &#x27;ts2phc&#x27;, a component name or abbreviation, not the product&#x27;s name
+        workaround: To work around this issue, remove the `ts2phc` metric.
+        no fix listed (installedHasFix: no-fix-listed)
+        https://redhat.atlassian.net/browse/OCPBUGS-63158  source https://github.com/openshift/openshift-docs/blob/a28e76ff671df01eb6d75f305153dc6a01039c60/modules/rn-ocp-release-notes-known-issues.adoc  (as of 2026-10-27)
+      RHEL-93579 [open, mentioned, OpenShift 4.20] listed for OpenShift 4.20; no fix listed since
+        Deleting and recreating test workloads with a BlueField-3 NIC causes clock jumps due to inconsistent PTP synchronization.
+        via &#x27;PTP&#x27;: uses &#x27;PTP&#x27;, a component name or abbreviation, not the product&#x27;s name
+        no fix listed (installedHasFix: no-fix-listed)
+        https://redhat.atlassian.net/browse/RHEL-93579  source https://github.com/openshift/openshift-docs/blob/a28e76ff671df01eb6d75f305153dc6a01039c60/modules/rn-ocp-release-notes-known-issues.adoc  (as of 2026-10-27)
+      OCPBUGS-77473 [fixed, named, OpenShift 4.21]
+        Before this update, when going into holdover a new data set was defined for the `ts2phc` command as it started reporting offsets, which did not meet the minimum number of samples.
+        via &#x27;PTP Operator&#x27;: names the product
+        fix listed for OpenShift 4.21.16; cluster at 4.21.5: after; in this operator: not-determined
+        https://redhat.atlassian.net/browse/OCPBUGS-77473  source https://github.com/openshift/openshift-docs/blob/d0ab121d9b4e0696c40e45c282233f03adc219a0/modules/zstream-4-21-16.adoc  (as of 2026-10-27)
+      OCPBUGS-73795 [fixed, named, OpenShift 4.21]
+        Before this update, when the PTP Operator monitored the digital phase-locked loop (DPLL) offset, and the DPLL reached a steady state, the offset value could be temporarily below the threshold to be considered locked because of the high variability of the offset.
+        via &#x27;PTP Operator&#x27;: names the product
+        fix listed for OpenShift 4.21.4; cluster at 4.21.5: at-or-before; in this operator: not-determined
+        https://redhat.atlassian.net/browse/OCPBUGS-73795  source https://github.com/openshift/openshift-docs/blob/d0ab121d9b4e0696c40e45c282233f03adc219a0/modules/zstream-4-21-4.adoc  (as of 2026-10-27)
+      OCPBUGS-105275 [fixed, mentioned, OpenShift 4.21]
+        Before this update, on a Telecom Boundary Clock (T-BC) PTP configuration, `ts2phc` could start before the upstream PTP source was stable enough and before `phc2sys` was ready.
+        via &#x27;ts2phc&#x27;: uses &#x27;ts2phc&#x27;, a component name or abbreviation, not the product&#x27;s name
+        fix listed for OpenShift 4.21.29; cluster at 4.21.5: after; in this operator: not-determined
+        https://redhat.atlassian.net/browse/OCPBUGS-105275  source https://github.com/openshift/openshift-docs/blob/d0ab121d9b4e0696c40e45c282233f03adc219a0/modules/zstream-4-21-29.adoc  (as of 2026-10-27)
+      OCPBUGS-88704 [fixed, mentioned, OpenShift 4.21]
+        Before this update, in Telecom Boundary Clock (T-BC) configurations, the `cloud-event-proxy` parameter previously derived the `CLOCK_REALTIME` (E3) sync state incorrectly due to conflicting code paths and race conditions.
+        via &#x27;cloud-event-proxy&#x27;: uses &#x27;cloud-event-proxy&#x27;, a component name or abbreviation, not the product&#x27;s name
+        fix listed for OpenShift 4.21.25; cluster at 4.21.5: after; in this operator: not-determined
+        https://redhat.atlassian.net/browse/OCPBUGS-88704  source https://github.com/openshift/openshift-docs/blob/d0ab121d9b4e0696c40e45c282233f03adc219a0/modules/zstream-4-21-25.adoc  (as of 2026-10-27)
+      OCPBUGS-77871 [fixed, mentioned, OpenShift 4.21]
+        Before this update, after you killed the `cloud-event-process` process on the sidecar of the `linuxptp-daemon` pod with the boundary clock (BC) configuration, the clock class was missing.
+        via &#x27;linuxptp-daemon&#x27;: uses &#x27;linuxptp-daemon&#x27;, a component name or abbreviation, not the product&#x27;s name
+        fix listed for OpenShift 4.21.9; cluster at 4.21.5: after; in this operator: not-determined
+        https://redhat.atlassian.net/browse/OCPBUGS-77871  source https://github.com/openshift/openshift-docs/blob/d0ab121d9b4e0696c40e45c282233f03adc219a0/modules/zstream-4-21-9.adoc  (as of 2026-10-27)
+  rhacs-operator/rhacs-operator.v4.6.0  package-unknown: its package is not known (no Subscription or olm.package property names it), so it was not looked up; the CSV&#x27;s name is not used to guess it
+      package unknown  version 4.6.0 (spec.version)  state subscription-not-read  catalog not named (unknown)
+      note: whether this operator is installed was not determined by the inventory
+inventory: partial -- 2 operators from OLM data; 1 operator state(s) not determined
+incomplete: the inventory is partial
+caveat: inventory: 1 operator(s) have a state that could not be determined from the input
+caveat: 1 operator(s) have no known package and were not matched
+caveat: the inventory could not say whether these are installed: rhacs-operator/rhacs-operator.v4.6.0
+fix: A fix is listed for an OpenShift release. The release notes do not say whether it ships in the OpenShift payload or in the operator&#x27;s own bundle, which OLM updates from its catalog on its own schedule, so whether this operator has it is not determined. fixReleaseVsCluster compares only the listed release with the cluster&#x27;s version: at-or-before, after, or unknown when either has no update number.
+method: A release-note lookup, not a vulnerability check: each operator&#x27;s package is looked up in a table of the names the OpenShift release notes use for it, and the issues whose text uses them are listed -- &#x27;named&#x27; for the product&#x27;s name, &#x27;mentioned&#x27; for a component name or an issue that also names another product or the platform. The notes key issues by OpenShift release and text, not by operator or operator version, so an issue that uses none of those names is not found, &#x27;named&#x27; says the notes name it, not that it is affected, and whether an installed operator carries a fix is not determined.</code></pre></div>
+<p class="note">Read the verdicts, not the count. <code>named</code> means the notes name that operator, not that
+your version is affected; <code>no-alias</code> means kube-noob has no entry saying what name the notes use for the
+package, which is <b>not</b> the same as no reported issue; and whether an installed operator already carries a fix
+is not determined, because the notes do not say whether a fix ships in the OpenShift payload or in the operator's own
+bundle.</p></section>
+<section class="band"><h2>From an MCP client</h2><p class="sub">The same answers as tools:
+<code>kubenoob_operator_inventory</code> takes the objects as YAML, <code>kubenoob_cluster_operator_inventory</code>
+reads the cluster when cluster access is on, and <code>kubenoob_analyze_must_gather</code> returns the inventory as
+<code>operatorInventory</code>. <a href="/reference/mcp/">Every tool and its schema</a>.</p></section>
+<section class="band"><h2>One question each</h2><p class="sub">Every page below shows the command and the output this build got from it, including what the command said it could not determine.</p><div class="grid features"><a class="card feature" href="/start/"><h3>Start here</h3><p>Install it, then the first five minutes: the example files, the text views, and what it says when it cannot answer.</p><span class="more">Read it</span></a><a class="card feature" href="/blast-radius/"><h3>If this pod is compromised, what can it reach?</h3><p>Five legs -- exposure, token, RBAC, Secrets, node -- each reached, none, or not determined.</p><span class="more">Read it</span></a><a class="card feature" href="/evidence/"><h3>What does a reviewer actually open?</h3><p>One self-contained HTML file, an alert turned into a stored evidence report, SARIF and OSCAL.</p><span class="more">Read it</span></a><a class="card feature" href="/testing/"><h3>How do you know it is not quietly passing?</h3><p>The defect classes the adversarial reviews keep finding, and the tests that hold each one.</p><span class="more">Read it</span></a></div></section>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

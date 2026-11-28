@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A packet meets a NetworkPolicy (network) - kube-noob mechanism walk</title>
+<style>
+:root{--sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+--header-h:52px;--story-w:360px;--radius:6px}
+:root{color-scheme:light;--bg:#f3f6fc;--panel:#fff;--raised:#eef2fa;--line:#d3dcee;--line-strong:#b3c2e1;
+--grid:rgba(50,90,170,.08);--text:#14203c;--dim:#4f5d7d;--faint:#8391ad;--accent:#326ce5;--accent-text:#2556c4;
+--accent-soft:rgba(50,108,229,.11);--on-accent:#fff;--l-api:#2563d9;--l-state:#0b7d71;--l-control:#955500;
+--l-node:#6a45d6;--l-scale:#a21caf;--l-drop:#c62f2f;--ok:#15803d;--iso-top:#fff;--iso-left:#e8eefb;
+--iso-right:#d9e3f7;--iso-line:#2f5fd0;--iso-detail:#2f5fd0;--display:#e3ebfb;--iso-hot-top:#e1eaff;
+--iso-hot-left:#cfdcfc;--iso-hot-right:#bccff8;--link:#b3c2e1;--floor:rgba(47,95,208,.035);--floor-edge:#e6ecf8;
+--iso-other-top:#f3f4f7;--iso-other-left:#e6e8ee;--iso-other-right:#d9dce5;--iso-other-line:#98a2b8;
+--shadow:0 18px 50px rgba(20,32,60,.18)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#080d1b;--panel:#0c1326;--raised:#121b35;--line:#1f2d55;--line-strong:#2f4378;
+--grid:rgba(120,150,230,.07);--text:#d6e0f7;--dim:#98a6c8;--faint:#5f6d92;--accent:#326ce5;--accent-text:#7ea6ff;
+--accent-soft:rgba(50,108,229,.18);--on-accent:#fff;--l-api:#6ea8ff;--l-state:#2dd4bf;--l-control:#f5b83d;
+--l-node:#a78bfa;--l-scale:#f0abfc;--l-drop:#f87171;--ok:#3ccf8e;--iso-top:#1b2b52;--iso-left:#142245;
+--iso-right:#0f1a38;--iso-line:#79a0ff;--iso-detail:#a9c2ff;--display:#0a1633;--iso-hot-top:#26478f;
+--iso-hot-left:#1c3878;--iso-hot-right:#152d63;--link:#2a3f72;--floor:rgba(121,160,255,.035);--floor-edge:#0c1326;
+--iso-other-top:#232a3c;--iso-other-left:#1b2131;--iso-other-right:#161b29;--iso-other-line:#56607a;
+--shadow:0 18px 50px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#080d1b;--panel:#0c1326;--raised:#121b35;--line:#1f2d55;--line-strong:#2f4378;
+--grid:rgba(120,150,230,.07);--text:#d6e0f7;--dim:#98a6c8;--faint:#5f6d92;--accent:#326ce5;--accent-text:#7ea6ff;
+--accent-soft:rgba(50,108,229,.18);--on-accent:#fff;--l-api:#6ea8ff;--l-state:#2dd4bf;--l-control:#f5b83d;
+--l-node:#a78bfa;--l-scale:#f0abfc;--l-drop:#f87171;--ok:#3ccf8e;--iso-top:#1b2b52;--iso-left:#142245;
+--iso-right:#0f1a38;--iso-line:#79a0ff;--iso-detail:#a9c2ff;--display:#0a1633;--iso-hot-top:#26478f;
+--iso-hot-left:#1c3878;--iso-hot-right:#152d63;--link:#2a3f72;--floor:rgba(121,160,255,.035);--floor-edge:#0c1326;
+--iso-other-top:#232a3c;--iso-other-left:#1b2131;--iso-other-right:#161b29;--iso-other-line:#56607a;
+--shadow:0 18px 50px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+h1,h2,p,dl,dd,ol,ul{margin:0;padding:0}
+ol,ul{list-style:none}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+a{color:inherit}
+code,kbd{font-family:var(--mono)}
+code.in{font-size:.92em;background:var(--raised);border:1px solid var(--line);border-radius:4px;padding:0 4px;
+overflow-wrap:anywhere}
+kbd{font-size:11px;font-weight:500;padding:0 5px;border:1px solid var(--line-strong);border-radius:4px;
+color:var(--dim);background:var(--raised);white-space:nowrap;line-height:18px}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;
+stroke-linejoin:round;flex:none}
+.ico .fill{fill:currentColor}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+.kicker{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+color:var(--accent-text)}
+.btn{height:32px;padding:0 14px;border:1px solid var(--line-strong);background:var(--raised);
+border-radius:var(--radius);font-size:13px;font-weight:600;display:inline-flex;align-items:center;
+justify-content:center;gap:8px;white-space:nowrap;text-decoration:none}
+.btn:hover{border-color:var(--accent-text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.ibtn{width:32px;height:32px;border:1px solid var(--line-strong);border-radius:var(--radius);display:inline-flex;
+align-items:center;justify-content:center;gap:4px;color:var(--dim);background:var(--panel);flex:none}
+.ibtn:hover{color:var(--text);border-color:var(--accent-text)}
+.ibtn:disabled{opacity:.4;cursor:default}
+.ibtn.ghost{border-color:transparent;background:transparent}
+.ibtn.ghost:hover{border-color:transparent;background:var(--raised)}
+.ibtn[aria-pressed="true"]{color:var(--accent-text);background:var(--accent-soft)}
+.link-btn{display:inline-flex;align-items:center;gap:4px;min-height:24px;font-size:12.5px;color:var(--dim);
+padding:2px 6px;border-radius:4px;text-decoration:none}
+.link-btn:hover{color:var(--text);background:var(--raised)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;padding:2px;gap:2px;
+background:var(--panel)}
+.seg button{height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--dim);
+display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{color:var(--on-accent);background:var(--accent)}
+.jsonly,.transport,.caption{display:none}
+.js .jsonly,.js .transport{display:flex}
+.js .caption:not([hidden]){display:block}
+
+.shell{height:100vh;height:100dvh;display:flex;flex-direction:column}
+.topbar{height:var(--header-h);flex:none;display:flex;align-items:center;gap:6px;padding:0 12px 0 16px;
+border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:8px;flex:none}
+.brand-mark{width:26px;height:26px}
+.wordmark{font-size:14px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.wordmark .k{font-weight:700;color:var(--accent-text)}
+.topbar-sep{color:var(--faint);margin:0 2px}
+.crumb{height:34px;padding:0 8px;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
+color:var(--dim);flex:none}
+.crumb-here{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tools{margin-left:auto;align-items:center;gap:2px;flex:none}
+:root[data-theme="dark"] .i-moon,:root[data-theme="light"] .i-sun{display:none}
+.workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--story-w);
+grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"stage story" "flow flow"}
+
+.stage{grid-area:stage;position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.canvas{flex:1;min-height:0;position:relative;
+background:radial-gradient(115% 85% at 50% 28%,color-mix(in srgb,var(--panel) 60%,var(--bg)) 0%,var(--bg) 68%)}
+.stage-tools{position:absolute;top:12px;left:12px;right:12px;z-index:2;align-items:center;gap:12px;flex-wrap:wrap}
+.transport{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;gap:6px;align-items:center;
+padding:6px;border:1px solid var(--line-strong);border-radius:14px;
+background:color-mix(in srgb,var(--panel) 90%,transparent);box-shadow:var(--shadow)}
+.transport .ibtn{width:36px;height:36px;border-color:transparent;background:transparent}
+.transport .ibtn:hover:not(:disabled){background:var(--raised);color:var(--text)}
+.transport .ibtn[aria-pressed="true"]{color:var(--accent-text);background:var(--accent-soft)}
+.transport .speed{width:auto;min-width:36px;padding:0 8px;font-family:var(--mono);font-size:11px;font-weight:600}
+.play{min-width:142px;height:36px;border-radius:9px}
+.scene{position:absolute;inset:0;width:100%;height:100%}
+.stage[data-view="sequence"] .scene,.stage[data-view="sequence"] .zoom-ui{display:none}
+.sequence{display:none;position:absolute;inset:56px 0 0;overflow:auto;padding-bottom:150px;
+border-top:1px solid var(--line)}
+.stage[data-view="sequence"] .sequence{display:block}
+
+.floor .floor-top{fill:var(--floor);stroke:var(--line-strong);stroke-width:1}
+.floor .floor-edge{fill:var(--floor-edge);stroke:var(--line-strong);stroke-width:1}
+.iso .floor-grid{stroke:var(--grid);stroke-width:1;fill:none}
+.floor-name{fill:var(--faint);font-family:var(--mono);font-weight:500}
+.iso polygon,.iso path,.iso ellipse{stroke:var(--iso-line);stroke-width:1.15;stroke-linejoin:round}
+.f-t{fill:var(--iso-top)}.f-l{fill:var(--iso-left)}.f-r{fill:var(--iso-right)}
+.hot .f-t{fill:var(--iso-hot-top)}.hot .f-l{fill:var(--iso-hot-left)}.hot .f-r{fill:var(--iso-hot-right)}
+.glass polygon{fill-opacity:.16}
+.hid{stroke:var(--iso-line);stroke-width:1;stroke-dasharray:2 3;opacity:.55}
+.det{stroke:var(--iso-detail);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.75;fill:none}
+.led{fill:var(--iso-detail)}.led.b{fill:var(--accent-text)}
+.display-r{fill:var(--display);stroke:var(--iso-line);stroke-width:.8;vector-effect:non-scaling-stroke}
+.scr{fill:var(--iso-detail);font-family:var(--mono);font-weight:700}.scr.d{font-weight:500}
+.iso .bar,.iso .cell{fill:none;stroke:var(--iso-detail);stroke-width:.8;vector-effect:non-scaling-stroke;opacity:.75}
+.keys rect{fill:none;stroke:var(--iso-detail);stroke-width:.7;vector-effect:non-scaling-stroke;opacity:.65}
+.topt{fill:var(--iso-detail);font-family:var(--mono);font-weight:800}
+.iso .arrows path{fill:none;stroke:var(--iso-detail);stroke-width:1.5;vector-effect:non-scaling-stroke;
+stroke-linecap:round}
+.iso .slot-other polygon{stroke:var(--iso-other-line)}
+.iso .slot-other .f-t{fill:var(--iso-other-top)}.iso .slot-other .f-l{fill:var(--iso-other-left)}
+.iso .slot-other .f-r{fill:var(--iso-other-right)}
+.iso .slot-v1 polygon{stroke:var(--accent-text)}
+.iso .slot-v1 .f-t{fill:var(--iso-hot-top)}.iso .slot-v1 .f-l{fill:var(--iso-hot-left)}
+.iso .slot-v1 .f-r{fill:var(--iso-hot-right)}
+
+.actor{--rk:var(--iso-line);transition:opacity .35s}
+.actor[data-dim]{opacity:.38}
+.res{--rk:var(--l-api)}
+.tone-node{--rk:var(--l-node)}.tone-state{--rk:var(--l-state)}.tone-scale,.tone-rbac{--rk:var(--l-scale)}
+.actor[data-v="holds"]{--rk:var(--ok)}
+.actor[data-v="fails"]{--rk:var(--l-drop)}
+.actor[data-v="cannot-judge"],.actor[data-v="unrecognised"]{--rk:var(--l-control)}
+.actor[data-v="not-observable"],.actor[data-v="not-walked"]{--rk:var(--dim)}
+.res .f-t{fill:color-mix(in srgb,var(--rk) 20%,var(--iso-top))}
+.res .f-l{fill:color-mix(in srgb,var(--rk) 14%,var(--iso-left))}
+.res .f-r{fill:color-mix(in srgb,var(--rk) 14%,var(--iso-right))}
+.res .sheet .f-t{fill:color-mix(in srgb,var(--rk) 34%,var(--iso-top))}
+.res .sheet .f-l{fill:color-mix(in srgb,var(--rk) 24%,var(--iso-left))}
+.res .sheet .f-r{fill:color-mix(in srgb,var(--rk) 24%,var(--iso-right))}
+.res polygon{stroke:color-mix(in srgb,var(--rk) 65%,var(--iso-line))}
+.res .topt{fill:color-mix(in srgb,var(--rk) 75%,var(--text))}
+.actor[data-v="fails"] polygon{stroke:var(--l-drop);stroke-width:1.6}
+.actor[data-v="cannot-judge"] polygon,.actor[data-v="unrecognised"] polygon{stroke:var(--l-control);
+stroke-dasharray:6 3}
+.actor[data-manifest="no"] polygon,.actor[data-manifest="no"] path,.actor[data-manifest="no"] ellipse,
+.actor[data-manifest="no"] rect{stroke-dasharray:4 3}
+.actor[data-v="not-walked"]{opacity:.5}
+.actor[data-v="not-walked"] polygon{stroke-dasharray:1 4}
+.alabel text{paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
+.alabel .n{fill:var(--text);font-family:var(--sans);font-weight:600;font-size:13.5px}
+.alabel .ip{fill:var(--dim);font-family:var(--mono);font-size:11.5px}
+.alabel .sec{fill:var(--l-drop);font-weight:700}
+.alabel .st{fill:var(--dim);font-family:var(--mono);font-size:11.5px;font-weight:700}
+.actor[data-on] .alabel .n{fill:var(--accent-text)}
+.actor[data-v="holds"] .st{fill:var(--ok)}.actor[data-v="fails"] .st{fill:var(--l-drop)}
+.actor[data-v="cannot-judge"] .st,.actor[data-v="unrecognised"] .st{fill:var(--l-control)}
+.iso .cable{fill:none;stroke:var(--link);stroke-width:1.5;stroke-linecap:round;transition:stroke .3s}
+.iso .cable[data-on]{stroke:color-mix(in srgb,var(--accent-text) 55%,var(--link))}
+.iso .c-not-observable,.iso .c-cannot-judge,.iso .c-unrecognised{stroke-dasharray:6 5}
+.iso .c-not-walked{stroke-dasharray:1 6;opacity:.6}
+.iso .trail{display:none;fill:none;stroke:var(--accent-text);stroke-width:2.2;stroke-linecap:round;
+stroke-dasharray:1 1;stroke-dashoffset:1}
+.iso .trail.on{display:inline}
+.iso .trail.t-holds{stroke:var(--ok)}.iso .trail.t-fails{stroke:var(--l-drop)}
+.iso .trail.t-cannot-judge{stroke:var(--l-control)}
+#dot{display:none;--c:var(--accent-text)}
+#dot.on{display:inline}
+#dot.ok{--c:var(--ok)}#dot.fail{--c:var(--l-drop)}#dot.halt{--c:var(--l-control)}
+#dot .core{fill:var(--c);stroke:var(--bg);stroke-width:2}
+#dot.fail .core,#dot.halt .core{fill:var(--bg);stroke:var(--c);stroke-width:2.5}
+#dot.after .core{fill:var(--bg);stroke:var(--l-drop);stroke-width:2.5}
+#dot .x,#dot .bar,#dot .ring{display:none;fill:none;stroke:var(--c);stroke-width:2.5;stroke-linecap:round}
+#dot.fail .x,#dot.halt .bar{display:inline}
+#dot.pulse .ring{display:inline;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;
+animation:ring 1.5s ease-out infinite}
+#dot.pulse .ring.r2{animation-delay:.75s}
+@keyframes ring{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(1.6)}}
+#dot .mchip rect{fill:var(--panel);stroke:var(--c);stroke-width:1}
+#dot .mchip text{fill:var(--c);font-family:var(--sans);font-size:12px;font-weight:500}
+
+.s-holds{--c:var(--ok)}.s-fails{--c:var(--l-drop)}.s-cannot-judge,.s-unrecognised{--c:var(--l-control)}
+.s-not-observable,.s-not-walked{--c:var(--dim)}
+.chip{display:inline-block;padding:0 7px;border:1.5px solid var(--c);border-radius:4px;color:var(--c);
+font-family:var(--mono);font-size:11px;font-weight:700;line-height:18px;white-space:nowrap;vertical-align:middle}
+.s-cannot-judge .chip,.s-cannot-judge.chip,.s-unrecognised .chip,.s-unrecognised.chip,.s-not-observable .chip,
+.s-not-observable.chip,.s-not-walked .chip,.s-not-walked.chip{border-style:dashed}
+.caption{position:absolute;left:50%;bottom:70px;width:min(680px,calc(100% - 120px));padding:12px 12px 12px 14px;
+border:1px solid var(--line-strong);border-radius:10px;background:color-mix(in srgb,var(--panel) 94%,transparent);
+font-size:14px;line-height:1.5;transform:translate(-50%,0);z-index:1}
+.caption-in{display:flex;gap:12px;align-items:flex-start}
+.caption em{display:block;font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--dim);
+white-space:pre-wrap;overflow-wrap:anywhere}
+.caption output{display:block;overflow-wrap:anywhere}
+.badge{display:inline-flex;min-width:20px;height:20px;padding:0 4px;border-radius:10px;align-items:center;
+justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;background:var(--c);
+color:var(--bg);flex:none;margin-top:2px}
+.caption-next{margin:-5px 0 -5px auto;align-self:center;flex:none;width:30px;height:30px;display:inline-flex;
+align-items:center;justify-content:center;border-radius:50%;background:var(--accent-soft);color:var(--accent-text)}
+.caption-next:hover{background:var(--accent);color:var(--on-accent)}
+.zoom-ui{position:absolute;right:12px;bottom:14px;flex-direction:column;gap:4px;z-index:2}
+.zoom-ui .ibtn{width:30px;height:30px;background:color-mix(in srgb,var(--panel) 90%,transparent)}
+
+.story{grid-area:story;min-height:0;overflow-y:auto;border-left:1px solid var(--line);display:flex;
+flex-direction:column}
+.story-body{padding:24px 24px 8px}
+.panel{scroll-margin-top:24px}
+.panel+.panel{margin-top:28px;padding-top:24px;border-top:1px solid var(--line)}
+.js .panel{margin-top:0;padding-top:0;border-top:0}
+.js #overview{display:none}.js #overview.sel{display:block}
+.js .hop{display:none}.js .hop.sel{display:block}
+.t-ok{--c:var(--ok)}.t-bad{--c:var(--l-drop)}.t-warn{--c:var(--l-control)}
+#overview>.kicker{border-left:2px solid var(--c);padding-left:10px;letter-spacing:.12em;color:var(--dim)}
+.t-warn>.kicker{border-left-style:dashed}
+.word{color:var(--c)}
+.kicker-row{display:flex;align-items:center;gap:10px}
+.dots{display:inline-flex;gap:3px;flex-wrap:wrap}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--line-strong)}
+.dots i.on{background:var(--accent-text)}
+.kicker-row .link-btn{margin-left:auto;margin-right:-6px}
+.display{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin-top:8px;overflow-wrap:anywhere}
+.sub{color:var(--dim);font-size:13.5px;margin:6px 0 14px;overflow-wrap:anywhere}
+.route{font-family:var(--mono);font-size:12px;white-space:pre-wrap}
+.body{line-height:1.7;font-size:14px;overflow-wrap:anywhere}
+.event{margin-top:12px;padding-left:10px;border-left:2px solid var(--c);color:var(--dim)}
+.s-cannot-judge .event,.s-unrecognised .event,.s-not-observable .event,.s-not-walked .event{border-left-style:dashed}
+.facts{margin-top:18px}
+.facts>div{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.facts dt{color:var(--dim);font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.07em;
+text-transform:uppercase;padding-top:3px}
+.facts dd{font-family:var(--mono);font-size:12.5px;line-height:1.65;overflow-wrap:anywhere;min-width:0}
+.finds li{padding:4px 0}.finds li+li{border-top:1px dashed var(--line)}
+.finds .sev{font-weight:700;color:var(--l-drop);margin-right:6px}
+.start{margin-top:22px;width:100%;height:40px;font-size:13.5px}
+.jump{display:inline-block;margin-top:10px;font-size:13px;color:var(--accent-text)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:18px}
+.stats div{display:flex;flex-direction:column-reverse}
+.stats dd{font-family:var(--mono);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;
+overflow-wrap:anywhere}
+.stats dt{font-size:12px;color:var(--dim)}
+.toc{margin-top:auto;padding:16px 24px 8px}
+.toc-list{border-top:1px solid var(--line)}
+.node{position:relative;display:flex;align-items:flex-start;gap:8px;min-height:44px;padding:10px 0;
+border-bottom:1px solid var(--line);font-size:14px;line-height:1.45;color:var(--dim);text-decoration:none}
+.node:hover,.node.sel{color:var(--text)}
+.node.sel{font-weight:500}
+.node::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--accent-text);
+transform:scaleX(0);transform-origin:0 50%;transition:transform .3s}
+.node:hover::after,.node.sel::after{transform:scaleX(1)}
+.num{width:16px;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;flex:none;padding-top:1px}
+.glyph{width:16px;flex:none;text-align:center;font-weight:700;color:var(--c)}
+.glyph.hollow::before{content:"";display:inline-block;width:10px;height:10px;border:1.5px dashed var(--c);
+border-radius:50%}
+.s-not-walked .glyph.hollow::before{border-style:dotted;opacity:.7}
+.lab{min-width:0;overflow-wrap:anywhere}
+.lab .chip{margin-left:6px}
+.note{display:block;font-size:12px;color:var(--dim)}
+.s-not-walked .toc-title{opacity:.75}
+.more{padding:10px 0;color:var(--dim);font-size:13px}
+.legend{padding:8px 24px 8px;font-size:13px;color:var(--dim)}
+.legend summary{width:fit-content;min-height:24px;padding:4px 0;cursor:pointer}
+.legend summary:hover{color:var(--text)}
+.legend li{margin:8px 0}
+.credit{padding:8px 24px 24px;font-size:12px;color:var(--dim)}
+
+.flow{grid-area:flow;min-width:0;border-top:1px solid var(--line);position:relative}
+.flow summary{list-style:none;height:42px;display:flex;align-items:center;gap:8px;padding:0 14px 0 12px;
+font-size:13px;font-weight:600;color:var(--dim);cursor:pointer}
+.flow summary::-webkit-details-marker{display:none}
+.flow summary:hover,.flow[open] summary{color:var(--text)}
+.flow-chevron{transition:transform .15s}
+.flow[open] .flow-chevron{transform:rotate(90deg)}
+.count{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--dim);background:var(--raised);
+border:1px solid var(--line);border-radius:99px;padding:1px 8px;font-variant-numeric:tabular-nums}
+.progress{position:absolute;left:0;right:0;top:-1px;height:2px;pointer-events:none}
+.progress i{display:block;height:100%;width:100%;background:var(--accent);transition:width .3s}
+.flow-panel{max-height:320px;overflow:auto;border-top:1px solid var(--line)}
+.etable{width:100%;min-width:680px;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.etable th{position:sticky;top:0;background:var(--bg);text-align:left;font-family:var(--sans);font-size:11px;
+font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);padding:7px 10px}
+.etable td{padding:6px 10px;border-top:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+.etable .sev{font-weight:700;color:var(--c);white-space:nowrap}
+.etable tr.cur td{background:var(--accent-soft)}
+.empty-row{padding:14px;color:var(--dim)}
+
+.seq-body{display:block;font-family:var(--mono)}
+.seq-lane{fill:var(--text);font-size:11px;font-weight:700;letter-spacing:.03em}
+.lifeline{stroke:var(--line-strong);stroke-dasharray:3 4}
+.seq-hit{fill:transparent}
+.seq-row.cur .seq-hit{fill:var(--accent-soft)}
+.seq-row.later{opacity:.35}
+.seq-time{fill:var(--dim);font-size:10.5px}
+.seq-arrow{stroke:var(--c);stroke-width:1.6;fill:none}
+.seq-head{fill:var(--c)}
+.s-not-observable .seq-arrow,.s-not-walked .seq-arrow,.s-cannot-judge .seq-arrow,
+.s-unrecognised .seq-arrow{stroke-dasharray:4 4}
+.s-not-observable .seq-head,.s-not-walked .seq-head{fill:none;stroke:var(--c)}
+.seq-label{fill:var(--c);font-size:11px;font-weight:600}
+
+dialog{width:min(420px,calc(100vw - 32px));background:var(--panel);color:var(--text);
+border:1px solid var(--line-strong);border-radius:12px;box-shadow:var(--shadow);padding:0}
+dialog::backdrop{background:rgba(4,8,20,.55)}
+.dialog-head{display:flex;justify-content:space-between;align-items:center;padding:10px 10px 10px 16px;
+border-bottom:1px solid var(--line)}
+.dialog-title{font-size:15px;font-weight:600}
+.shortcut-list{padding:6px 16px 10px}
+.shortcut-list div{display:grid;grid-template-columns:110px 1fr;padding:7px 0;border-bottom:1px solid var(--line);
+align-items:center;font-size:13px}
+.shortcut-list div:last-child{border-bottom:0}
+
+@media (max-width:1100px){:root{--story-w:320px}}
+@media (max-width:900px){.shell{height:auto}
+.workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:"stage" "story" "flow"}
+.stage .canvas{flex:none;height:max(420px,64vh)}
+.story{border-left:0;border-top:1px solid var(--line);overflow:visible}
+.toc{margin-top:8px}
+.caption{width:calc(100% - 24px);bottom:64px;font-size:13px}
+.js .zoom-ui{display:none}}
+@media (max-width:600px){.wordmark,.brand+.topbar-sep,.crumb,.crumb+.topbar-sep{display:none}}
+@media (max-width:480px){.story-body{padding:20px 16px 8px}.toc,.legend,.credit{padding-left:16px;padding-right:16px}
+.facts>div{grid-template-columns:1fr;gap:2px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media print{.transport,.caption,.stage-tools,.zoom-ui,.tools{display:none!important}.shell{height:auto}
+.workspace{display:block}.stage .canvas{height:420px}.story{overflow:visible;border-left:0}
+.js .hop,.js #overview{display:block}.flow-panel{max-height:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+<span class="brand"><svg class="iso brand-mark" viewBox="-19 -32 38 44" aria-hidden="true" focusable="false"><line class="hid" x1="0" y1="-10" x2="0" y2="-30"/><line class="hid" x1="0" y1="-10" x2="17.3" y2="0"/><line class="hid" x1="0" y1="-10" x2="-17.3" y2="0"/><g class="hot"><polygon class="f-l" points="-7.62,0 0,4.4 0,-4.4 -7.62,-8.8"/><polygon class="f-r" points="7.62,0 0,4.4 0,-4.4 7.62,-8.8"/><polygon class="f-t" points="0,-13.2 7.62,-8.8 0,-4.4 -7.62,-8.8"/></g><g class="glass"><polygon class="f-l" points="-17.32,0 0,10 0,-10 -17.32,-20"/><polygon class="f-r" points="17.32,0 0,10 0,-10 17.32,-20"/><polygon class="f-t" points="0,-30 17.32,-20 0,-10 -17.32,-20"/></g></svg><span class="wordmark"><span class="k">kube</span>-noob</span></span>
+<span class="topbar-sep" aria-hidden="true">/</span>
+<span class="crumb">learn mechanism</span>
+<span class="topbar-sep" aria-hidden="true">/</span>
+<h1 class="crumb-here">A packet meets a NetworkPolicy</h1>
+<div class="tools jsonly">
+<button type="button" class="ibtn ghost" id="theme" aria-label="Switch theme"><svg class="ico i-sun" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg><svg class="ico i-moon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg></button>
+<button type="button" class="ibtn ghost" id="keys" aria-label="Keyboard shortcuts"><svg class="ico i-keys" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="12" rx="1.5"/><path d="M6 10h.01M9.5 10h.01M13 10h.01M16.5 10h.01M8 14h8"/></svg></button>
+</div>
+</header>
+<main class="workspace">
+<section class="stage" id="schem" data-view="cluster" data-start="1" aria-label="Diagram">
+<div class="canvas">
+<svg class="iso scene" id="scene" viewBox="82.5 73.7 1000 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Isometric diagram of the path. The list of hops beside it says the same in words."><g class="level"><g class="floor"><polygon class="floor-edge" points="356.42,345 539.67,450.8 539.67,456.8 356.42,351"/><polygon class="floor-edge" points="539.67,450.8 874.31,257.6 874.31,263.6 539.67,456.8"/><polygon class="floor-top" points="691.06,151.8 874.31,257.6 539.67,450.8 356.42,345"/><path class="floor-grid" d="M707 161 L372.4 354.2M722.9 170.2 L388.3 363.4M738.9 179.4 L404.2 372.6M754.8 188.6 L420.2 381.8M770.7 197.8 L436.1 391M786.7 207 L452 400.2M802.6 216.2 L468 409.4M818.5 225.4 L483.9 418.6M834.5 234.6 L499.8 427.8M850.4 243.8 L515.8 437M866.3 253 L531.7 446.2M675.1 161 L858.4 266.8M659.2 170.2 L842.4 276M643.3 179.4 L826.5 285.2M627.3 188.6 L810.6 294.4M611.4 197.8 L794.6 303.6M595.4 207 L778.7 312.8M579.5 216.2 L762.8 322M563.6 225.4 L746.8 331.2M547.6 234.6 L730.9 340.4M531.7 243.8 L715 349.6M515.8 253 L699 358.8M499.8 262.2 L683.1 368M483.9 271.4 L667.2 377.2M468 280.6 L651.2 386.4M452 289.8 L635.3 395.6M436.1 299 L619.3 404.8M420.2 308.2 L603.4 414M404.2 317.4 L587.5 423.2M388.3 326.6 L571.5 432.4M372.4 335.8 L555.6 441.6"/><text class="floor-name" transform="matrix(3.984 2.3 -3.984 2.3 374 344.1)" font-size="2.1">cluster &#183; namespace shop</text></g><path class="cable c-holds" id="cab-1" d="M392.6 453.3 L232.9 361.1 L422.2 251.8"/><path class="cable c-not-observable" id="cab-3" d="M456 255.3 L579.5 326.6 L570.7 331.7"/><path class="cable c-holds" id="cab-4" d="M531.5 317.3 L420.2 253 L428.9 247.9"/><path class="cable c-not-observable" id="cab-5" d="M450 235.8 L563.6 170.2 L674.9 234.5"/><path class="cable c-holds" id="cab-6" d="M674.9 234.5 L563.6 170.2 L450 235.8"/><path class="trail" id="trail" d=""/><g class="actor res tone-net" id="act-a1" data-v="holds" data-manifest="yes"><g transform="translate(436.1 243.8)"><g class=""><polygon class="f-l" points="-33.86,-3.91 6.77,19.55 6.77,13.29 -33.86,-10.17"/><polygon class="f-r" points="33.86,3.91 6.77,19.55 6.77,13.29 33.86,-2.35"/><polygon class="f-t" points="-6.77,-25.81 33.86,-2.35 6.77,13.29 -33.86,-10.17"/></g><g class="sheet"><polygon class="f-l" points="-33.86,-10.17 6.77,13.29 6.77,8.99 -33.86,-14.47"/><polygon class="f-r" points="33.86,-2.35 6.77,13.29 6.77,8.99 33.86,-6.65"/><polygon class="f-t" points="-6.77,-30.11 33.86,-6.65 6.77,8.99 -33.86,-14.47"/></g><g transform="matrix(3.386 1.955 -3.386 1.955 -6.772 -30.107)"><text class="topt" x="6" y="5.2" font-size="2.7" text-anchor="middle">NP</text></g></g><g class="alabel" transform="translate(436.1 285.8)" text-anchor="middle"><text class="n">NetworkPolicy</text><text class="ip" y="16">kind; no object named<tspan class="sec"></tspan></text><text class="st" y="32">&#10003; holds</text></g></g><g class="actor" id="act-a3" data-v="not-observable" data-manifest="no"><g transform="translate(707 253)"><g class=""><polygon class="f-l" points="-63.74,0 0,36.8 0,25.76 -63.74,-11.04"/><polygon class="f-r" points="63.74,0 0,36.8 0,25.76 63.74,-11.04"/><polygon class="f-t" points="0,-47.84 63.74,-11.04 0,25.76 -63.74,-11.04"/></g><g transform="matrix(3.984 -2.3 0 4.6 0 25.76)"><circle class="led" cx="1.3" cy="1.2" r=".4"/><circle class="led b" cx="2.6" cy="1.2" r=".4"/><circle class="led" cx="3.9" cy="1.2" r=".4"/><line class="det" x1="6" y1=".9" x2="14.5" y2=".9"/><line class="det" x1="6" y1="1.6" x2="14.5" y2="1.6"/></g><g class="slot slot-v1"><polygon class="f-l" points="-21.91,-29.67 0,-17.02 0,-37.26 -21.91,-49.91"/><polygon class="f-r" points="21.91,-29.67 0,-17.02 0,-37.26 21.91,-49.91"/><polygon class="f-t" points="0,-62.56 21.91,-49.91 0,-37.26 -21.91,-49.91"/></g><g class="slot slot-other"><polygon class="f-l" points="10.36,-11.04 32.27,1.61 32.27,-18.63 10.36,-31.28"/><polygon class="f-r" points="54.18,-11.04 32.27,1.61 32.27,-18.63 54.18,-31.28"/><polygon class="f-t" points="32.27,-43.93 54.18,-31.28 32.27,-18.63 10.36,-31.28"/></g><g class="slot slot-v1"><polygon class="f-l" points="-54.18,-11.04 -32.27,1.61 -32.27,-18.63 -54.18,-31.28"/><polygon class="f-r" points="-10.36,-11.04 -32.27,1.61 -32.27,-18.63 -10.36,-31.28"/><polygon class="f-t" points="-32.27,-43.93 -10.36,-31.28 -32.27,-18.63 -54.18,-31.28"/></g></g><g class="alabel" transform="translate(707 311)" text-anchor="middle"><text class="n">The destination pod</text><text class="ip" y="16">not in any manifest<tspan class="sec"></tspan></text><text class="st" y="32">&#9676; not observable</text></g></g><g class="actor" id="act-a2" data-v="not-observable" data-manifest="no"><g transform="translate(563.6 335.8)"><g class=""><polygon class="f-l" points="-63.74,0 0,36.8 0,25.76 -63.74,-11.04"/><polygon class="f-r" points="63.74,0 0,36.8 0,25.76 63.74,-11.04"/><polygon class="f-t" points="0,-47.84 63.74,-11.04 0,25.76 -63.74,-11.04"/></g><g transform="matrix(3.984 -2.3 0 4.6 0 25.76)"><circle class="led" cx="1.3" cy="1.2" r=".4"/><circle class="led b" cx="2.6" cy="1.2" r=".4"/><circle class="led" cx="3.9" cy="1.2" r=".4"/><line class="det" x1="6" y1=".9" x2="14.5" y2=".9"/><line class="det" x1="6" y1="1.6" x2="14.5" y2="1.6"/></g><g class="slot slot-other"><polygon class="f-l" points="-21.91,-29.67 0,-17.02 0,-37.26 -21.91,-49.91"/><polygon class="f-r" points="21.91,-29.67 0,-17.02 0,-37.26 21.91,-49.91"/><polygon class="f-t" points="0,-62.56 21.91,-49.91 0,-37.26 -21.91,-49.91"/></g><g class="slot slot-v1"><polygon class="f-l" points="10.36,-11.04 32.27,1.61 32.27,-18.63 10.36,-31.28"/><polygon class="f-r" points="54.18,-11.04 32.27,1.61 32.27,-18.63 54.18,-31.28"/><polygon class="f-t" points="32.27,-43.93 54.18,-31.28 32.27,-18.63 10.36,-31.28"/></g></g><g class="alabel" transform="translate(563.6 393.8)" text-anchor="middle"><text class="n">CNI on the node</text><text class="ip" y="16">not in any manifest<tspan class="sec"></tspan></text><text class="st" y="32">&#9676; not observable</text></g></g><g class="actor scenery" id="act-a0" data-v="none" data-manifest="no"><g transform="translate(408.2 462.3)"><g class=""><polygon class="f-l" points="-30.48,0 0,17.59 0,8.99 -30.48,-8.6"/><polygon class="f-r" points="30.48,0 0,17.59 0,8.99 30.48,-8.6"/><polygon class="f-t" points="0,-26.2 30.48,-8.6 0,8.99 -30.48,-8.6"/></g><g transform="matrix(3.386 -1.955 0 3.91 0 8.993)"><circle class="led" cx="1.2" cy="1.1" r=".4"/><circle class="led b" cx="2.4" cy="1.1" r=".4"/><line class="det" x1="4.5" y1="1.1" x2="8" y2="1.1"/></g><g class=""><polygon class="f-l" points="-30.48,-10.56 0,7.04 0,-1.56 -30.48,-19.16"/><polygon class="f-r" points="30.48,-10.56 0,7.04 0,-1.56 30.48,-19.16"/><polygon class="f-t" points="0,-36.75 30.48,-19.16 0,-1.56 -30.48,-19.16"/></g><g transform="matrix(3.386 -1.955 0 3.91 0 -1.564)"><circle class="led" cx="1.2" cy="1.1" r=".4"/><circle class="led b" cx="2.4" cy="1.1" r=".4"/><line class="det" x1="4.5" y1="1.1" x2="8" y2="1.1"/></g><g transform="matrix(3.386 1.955 -3.386 1.955 0 -36.754)"><text class="topt" x="4.5" y="5.4" font-size="2.3" text-anchor="middle">SRC</text></g></g><g class="alabel" transform="translate(408.2 504.3)" text-anchor="middle"><text class="n">Sending pod</text><text class="ip" y="16">not in any manifest<tspan class="sec"></tspan></text><text class="st" y="32"></text></g></g><g id="dot"><circle class="ring" r="16"/><circle class="ring r2" r="16"/><circle class="core" r="6"/><path class="x" d="M-3 -3L3 3M3 -3L-3 3"/><path class="bar" d="M-3 0H3"/><g class="mchip" transform="translate(0 -24)"><rect x="-80" y="-11" width="160" height="21" rx="4"/><text text-anchor="middle" y="4"></text></g></g></g></svg>
+<div class="sequence"><svg class="seq-body" id="seq" width="674" height="272" viewBox="0 0 674 272" role="img" aria-label="Sequence diagram of the path. The list of hops beside it says the same in words."><text class="seq-lane" x="133" y="26" text-anchor="middle">Sending pod</text><line class="lifeline" x1="133" x2="133" y1="44" y2="272"/><text class="seq-lane" x="283" y="26" text-anchor="middle">NetworkPolicy</text><line class="lifeline" x1="283" x2="283" y1="44" y2="272"/><text class="seq-lane" x="433" y="26" text-anchor="middle">CNI on the node</text><line class="lifeline" x1="433" x2="433" y1="44" y2="272"/><text class="seq-lane" x="583" y="26" text-anchor="middle">The destination pod</text><line class="lifeline" x1="583" x2="583" y1="44" y2="272"/><g class="seq-row s-holds" id="seq-1"><rect class="seq-hit" x="0" y="52" width="674" height="34"/><text class="seq-time" x="8" y="79">hop 1</text><line class="seq-arrow" x1="133" x2="280" y1="75" y2="75"/><path class="seq-head" d="M283 75 l-7 -4 v8 z"/><text class="seq-label" x="208" y="69" text-anchor="middle">&#10003; holds: The namespace has a NetworkPolicy</text></g><g class="seq-row s-holds" id="seq-2"><rect class="seq-hit" x="0" y="86" width="674" height="34"/><text class="seq-time" x="8" y="113">hop 2</text><path class="seq-arrow" d="M283 103 h26 v12 h-24"/><path class="seq-head" d="M285 115 l7 -4 v8 z"/><text class="seq-label" x="315" y="113" text-anchor="start">&#10003; holds: Every NetworkPolicy here selects a pod that&#8230;</text></g><g class="seq-row s-not-observable" id="seq-3"><rect class="seq-hit" x="0" y="120" width="674" height="34"/><text class="seq-time" x="8" y="147">hop 3</text><line class="seq-arrow" x1="283" x2="430" y1="143" y2="143"/><path class="seq-head" d="M433 143 l-7 -4 v8 z"/><text class="seq-label" x="358" y="137" text-anchor="middle">&#9676; not observable: The cluster&#x27;s network p&#8230;</text></g><g class="seq-row s-holds" id="seq-4"><rect class="seq-hit" x="0" y="154" width="674" height="34"/><text class="seq-time" x="8" y="181">hop 4</text><line class="seq-arrow" x1="433" x2="286" y1="177" y2="177"/><path class="seq-head" d="M283 177 l7 -4 v8 z"/><text class="seq-label" x="358" y="171" text-anchor="middle">&#10003; holds: No NetworkPolicy here carries an&#8230;</text></g><g class="seq-row s-not-observable" id="seq-5"><rect class="seq-hit" x="0" y="188" width="674" height="34"/><text class="seq-time" x="8" y="215">hop 5</text><line class="seq-arrow" x1="283" x2="580" y1="211" y2="211"/><path class="seq-head" d="M583 211 l-7 -4 v8 z"/><text class="seq-label" x="433" y="205" text-anchor="middle">&#9676; not observable: The node admits the packe&#8230;</text></g><g class="seq-row s-holds" id="seq-6"><rect class="seq-hit" x="0" y="222" width="674" height="34"/><text class="seq-time" x="8" y="249">hop 6</text><line class="seq-arrow" x1="583" x2="286" y1="245" y2="245"/><path class="seq-head" d="M283 245 l7 -4 v8 z"/><text class="seq-label" x="433" y="239" text-anchor="middle">&#10003; holds: No network policy here stops the p&#8230;</text></g></svg></div>
+<div class="stage-tools jsonly">
+<div class="seg" role="group" aria-label="Diagram view">
+<button type="button" id="v-cluster" aria-pressed="true"><svg class="ico i-layers" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 4 8.5 4.5L12 13 3.5 8.5Zm-8.5 8L12 16.5l8.5-4.5M3.5 15.5 12 20l8.5-4.5"/></svg>Cluster</button>
+<button type="button" id="v-sequence" aria-pressed="false"><svg class="ico i-sequence" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3.5v17M18 3.5v17M6 8h10.5m-2-2 2 2-2 2M18 15H7.5m2-2-2 2 2 2"/></svg>Sequence</button>
+</div>
+</div>
+<div class="zoom-ui jsonly">
+<button type="button" class="ibtn" id="zin" aria-label="Zoom in"><svg class="ico i-plus" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button>
+<button type="button" class="ibtn" id="zout" aria-label="Zoom out"><svg class="ico i-minus" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14"/></svg></button>
+<button type="button" class="ibtn" id="zreset" aria-label="Reset view" hidden><svg class="ico i-recenter" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="6.5"/><path d="M12 2.5V6M12 18v3.5M2.5 12H6M18 12h3.5"/><circle class="fill" cx="12" cy="12" r="1.2"/></svg></button>
+</div>
+<div class="caption" id="capbox" hidden>
+<div class="caption-in"><span class="badge" id="capn" aria-hidden="true"></span><span><em id="capr"></em><output id="cap" aria-live="polite"></output></span><button type="button" class="caption-next" id="capnext" aria-label="Next"><svg class="ico i-right" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 6 6 6-6 6"/></svg></button></div>
+</div>
+<div class="transport controls" role="group" aria-label="Step through the walk">
+<button type="button" class="ibtn" id="prev" aria-label="Previous hop"><svg class="ico i-prev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m16 6-6 6 6 6M7 6v12"/></svg></button>
+<button type="button" class="btn primary play" id="next"><svg class="ico i-next" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m8 6 6 6-6 6M17 6v12"/></svg><span id="nextlabel">Next hop</span></button>
+<button type="button" class="ibtn" id="play" aria-pressed="false" aria-label="Auto-play the hops"><svg class="ico i-play" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="fill" d="M7 5v14l11-7z"/></svg></button>
+<button type="button" class="ibtn speed" id="speed" aria-label="Playback speed 1 times. Change speed">1&#215;</button>
+<button type="button" class="ibtn" id="restart" aria-label="Restart at the overview"><svg class="ico i-replay" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v4h4"/></svg></button>
+</div>
+</div>
+</section>
+<aside class="story" id="story" aria-label="The walk, hop by hop">
+<div class="story-body">
+<section class="panel t-ok" id="overview" aria-label="Path verdict">
+<p class="kicker">network layer &#183; mechanism walk</p>
+<h2 class="display">
+<span class="word">Path verdict: complete</span>
+</h2>
+<p class="sub">exit code 0 (at least one hop was judged and every observable hop holds)</p>
+<p class="body prose">every observable hop on this path holds</p>
+<dl class="stats">
+<div><dt>hops declared</dt><dd>6</dd></div>
+<div><dt>judged</dt><dd>4</dd></div>
+<div><dt>not observable</dt><dd>2</dd></div>
+<div><dt>not walked</dt><dd>0</dd></div>
+</dl>
+<dl class="facts">
+<div><dt>Lesson</dt><dd>kube-noob learn mechanism mech-net-network-policy</dd></div>
+<div><dt>Namespace</dt><dd><code class="in">shop</code> (the namespace judged)</dd></div>
+</dl>
+<a class="btn primary start" href="#step-1"><svg class="ico i-play" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path class="fill" d="M7 5v14l11-7z"/></svg>Walk the 6 hops</a>
+</section>
+<section class="panel hop s-holds" id="step-1"><div class="kicker-row"><span class="kicker">Hop 1 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">The namespace has a NetworkPolicy</h2><p class="sub route">01/06  start &#8594; NetworkPolicy</p><p class="body prose">the namespace has at least one NetworkPolicy; with none, every pod in it accepts every connection. KN-N001 counts networking.k8s.io policies only, so a namespace whose one policy is a CiliumNetworkPolicy is reported as having none (KN-N001)</p><p class="body event">The event arrives: this hop holds.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk (the hop reads NetworkPolicy)</dd></div><div><dt>Rules</dt><dd>KN-N001</dd></div><div><dt>Verdict</dt><dd><span class="chip s-holds">&#10003; holds</span></dd></div><div><dt>Findings</dt><dd>none from the rules above</dd></div></dl></section>
+<section class="panel hop s-holds" id="step-2"><div class="kicker-row"><span class="kicker">Hop 2 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">Every NetworkPolicy here selects a pod that is here</h2><p class="sub route">02/06  at NetworkPolicy</p><p class="body prose">every NetworkPolicy here selects at least one pod template in this namespace, so none of them is a label typo that protects nothing. KN-N012 does not read the other direction: a workload no policy selects stays open to every source, and nothing here reports it (KN-N012)</p><p class="body event">The event arrives: this hop holds.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk (the hop reads NetworkPolicy)</dd></div><div><dt>Rules</dt><dd>KN-N012</dd></div><div><dt>Verdict</dt><dd><span class="chip s-holds">&#10003; holds</span></dd></div><div><dt>Findings</dt><dd>none from the rules above</dd></div></dl></section>
+<section class="panel hop s-not-observable" id="step-3"><div class="kicker-row"><span class="kicker">Hop 3 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">The cluster&#x27;s network plugin turns the policy into rules on each node</h2><p class="sub route">03/06  NetworkPolicy &#8594; cni-enforces-the-policy</p><p class="body prose">the API server only stores a NetworkPolicy. The CNI&#x27;s agent on each node turns it into an allow-list for each selected pod, and a CNI that does not implement NetworkPolicy leaves it stored and inert. Nothing in a manifest records which CNI runs, so kube-noob does not check it and does not count it as passed.</p><p class="body event">No event is drawn: no manifest can show this hop, so it was not checked and is not counted as passing.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk</dd></div><div><dt>Rules</dt><dd>none: no rule in this build reads this hop</dd></div><div><dt>Verdict</dt><dd><span class="chip s-not-observable">&#9676; not observable</span></dd></div><div><dt>Findings</dt><dd>none reported; that is not a pass for this hop</dd></div></dl></section>
+<section class="panel hop s-holds" id="step-4"><div class="kicker-row"><span class="kicker">Hop 4 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">No NetworkPolicy here carries an ingress rule that is open to every source</h2><p class="sub route">04/06  cni-enforces-the-policy &#8594; NetworkPolicy</p><p class="body prose">no NetworkPolicy here has an ingress rule that is empty, lists no peer, selects every namespace or allows 0.0.0.0/0. KN-N007 reads those shapes: a rule that names ports and no `from` still admits every source on those ports, and is not reported (KN-N007)</p><p class="body event">The event arrives: this hop holds.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk (the hop reads NetworkPolicy)</dd></div><div><dt>Rules</dt><dd>KN-N007</dd></div><div><dt>Verdict</dt><dd><span class="chip s-holds">&#10003; holds</span></dd></div><div><dt>Findings</dt><dd>none from the rules above</dd></div></dl></section>
+<section class="panel hop s-not-observable" id="step-5"><div class="kicker-row"><span class="kicker">Hop 5 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">The node admits the packet a rule allows and drops the rest</h2><p class="sub route">05/06  NetworkPolicy &#8594; packet-is-admitted-or-dropped</p><p class="body prose">a packet from a pod a rule&#x27;s `from` selects, to a port that rule names, is let through and its reply follows it back; anything else sent to a selected pod is discarded on the node, with no answer. Which pod is calling, and on which port, is decided per packet, so kube-noob does not check it and does not count it as passed; and no rule in this build compares a policy&#x27;s ports with the ports the containers declare.</p><p class="body event">No event is drawn: no manifest can show this hop, so it was not checked and is not counted as passing.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk</dd></div><div><dt>Rules</dt><dd>none: no rule in this build reads this hop</dd></div><div><dt>Verdict</dt><dd><span class="chip s-not-observable">&#9676; not observable</span></dd></div><div><dt>Findings</dt><dd>none reported; that is not a pass for this hop</dd></div></dl></section>
+<section class="panel hop s-holds" id="step-6"><div class="kicker-row"><span class="kicker">Hop 6 of 6</span><span class="dots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><a class="link-btn" href="#overview"><svg class="ico i-back" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 6-6 6 6 6"/></svg>Overview</a></div><h2 class="display">No network policy here stops the pods it selects from reaching cluster DNS</h2><p class="sub route">06/06  packet-is-admitted-or-dropped &#8594; NetworkPolicy</p><p class="body prose">no NetworkPolicy here restricts egress without leaving a route to port 53, so a pod it selects can still resolve a name before it sends a packet. KN-N013 reads the policies in this input; one applied by the cluster (an AdminNetworkPolicy, a CNI&#x27;s own) is not read (KN-N013)</p><p class="body event">The event arrives: this hop holds.</p><dl class="facts"><div><dt>Object</dt><dd>none named by the walk (the hop reads NetworkPolicy)</dd></div><div><dt>Rules</dt><dd>KN-N013</dd></div><div><dt>Verdict</dt><dd><span class="chip s-holds">&#10003; holds</span></dd></div><div><dt>Findings</dt><dd>none from the rules above</dd></div></dl></section>
+</div>
+<nav class="toc" aria-label="Hops">
+<ol class="toc-list">
+<li><a class="node s-holds" href="#step-1"><span class="num">1</span><span class="glyph" aria-hidden="true">&#10003;</span><span class="lab"><span class="toc-title">The namespace has a NetworkPolicy</span> <span class="chip">holds</span></span></a></li>
+<li><a class="node s-holds" href="#step-2"><span class="num">2</span><span class="glyph" aria-hidden="true">&#10003;</span><span class="lab"><span class="toc-title">Every NetworkPolicy here selects a pod that is here</span> <span class="chip">holds</span></span></a></li>
+<li><a class="node s-not-observable" href="#step-3"><span class="num">3</span><span class="glyph hollow" aria-hidden="true"></span><span class="lab"><span class="toc-title">The cluster&#x27;s network plugin turns the policy into rules on each node</span> <span class="chip">not observable</span><span class="note">not checked by any manifest</span></span></a></li>
+<li><a class="node s-holds" href="#step-4"><span class="num">4</span><span class="glyph" aria-hidden="true">&#10003;</span><span class="lab"><span class="toc-title">No NetworkPolicy here carries an ingress rule that is open to every source</span> <span class="chip">holds</span></span></a></li>
+<li><a class="node s-not-observable" href="#step-5"><span class="num">5</span><span class="glyph hollow" aria-hidden="true"></span><span class="lab"><span class="toc-title">The node admits the packet a rule allows and drops the rest</span> <span class="chip">not observable</span><span class="note">not checked by any manifest</span></span></a></li>
+<li><a class="node s-holds" href="#step-6"><span class="num">6</span><span class="glyph" aria-hidden="true">&#10003;</span><span class="lab"><span class="toc-title">No network policy here stops the pods it selects from reaching cluster DNS</span> <span class="chip">holds</span></span></a></li>
+</ol>
+</nav>
+<details class="legend">
+<summary>How to read this page</summary>
+<ul>
+<li><span class="chip s-holds">&#10003; holds</span> a rule read this hop and found nothing wrong.</li>
+<li><span class="chip s-fails">&#10007; BROKEN</span> a rule on this hop produced a finding. The walk carries on.</li>
+<li><span class="chip s-cannot-judge">? cannot judge</span> nothing could answer for this hop. The walk stops here.</li>
+<li><span class="chip s-not-observable">&#9676; not observable</span> no manifest can show this hop. It is never counted as passing, and what stands there in the diagram is drawn dashed and marked not in any manifest.</li>
+<li><span class="chip s-not-walked">&#183; not walked</span> the walk stopped before this hop. It is never reported as working.</li>
+<li><code class="in">shaded text</code> came from your manifests; everything else is kube-noob speaking.</li>
+<li>Green is used for one thing: a hop that holds. The colour of a card that has no verdict yet says what kind of object it is, and nothing about whether it works.</li>
+</ul>
+</details>
+<footer class="credit">Player design ported from KubeLearn by Joe Sabbagh, MIT. Drawn by kube-noob from your own manifests; this page fetched nothing.</footer>
+</aside>
+<details class="flow" id="flow">
+<summary><svg class="ico i-right flow-chevron" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 6 6 6-6 6"/></svg>Events <span class="count" id="count">2 / 2</span></summary>
+<span class="progress" aria-hidden="true"><i id="bar"></i></span>
+<div class="flow-panel">
+<table class="etable"><thead><tr><th scope="col">Hop</th><th scope="col">Rule</th><th scope="col">Severity</th><th scope="col">Object</th><th scope="col">What the walk recorded</th></tr></thead><tbody>
+<tr data-hop="3"><td>3</td><td>none</td><td class="sev s-not-observable">not observable</td><td><code class="in">none named by the walk</code></td><td>the API server only stores a NetworkPolicy. The CNI&#x27;s agent on each node turns it into an allow-list for each selected pod, and a CNI that does not implement NetworkPolicy leaves it stored and inert. Nothing in a manifest records which CNI runs, so kube-noob does not check it and does not count it as passed.</td></tr>
+<tr data-hop="5"><td>5</td><td>none</td><td class="sev s-not-observable">not observable</td><td><code class="in">none named by the walk</code></td><td>a packet from a pod a rule&#x27;s `from` selects, to a port that rule names, is let through and its reply follows it back; anything else sent to a selected pod is discarded on the node, with no answer. Which pod is calling, and on which port, is decided per packet, so kube-noob does not check it and does not count it as passed; and no rule in this build compares a policy&#x27;s ports with the ports the containers declare.</td></tr>
+</tbody></table>
+</div>
+</details>
+</main>
+</div>
+<dialog id="shortcuts" aria-labelledby="keys-title">
+<div class="dialog-head"><h2 class="dialog-title" id="keys-title">Keyboard shortcuts</h2>
+<button type="button" class="ibtn ghost" id="keysclose" aria-label="Close"><svg class="ico i-close" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<dl class="shortcut-list">
+<div><dt><kbd>&#8594;</kbd> <kbd>Space</kbd></dt><dd>Next hop</dd></div>
+<div><dt><kbd>&#8592;</kbd></dt><dd>Previous hop</dd></div>
+<div><dt><kbd>Home</kbd></dt><dd>Back to the overview</dd></div>
+<div><dt><kbd>P</kbd></dt><dd>Auto-play, or stop it</dd></div>
+<div><dt><kbd>+</kbd> <kbd>-</kbd></dt><dd>Zoom the diagram</dd></div>
+<div><dt><kbd>?</kbd></dt><dd>This list</dd></div>
+</dl>
+</dialog>
+<script type="application/json" id="walk-data">{"view":{"counts":{"declared":"6","judged":"4","notObservable":"2","notReached":"0"},"evidence":[{"hop":3,"message":"the API server only stores a NetworkPolicy. The CNI's agent on each node turns it into an allow-list for each selected pod, and a CNI that does not implement NetworkPolicy leaves it stored and inert. Nothing in a manifest records which CNI runs, so kube-noob does not check it and does not count it as passed.","object":"none named by the walk","rule":"none","severity":"not observable","state":"not-observable"},{"hop":5,"message":"a packet from a pod a rule's `from` selects, to a port that rule names, is let through and its reply follows it back; anything else sent to a selected pod is discarded on the node, with no answer. Which pod is calling, and on which port, is decided per packet, so kube-noob does not check it and does not count it as passed; and no rule in this build compares a policy's ports with the ports the containers declare.","object":"none named by the walk","rule":"none","severity":"not observable","state":"not-observable"}],"exitCode":"0","exitMeans":"at least one hop was judged and every observable hop holds","hiddenHops":0,"hops":[{"actor":"a1","at":[436.1,223.8],"caption":"01/06  start \u2192 NetworkPolicy","chip":"The namespace has a NetworkPolicy","chipdy":-24,"event":"The event arrives: this hop holds.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a0","glyph":"\u2713","id":"namespace-has-a-policy","kinds":["NetworkPolicy"],"label":"NetworkPolicy","mark":"holds","n":1,"named":false,"objects":[],"route":[[392.6,453.3],[232.9,361.1],[422.2,251.8]],"rules":["KN-N001"],"says":"The namespace has a NetworkPolicy: holds. The rules that read this hop found nothing wrong.","state":"holds","title":"The namespace has a NetworkPolicy","why":"the namespace has at least one NetworkPolicy; with none, every pod in it accepts every connection. KN-N001 counts networking.k8s.io policies only, so a namespace whose one policy is a CiliumNetworkPolicy is reported as having none (KN-N001)"},{"actor":"a1","at":[436.1,223.8],"caption":"02/06  at NetworkPolicy","chip":"Every NetworkPolicy here selects\u2026","chipdy":-24,"event":"The event arrives: this hop holds.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a1","glyph":"\u2713","id":"policy-selects-pods-here","kinds":["NetworkPolicy"],"label":"NetworkPolicy","mark":"holds","n":2,"named":false,"objects":[],"route":[],"rules":["KN-N012"],"says":"Every NetworkPolicy here selects a pod that is here: holds. The rules that read this hop found nothing wrong.","state":"holds","title":"Every NetworkPolicy here selects a pod that is here","why":"every NetworkPolicy here selects at least one pod template in this namespace, so none of them is a label typo that protects nothing. KN-N012 does not read the other direction: a workload no policy selects stays open to every source, and nothing here reports it (KN-N012)"},{"actor":"a2","at":[563.6,315.8],"caption":"03/06  NetworkPolicy \u2192 cni-enforces-the-policy","chip":"The cluster's network plugin turn\u2026","chipdy":-78,"event":"No event is drawn: no manifest can show this hop, so it was not checked and is not counted as passing.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a1","glyph":"\u25cc","id":"cni-enforces-the-policy","kinds":[],"label":"cni-enforces-the-policy","mark":"not observable","n":3,"named":false,"objects":[],"route":[[456.0,255.3],[579.5,326.6],[570.7,331.7]],"rules":[],"says":"The cluster's network plugin turns the policy into rules on each node: not observable. No manifest can show this hop, so it was not checked and is not counted as passing.","state":"not-observable","title":"The cluster's network plugin turns the policy into rules on each node","why":"the API server only stores a NetworkPolicy. The CNI's agent on each node turns it into an allow-list for each selected pod, and a CNI that does not implement NetworkPolicy leaves it stored and inert. Nothing in a manifest records which CNI runs, so kube-noob does not check it and does not count it as passed."},{"actor":"a1","at":[436.1,223.8],"caption":"04/06  cni-enforces-the-policy \u2192 NetworkPolicy","chip":"No NetworkPolicy here carries an\u2026","chipdy":-24,"event":"The event arrives: this hop holds.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a2","glyph":"\u2713","id":"no-rule-admits-every-source","kinds":["NetworkPolicy"],"label":"NetworkPolicy","mark":"holds","n":4,"named":false,"objects":[],"route":[[531.5,317.3],[420.2,253.0],[428.9,247.9]],"rules":["KN-N007"],"says":"No NetworkPolicy here carries an ingress rule that is open to every source: holds. The rules that read this hop found nothing wrong.","state":"holds","title":"No NetworkPolicy here carries an ingress rule that is open to every source","why":"no NetworkPolicy here has an ingress rule that is empty, lists no peer, selects every namespace or allows 0.0.0.0/0. KN-N007 reads those shapes: a rule that names ports and no `from` still admits every source on those ports, and is not reported (KN-N007)"},{"actor":"a3","at":[707.0,233.0],"caption":"05/06  NetworkPolicy \u2192 packet-is-admitted-or-dropped","chip":"The node admits the packet a rule\u2026","chipdy":-24,"event":"No event is drawn: no manifest can show this hop, so it was not checked and is not counted as passing.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a1","glyph":"\u25cc","id":"packet-is-admitted-or-dropped","kinds":[],"label":"packet-is-admitted-or-dropped","mark":"not observable","n":5,"named":false,"objects":[],"route":[[450.0,235.8],[563.6,170.2],[674.9,234.5]],"rules":[],"says":"The node admits the packet a rule allows and drops the rest: not observable. No manifest can show this hop, so it was not checked and is not counted as passing.","state":"not-observable","title":"The node admits the packet a rule allows and drops the rest","why":"a packet from a pod a rule's `from` selects, to a port that rule names, is let through and its reply follows it back; anything else sent to a selected pod is discarded on the node, with no answer. Which pod is calling, and on which port, is decided per packet, so kube-noob does not check it and does not count it as passed; and no rule in this build compares a policy's ports with the ports the containers declare."},{"actor":"a1","at":[436.1,223.8],"caption":"06/06  packet-is-admitted-or-dropped \u2192 NetworkPolicy","chip":"No network policy here stops the\u2026","chipdy":-24,"event":"The event arrives: this hop holds.","evidence":[],"findings":[],"frame":[87.8,117.8,989.2,633.1],"from":"a3","glyph":"\u2713","id":"egress-keeps-dns","kinds":["NetworkPolicy"],"label":"NetworkPolicy","mark":"holds","n":6,"named":false,"objects":[],"route":[[674.9,234.5],[563.6,170.2],[450.0,235.8]],"rules":["KN-N013"],"says":"No network policy here stops the pods it selects from reaching cluster DNS: holds. The rules that read this hop found nothing wrong.","state":"holds","title":"No network policy here stops the pods it selects from reaching cluster DNS","why":"no NetworkPolicy here restricts egress without leaving a route to port 53, so a pod it selects can still resolve a name before it sends a packet. KN-N013 reads the policies in this input; one applied by the cluster (an AdminNetworkPolicy, a CNI's own) is not read (KN-N013)"}],"layer":"network","lesson":"mech-net-network-policy","namespaces":["shop"],"reason":"every observable hop on this path holds","scene":{"actors":[{"box":[290.6,402.3,525.8,546.3],"hops":[],"id":"a0"},{"box":[311.3,215.8,560.9,327.8],"hops":[1,2,4,6],"id":"a1"},{"box":[446.0,275.8,681.2,435.8],"hops":[3],"id":"a2"},{"box":[589.4,193.0,824.6,353.0],"hops":[5],"id":"a3"}],"frame":[82.5,73.7,1000.0,640.0],"layout":"mech-net-network-policy"},"start":1,"title":"A packet meets a NetworkPolicy","tone":"ok","verdict":"complete","verdictWord":"complete"},"walk":{"counts":{"declared":6,"judged":4,"notObservable":2,"notReached":0},"exitCode":0,"layer":"network","lesson":"mech-net-network-policy","namespaces":["shop"],"steps":[{"rules":["KN-N001"],"step":"namespace-has-a-policy","title":"The namespace has a NetworkPolicy","verdict":"holds","why":"the namespace has at least one NetworkPolicy; with none, every pod in it accepts every connection. KN-N001 counts networking.k8s.io policies only, so a namespace whose one policy is a CiliumNetworkPolicy is reported as having none (KN-N001)"},{"rules":["KN-N012"],"step":"policy-selects-pods-here","title":"Every NetworkPolicy here selects a pod that is here","verdict":"holds","why":"every NetworkPolicy here selects at least one pod template in this namespace, so none of them is a label typo that protects nothing. KN-N012 does not read the other direction: a workload no policy selects stays open to every source, and nothing here reports it (KN-N012)"},{"step":"cni-enforces-the-policy","title":"The cluster's network plugin turns the policy into rules on each node","verdict":"not-observable","why":"the API server only stores a NetworkPolicy. The CNI's agent on each node turns it into an allow-list for each selected pod, and a CNI that does not implement NetworkPolicy leaves it stored and inert. Nothing in a manifest records which CNI runs, so kube-noob does not check it and does not count it as passed."},{"rules":["KN-N007"],"step":"no-rule-admits-every-source","title":"No NetworkPolicy here carries an ingress rule that is open to every source","verdict":"holds","why":"no NetworkPolicy here has an ingress rule that is empty, lists no peer, selects every namespace or allows 0.0.0.0/0. KN-N007 reads those shapes: a rule that names ports and no `from` still admits every source on those ports, and is not reported (KN-N007)"},{"step":"packet-is-admitted-or-dropped","title":"The node admits the packet a rule allows and drops the rest","verdict":"not-observable","why":"a packet from a pod a rule's `from` selects, to a port that rule names, is let through and its reply follows it back; anything else sent to a selected pod is discarded on the node, with no answer. Which pod is calling, and on which port, is decided per packet, so kube-noob does not check it and does not count it as passed; and no rule in this build compares a policy's ports with the ports the containers declare."},{"rules":["KN-N013"],"step":"egress-keeps-dns","title":"No network policy here stops the pods it selects from reaching cluster DNS","verdict":"holds","why":"no NetworkPolicy here restricts egress without leaving a route to port 53, so a pod it selects can still resolve a name before it sends a packet. KN-N013 reads the policies in this input; one applied by the cluster (an AdminNetworkPolicy, a CNI's own) is not read (KN-N013)"}],"stoppedAt":null,"title":"A packet meets a NetworkPolicy","verdict":"complete","verdictReason":"every observable hop on this path holds"}}</script>
+<script>
+(function(){
+"use strict";
+var blob=document.getElementById("walk-data");if(!blob)return;
+var V;try{V=JSON.parse(blob.textContent).view;}catch(e){return;}
+var hops=V.hops,n=hops.length;if(!n||!V.scene)return;
+function $(id){return document.getElementById(id);}
+var root=document.documentElement,stage=$("schem"),svg=$("scene"),dot=$("dot"),trail=$("trail");
+var secs=document.querySelectorAll(".hop"),nodes=document.querySelectorAll(".toc .node"),over=$("overview");
+var story=$("story"),capbox=$("capbox"),capn=$("capn"),capr=$("capr"),cap=$("cap");
+var play=$("play"),next=$("next"),prev=$("prev"),nextLabel=$("nextlabel"),speedBtn=$("speed");
+if(!stage||!svg||!dot||!trail||!over||!play||!next||!prev||secs.length!==n||nodes.length!==n)return;
+root.classList.add("js");
+var still=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:true};
+var DRAWN={"holds":1,"fails":1,"cannot-judge":1};
+var RANK={"fails":6,"cannot-judge":5,"unrecognised":5,"holds":3,"not-observable":2,"not-walked":1};
+var cur=-1,raf=0,camRaf=0,timer=0,playing=false,speed=1,box=V.scene.frame.slice();
+var chipBox=dot.querySelector(".mchip"),chipText=chipBox.querySelector("text"),chipRect=chipBox.querySelector("rect");
+var acts=V.scene.actors.map(function(a){var el=$("act-"+a.id);
+return{id:a.id,hops:a.hops,el:el,st:el?el.querySelector(".st"):null,sec:el?el.querySelector(".sec"):null};});
+var rows=document.querySelectorAll(".etable tr[data-hop]"),count=$("count"),bar=$("bar");
+
+/* What each actor shows: the worst state among the hops on it that the walk has reached so far. A hop that was
+   not walked is never reached, so it is shown as not walked from the start. */
+function paint(upto,here){
+acts.forEach(function(a){
+if(!a.el||!a.hops.length)return;
+var best=null,left=[];
+a.hops.forEach(function(k){var h=hops[k-1];if(!h)return;
+if(k-1>upto&&h.state!=="not-walked")return;
+if(!best||(RANK[h.state]||5)>(RANK[best.state]||5))best=h;});
+/* The card the walk is standing on shows THIS hop's verdict, so it cannot contradict the caption under it. A
+   break an earlier hop left on the same card is not lost: it stays on the card's second line, as "hop 1 x". */
+if(here>=0&&here<=upto&&a.id===hops[here].actor){
+best=hops[here];
+a.hops.forEach(function(k){var h=hops[k-1];
+if(h&&k-1<here&&h.state==="fails"&&best.state!=="fails")left.push("hop "+k+" "+h.glyph);});}
+a.el.setAttribute("data-v",best?best.state:"pending");
+if(a.st)a.st.textContent=best?best.glyph+" "+best.mark:"";
+if(a.sec)a.sec.textContent=left.length?" \u00b7 "+left.join(", "):"";
+});}
+function flag(el,name,on){if(!el)return;if(on){el.setAttribute(name,"");}else{el.removeAttribute(name);}}
+function focus(i){
+acts.forEach(function(a){var on=i>=0&&(a.id===hops[i].actor||a.id===hops[i].from);
+flag(a.el,"data-on",on);flag(a.el,"data-dim",i>=0&&!on);});
+for(var k=0;k<n;k++){flag($("cab-"+(k+1)),"data-on",k===i);}
+}
+
+function setBox(b){svg.setAttribute("viewBox",b.map(function(v){return v.toFixed(1);}).join(" "));}
+function ease(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+function camera(to,animate){
+if(camRaf){window.cancelAnimationFrame(camRaf);camRaf=0;}
+var from=box.slice();
+if(!animate||still.matches){box=to.slice();setBox(box);return;}
+var t0=0;
+function step(t){if(!t0)t0=t;var f=Math.min(1,(t-t0)/900),e=ease(f);
+box=from.map(function(v,k){return v+(to[k]-v)*e;});setBox(box);
+camRaf=f<1?window.requestAnimationFrame(step):0;}
+camRaf=window.requestAnimationFrame(step);
+}
+function home(){return cur<0?V.scene.frame:hops[cur].frame;}
+function zoom(f){var w=box[2]/f,h=box[3]/f;
+if(w<160||w>6000)return;
+camera([box[0]+(box[2]-w)/2,box[1]+(box[3]-h)/2,w,h],true);flag($("zreset"),"hidden",false);}
+
+function at(pts,f){
+var len=[],total=0,i;
+for(i=1;i<pts.length;i++){var d=Math.sqrt(Math.pow(pts[i][0]-pts[i-1][0],2)+Math.pow(pts[i][1]-pts[i-1][1],2));
+len.push(d);total+=d;}
+var want=total*f;
+for(i=0;i<len.length;i++){if(want<=len[i]||i===len.length-1){var k=len[i]?Math.min(1,want/len[i]):1;
+return[pts[i][0]+(pts[i+1][0]-pts[i][0])*k,pts[i][1]+(pts[i+1][1]-pts[i][1])*k];}want-=len[i];}
+return pts[pts.length-1];}
+function length(pts){var t=0;for(var i=1;i<pts.length;i++){
+t+=Math.sqrt(Math.pow(pts[i][0]-pts[i-1][0],2)+Math.pow(pts[i][1]-pts[i-1][1],2));}return t;}
+function path(pts){return pts.map(function(q,i){return(i?"L":"M")+q[0].toFixed(1)+" "+q[1].toFixed(1);}).join(" ");}
+function put(q){dot.setAttribute("transform","translate("+q[0].toFixed(1)+" "+q[1].toFixed(1)+")");}
+function label(text,dy){
+chipBox.setAttribute("transform","translate(0 "+dy+")");
+chipText.textContent=text;
+var w=160;try{w=chipText.getComputedTextLength()+18;}catch(e){}
+chipRect.setAttribute("x",(-w/2).toFixed(1));chipRect.setAttribute("width",w.toFixed(1));}
+function brokenBefore(i){for(var k=0;k<i;k++){if(hops[k].state==="fails")return true;}return false;}
+function reach(s){return s==="cannot-judge"?0.55:1;}
+/* How long the event takes to get there: 0.2 px a millisecond, between 0.8 and 3 seconds. */
+function travel(i){var h=hops[i];if(still.matches||!DRAWN[h.state])return 0;
+if(h.route.length<2)return 750/speed;
+return Math.max(800,Math.min(3000,length(h.route)/0.2))/speed;}
+function reading(i){var words=hops[i].says.split(/\s+/).length;return(Math.max(1500,words*220)+800)/speed;}
+function settle(i){
+var h=hops[i],s=h.state,pts=h.route,inPlace=pts.length<2;
+dot.setAttribute("class","on "+(s==="fails"?"fail":s==="cannot-judge"?"halt":brokenBefore(i)?"after":"ok")+
+(inPlace&&s==="holds"&&!still.matches?" pulse":""));
+put(inPlace?h.at:at(pts,reach(s)));
+if(!inPlace){trail.setAttribute("d",path(pts));trail.setAttribute("class","trail on t-"+s);
+trail.style.strokeDashoffset=String(1-reach(s));}
+paint(i,i);
+}
+function fly(i,move){
+if(raf){window.cancelAnimationFrame(raf);raf=0;}
+trail.setAttribute("class","trail");
+var s=hops[i].state,pts=hops[i].route;
+if(!DRAWN[s]){dot.setAttribute("class","");return;}
+label(hops[i].chip,hops[i].chipdy);
+if(!move||still.matches||pts.length<2){settle(i);return;}
+var end=reach(s),t0=0,ms=travel(i);
+dot.setAttribute("class","on"+(brokenBefore(i)?" after":""));
+put(at(pts,0));
+trail.setAttribute("d",path(pts));trail.setAttribute("class","trail on t-"+s);trail.style.strokeDashoffset="1";
+function frame(t){if(!t0)t0=t;var f=Math.min(1,(t-t0)/ms),e=ease(f)*end;put(at(pts,e));
+trail.style.strokeDashoffset=String(1-e);
+if(f<1){raf=window.requestAnimationFrame(frame);}else{raf=0;settle(i);}}
+raf=window.requestAnimationFrame(frame);
+}
+
+function canAdvance(){
+if(cur>=n-1)return false;
+if(cur<0)return hops[0].state!=="not-walked";
+var s=hops[cur].state;
+if(s==="cannot-judge"||s==="unrecognised"||s==="not-walked")return false;
+return hops[cur+1].state!=="not-walked";}
+function evidence(){
+var shown=0;
+for(var k=0;k<rows.length;k++){var hop=parseInt(rows[k].getAttribute("data-hop"),10);
+var later=cur>=0&&hop>cur+1;rows[k].hidden=later;rows[k].className=hop===cur+1?"cur":"";if(!later)shown++;}
+if(count)count.textContent=shown+" / "+rows.length;
+if(bar)bar.style.width=(rows.length?shown/rows.length*100:100)+"%";
+for(k=0;k<n;k++){var r=$("seq-"+(k+1));if(r){r.classList.toggle("cur",k===cur);
+r.classList.toggle("later",cur>=0&&k>cur);}}
+}
+function buttons(){
+prev.disabled=cur<0;
+nextLabel.textContent=cur<0?"Start the walk":canAdvance()?"Next hop":"See the verdict";
+play.setAttribute("aria-pressed",playing?"true":"false");
+play.setAttribute("aria-label",playing?"Stop auto-play":"Auto-play the hops");
+}
+function show(i,move){
+cur=i;
+for(var k=0;k<n;k++){var on=k===i;secs[k].classList.toggle("sel",on);nodes[k].classList.toggle("sel",on);
+if(on){nodes[k].setAttribute("aria-current","step");}else{nodes[k].removeAttribute("aria-current");}}
+over.classList.toggle("sel",i<0);
+if(story)story.scrollTop=0;
+evidence();buttons();
+flag($("zreset"),"hidden",true);
+camera(home(),true);
+focus(i);
+if(timer){window.clearTimeout(timer);timer=0;}
+if(i<0){
+if(raf){window.cancelAnimationFrame(raf);raf=0;}
+capbox.hidden=true;dot.setAttribute("class","");trail.setAttribute("class","trail");paint(n-1,-1);
+if(playing)timer=window.setTimeout(tick,600);
+return;}
+var h=hops[i],flying=move&&!still.matches&&DRAWN[h.state]&&h.route.length>1;
+capbox.hidden=false;capbox.className="caption s-"+h.state;
+capn.textContent=String(h.n);capr.textContent=h.caption;cap.textContent=h.says;
+paint(flying?i-1:i,i);
+fly(i,move);
+if(playing)timer=window.setTimeout(tick,(flying||h.route.length<2?travel(i):0)+reading(i));
+}
+function parse(hash){if(hash==="#overview")return-1;var m=/^#step-(\d+)$/.exec(hash||"");if(!m)return null;
+var i=parseInt(m[1],10)-1;return i>=0&&i<n?i:null;}
+function go(i,move){
+if(i<-1||i>=n)return;
+try{window.history.replaceState(null,"",i<0?"#overview":"#step-"+(i+1));}catch(e){}
+show(i,move);
+}
+function stop(){playing=false;if(timer){window.clearTimeout(timer);timer=0;}buttons();}
+function advance(){if(cur<0){go(0,true);}else if(canAdvance()){go(cur+1,true);}else{go(-1,false);}}
+function tick(){timer=0;if(!playing)return;if(!canAdvance()){stop();return;}go(cur+1,true);}
+function start(){playing=true;buttons();
+if(!canAdvance()){go(-1,false);}else{timer=window.setTimeout(tick,cur<0?300:600);}}
+
+window.addEventListener("hashchange",function(){var i=parse(window.location.hash);
+if(i===null||i===cur)return;stop();show(i,false);});
+document.addEventListener("click",function(e){
+var a=e.target&&e.target.closest?e.target.closest("a"):null;if(!a)return;
+var i=parse(a.getAttribute("href"));if(i===null)return;
+e.preventDefault();stop();go(i,i===cur+1);});
+play.addEventListener("click",function(){if(playing){stop();}else{start();}});
+prev.addEventListener("click",function(){stop();go(cur-1,false);});
+next.addEventListener("click",function(){stop();advance();});
+function on(id,fn){var el=$(id);if(el)el.addEventListener("click",fn);}
+on("capnext",function(){stop();advance();});
+on("restart",function(){stop();go(-1,false);});
+on("speed",function(){speed=speed===1?1.5:speed===1.5?2:1;speedBtn.textContent=speed+"\u00d7";
+speedBtn.setAttribute("aria-label","Playback speed "+speed+" times. Change speed");});
+on("zin",function(){zoom(1.4);});
+on("zout",function(){zoom(1/1.4);});
+on("zreset",function(){camera(home(),true);flag($("zreset"),"hidden",true);});
+function view(name){stage.setAttribute("data-view",name);
+$("v-cluster").setAttribute("aria-pressed",name==="cluster"?"true":"false");
+$("v-sequence").setAttribute("aria-pressed",name==="sequence"?"true":"false");}
+on("v-cluster",function(){view("cluster");});
+on("v-sequence",function(){view("sequence");});
+
+var KEY="kube-noob-walk-theme",themeBtn=$("theme");
+function theme(t,keep){root.setAttribute("data-theme",t);
+if(themeBtn)themeBtn.setAttribute("aria-label","Switch to "+(t==="dark"?"light":"dark")+" theme");
+if(keep){try{window.localStorage.setItem(KEY,t);}catch(e){}}}
+var chosen=null;try{chosen=window.localStorage.getItem(KEY);}catch(e){}
+if(chosen!=="dark"&&chosen!=="light"){
+chosen=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+theme(chosen,false);
+on("theme",function(){theme(root.getAttribute("data-theme")==="dark"?"light":"dark",true);});
+
+var dlg=$("shortcuts");
+function keys(){if(!dlg)return;if(dlg.showModal){if(!dlg.open)dlg.showModal();}else{dlg.setAttribute("open","");}}
+on("keys",keys);
+on("keysclose",function(){if(dlg.close){dlg.close();}else{dlg.removeAttribute("open");}});
+document.addEventListener("keydown",function(e){
+if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey)return;
+if(dlg&&dlg.open)return;
+var tag=e.target&&e.target.tagName;
+if(e.key==="ArrowLeft"){stop();go(cur-1,false);e.preventDefault();}
+else if(e.key==="ArrowRight"){stop();advance();e.preventDefault();}
+else if((e.key===" "||e.key==="Spacebar")&&tag!=="BUTTON"&&tag!=="A"&&tag!=="SUMMARY"){
+stop();advance();e.preventDefault();}
+else if(e.key==="Home"){stop();go(-1,false);e.preventDefault();}
+else if(e.key==="?"){keys();e.preventDefault();}
+else if(e.key==="p"||e.key==="P"){if(playing){stop();}else{start();}}
+else if(e.key==="+"||e.key==="="){zoom(1.4);}
+else if(e.key==="-"){zoom(1/1.4);}
+});
+var first=parse(window.location.hash);
+show(first===null?-1:first,false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>What kube-noob reads from a cluster, and what the chart grants · kube-noob</title>
+<meta name="description" content="Live cluster access is off until cluster.enabled: true (the chart&#x27;s config.clusterEnabled ). When on, every read goes through one backend (…">
+<link rel="canonical" href="https://kube-noob.com/docs/permissions/">
+<meta property="og:title" content="What kube-noob reads from a cluster, and what the chart grants · kube-noob">
+<meta property="og:description" content="Live cluster access is off until cluster.enabled: true (the chart&#x27;s config.clusterEnabled ). When on, every read goes through one backend (…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/permissions/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/" aria-current="page">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="what-kube-noob-reads-from-a-cluster-and-what-the-chart-grants">What kube-noob reads from a cluster, and what the chart grants</h1>
+<p>Live cluster access is off until <code>cluster.enabled: true</code> (the chart's <code>config.clusterEnabled</code>). When on, every read goes through one backend (<code>kube_noob.debug.cluster</code>, with <code>kubectl</code>/<code>oc</code> and the operator's kubeconfig, or the pod's ServiceAccount token) that allows 51 resources, verbs <code>get</code> and <code>list</code> and the <code>pods/log</code> subresource, and nothing else: no <code>watch</code>, no <code>exec</code>, no write, and Secrets are refused before a request is built. The table below was <strong>recorded</strong>, not written: each capability was run against a recording backend over a fixture cluster (one namespace with a crashing Deployment behind a Service and a Route, its RBAC, a NetworkPolicy, an OLM operator, a ClusterVersion) and the row lists exactly the resources it asked for and with which verb. A read the fixture does not provoke is not listed. A forbidden read is reported by the capability that asked, naming the resource -- in its <code>notRead</code>, <code>errors</code>, <code>unread</code> or evidence list and in its text view -- never as an empty namespace or a silent None; <code>tests/test_permissions_doc.py</code> forbids every recorded read of every row, one at a time, and holds that.</p>
+<h2 id="per-capability">Per capability</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Capability (CLI / MCP tool)</th>
+<th>Reads</th>
+<th>API group: resource (verbs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>posture scan --live</code> / <code>cluster_posture_scan</code></td>
+<td>attack paths: every workload, its pods, what fronts them and the RBAC their ServiceAccounts hold</td>
+<td><strong>core</strong>: <code>pods</code> (list), <code>serviceaccounts</code> (list), <code>services</code> (list); <strong>apps</strong>: <code>daemonsets</code> (list), <code>deployments</code> (list), <code>replicasets</code> (list), <code>statefulsets</code> (list); <strong>apps.openshift.io</strong>: <code>deploymentconfigs</code> (list); <strong>batch</strong>: <code>cronjobs</code> (list), <code>jobs</code> (list); <strong>gateway.networking.k8s.io</strong>: <code>grpcroutes</code> (list), <code>httproutes</code> (list); <strong>networking.istio.io</strong>: <code>virtualservices</code> (list); <strong>networking.k8s.io</strong>: <code>ingresses</code> (list); <strong>ray.io</strong>: <code>rayclusters</code> (list), <code>rayjobs</code> (list), <code>rayservices</code> (list); <strong>rbac.authorization.k8s.io</strong>: <code>clusterrolebindings</code> (list), <code>clusterroles</code> (list), <code>rolebindings</code> (list), <code>roles</code> (list); <strong>route.openshift.io</strong>: <code>routes</code> (list); <strong>security.openshift.io</strong>: <code>securitycontextconstraints</code> (list); <strong>serving.kserve.io</strong>: <code>inferenceservices</code> (list)</td>
+</tr>
+<tr>
+<td><code>posture reach --live</code> / <code>cluster_posture_reach</code></td>
+<td>one workload's blast radius, from the same inventory as the scan</td>
+<td><strong>core</strong>: <code>pods</code> (list), <code>serviceaccounts</code> (list), <code>services</code> (list); <strong>apps</strong>: <code>daemonsets</code> (list), <code>deployments</code> (list), <code>replicasets</code> (list), <code>statefulsets</code> (list); <strong>apps.openshift.io</strong>: <code>deploymentconfigs</code> (list); <strong>batch</strong>: <code>cronjobs</code> (list), <code>jobs</code> (list); <strong>gateway.networking.k8s.io</strong>: <code>grpcroutes</code> (list), <code>httproutes</code> (list); <strong>networking.istio.io</strong>: <code>virtualservices</code> (list); <strong>networking.k8s.io</strong>: <code>ingresses</code> (list); <strong>ray.io</strong>: <code>rayclusters</code> (list), <code>rayjobs</code> (list), <code>rayservices</code> (list); <strong>rbac.authorization.k8s.io</strong>: <code>clusterrolebindings</code> (list), <code>clusterroles</code> (list), <code>rolebindings</code> (list), <code>roles</code> (list); <strong>route.openshift.io</strong>: <code>routes</code> (list); <strong>security.openshift.io</strong>: <code>securitycontextconstraints</code> (list); <strong>serving.kserve.io</strong>: <code>inferenceservices</code> (list)</td>
+</tr>
+<tr>
+<td><code>operators inventory --live</code> / <code>cluster_operator_inventory</code></td>
+<td>OLM operators installed, at what version, from which catalog and channel</td>
+<td><strong>operators.coreos.com</strong>: <code>clusterserviceversions</code> (list), <code>subscriptions</code> (list)</td>
+</tr>
+<tr>
+<td><code>operators known-issues --live</code> / <code>cluster_operator_known_issues</code></td>
+<td>the inventory above, plus the ClusterVersion named <code>version</code> for the release</td>
+<td><strong>config.openshift.io</strong>: <code>clusterversions</code> (get); <strong>operators.coreos.com</strong>: <code>clusterserviceversions</code> (list), <code>subscriptions</code> (list)</td>
+</tr>
+<tr>
+<td><code>policy reach --live</code> / <code>cluster_check_traffic</code></td>
+<td>the two endpoints' workloads and pods, their namespaces' labels, NetworkPolicies, the cluster-scoped tiers and the CNI's own version object</td>
+<td><strong>core</strong>: <code>namespaces</code> (get), <code>pods</code> (get); <strong>apps</strong>: <code>deployments</code> (get), <code>statefulsets</code> (get); <strong>cilium.io</strong>: <code>ciliumclusterwidenetworkpolicies</code> (list); <strong>crd.projectcalico.org</strong>: <code>clusterinformations</code> (list), <code>globalnetworkpolicies</code> (list); <strong>networking.k8s.io</strong>: <code>networkpolicies</code> (list); <strong>policy.networking.k8s.io</strong>: <code>adminnetworkpolicies</code> (list), <code>baselineadminnetworkpolicies</code> (list), <code>clusternetworkpolicies</code> (list)</td>
+</tr>
+<tr>
+<td><code>watch</code>, <code>incidents</code> / <code>cluster_check_namespace</code></td>
+<td>a namespace's pods, events and owners, and the previous log of a container that keeps crashing</td>
+<td><strong>core</strong>: <code>events</code> (list), <code>pods</code> (list), <code>pods/log</code> (get); <strong>apps</strong>: <code>deployments</code> (list), <code>replicasets</code> (list); <strong>config.openshift.io</strong>: <code>clusterversions</code> (get); endpoint <code>/version</code></td>
+</tr>
+<tr>
+<td><code>debug</code>, <code>bundle</code> / <code>cluster_debug</code></td>
+<td>one workload by kind and name, its pods, their events, the ServiceAccount of a pod stuck pulling (pull secret names only, never the Secret), and container logs</td>
+<td><strong>core</strong>: <code>events</code> (list), <code>pods</code> (get, list), <code>pods/log</code> (get), <code>serviceaccounts</code> (get); <strong>apps</strong>: <code>daemonsets</code> (get), <code>deployments</code> (get), <code>statefulsets</code> (get); <strong>batch</strong>: <code>jobs</code> (get); <strong>config.openshift.io</strong>: <code>clusterversions</code> (get); endpoint <code>/version</code></td>
+</tr>
+<tr>
+<td><code>doctor</code> (with cluster access) / <code>cluster_version</code></td>
+<td>the API server's version</td>
+<td><strong>config.openshift.io</strong>: <code>clusterversions</code> (get); endpoint <code>/version</code></td>
+</tr>
+<tr>
+<td><code>posture snapshot --live</code>, <code>posture diff</code>, the drift schedule</td>
+<td>a snapshot of the workloads, their fronts and RBAC, plus the context objects drift is scored on</td>
+<td><strong>core</strong>: <code>configmaps</code> (list), <code>namespaces</code> (list), <code>persistentvolumeclaims</code> (list), <code>pods</code> (list), <code>serviceaccounts</code> (list), <code>services</code> (list); <strong>apps</strong>: <code>daemonsets</code> (list), <code>deployments</code> (list), <code>replicasets</code> (list), <code>statefulsets</code> (list); <strong>apps.openshift.io</strong>: <code>deploymentconfigs</code> (list); <strong>autoscaling</strong>: <code>horizontalpodautoscalers</code> (list); <strong>batch</strong>: <code>cronjobs</code> (list), <code>jobs</code> (list); <strong>gateway.networking.k8s.io</strong>: <code>grpcroutes</code> (list), <code>httproutes</code> (list); <strong>k8s.ovn.org</strong>: <code>egressfirewalls</code> (list); <strong>networking.istio.io</strong>: <code>virtualservices</code> (list); <strong>networking.k8s.io</strong>: <code>ingresses</code> (list), <code>networkpolicies</code> (list); <strong>policy</strong>: <code>poddisruptionbudgets</code> (list); <strong>ray.io</strong>: <code>rayclusters</code> (list), <code>rayjobs</code> (list), <code>rayservices</code> (list); <strong>rbac.authorization.k8s.io</strong>: <code>clusterrolebindings</code> (list), <code>clusterroles</code> (list), <code>rolebindings</code> (list), <code>roles</code> (list); <strong>route.openshift.io</strong>: <code>routes</code> (list); <strong>security.openshift.io</strong>: <code>securitycontextconstraints</code> (list); <strong>serving.kserve.io</strong>: <code>inferenceservices</code> (list); <strong>storage.k8s.io</strong>: <code>storageclasses</code> (list)</td>
+</tr>
+<tr>
+<td>admission webhook (<code>serve</code> with <code>admission.enabled</code>)</td>
+<td>the context cross-object rules need, per namespace the webhook has seen, and the cluster's StorageClasses</td>
+<td><strong>core</strong>: <code>persistentvolumeclaims</code> (list); <strong>autoscaling</strong>: <code>horizontalpodautoscalers</code> (list); <strong>networking.k8s.io</strong>: <code>networkpolicies</code> (list); <strong>policy</strong>: <code>poddisruptionbudgets</code> (list); <strong>storage.k8s.io</strong>: <code>storageclasses</code> (list)</td>
+</tr>
+<tr>
+<td><code>cluster_get</code></td>
+<td>any one resource on the read-only allowlist, by name or as a list, with a label selector; never Secrets (refused before any backend is touched)</td>
+<td><strong>core</strong>: <code>configmaps</code> (get, list), <code>endpoints</code> (get, list), <code>events</code> (get, list), <code>limitranges</code> (get, list), <code>namespaces</code> (get, list), <code>nodes</code> (get, list), <code>persistentvolumeclaims</code> (get, list), <code>persistentvolumes</code> (get, list), <code>pods</code> (get, list), <code>resourcequotas</code> (get, list), <code>serviceaccounts</code> (get, list), <code>services</code> (get, list); <strong>apps</strong>: <code>daemonsets</code> (get, list), <code>deployments</code> (get, list), <code>replicasets</code> (get, list), <code>statefulsets</code> (get, list); <strong>apps.openshift.io</strong>: <code>deploymentconfigs</code> (get, list); <strong>autoscaling</strong>: <code>horizontalpodautoscalers</code> (get, list); <strong>batch</strong>: <code>cronjobs</code> (get, list), <code>jobs</code> (get, list); <strong>cilium.io</strong>: <code>ciliumclusterwidenetworkpolicies</code> (get, list); <strong>config.openshift.io</strong>: <code>apiservers</code> (get, list), <code>clusteroperators</code> (get, list), <code>clusterversions</code> (get, list); <strong>crd.projectcalico.org</strong>: <code>clusterinformations</code> (get, list), <code>globalnetworkpolicies</code> (get, list); <strong>gateway.networking.k8s.io</strong>: <code>grpcroutes</code> (get, list), <code>httproutes</code> (get, list); <strong>k8s.ovn.org</strong>: <code>egressfirewalls</code> (get, list); <strong>networking.istio.io</strong>: <code>virtualservices</code> (get, list); <strong>networking.k8s.io</strong>: <code>ingresses</code> (get, list), <code>networkpolicies</code> (get, list); <strong>operators.coreos.com</strong>: <code>clusterserviceversions</code> (get, list), <code>subscriptions</code> (get, list); <strong>platform.stackrox.io</strong>: <code>centrals</code> (get, list), <code>securedclusters</code> (get, list); <strong>policy</strong>: <code>poddisruptionbudgets</code> (get, list); <strong>policy.networking.k8s.io</strong>: <code>adminnetworkpolicies</code> (get, list), <code>baselineadminnetworkpolicies</code> (get, list), <code>clusternetworkpolicies</code> (get, list); <strong>ray.io</strong>: <code>rayclusters</code> (get, list), <code>rayjobs</code> (get, list), <code>rayservices</code> (get, list); <strong>rbac.authorization.k8s.io</strong>: <code>clusterrolebindings</code> (get, list), <code>clusterroles</code> (get, list), <code>rolebindings</code> (get, list), <code>roles</code> (get, list); <strong>route.openshift.io</strong>: <code>routes</code> (get, list); <strong>security.openshift.io</strong>: <code>securitycontextconstraints</code> (get, list); <strong>serving.kserve.io</strong>: <code>inferenceservices</code> (get, list); <strong>storage.k8s.io</strong>: <code>storageclasses</code> (get, list)</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>cluster_get</code> is the one row that is the allowlist rather than a recording: it reads whichever allowlisted resource it is asked for. Every other command (<code>audit</code>, <code>gate</code>, <code>alerts</code>, <code>must-gather analyze</code>, <code>operators inventory</code> from files, ...) reads no cluster at all: <code>get_backend</code> is called only from <code>kube_noob/cli.py</code>, <code>kube_noob/drift_schedule.py</code>, <code>kube_noob/toolkit.py</code>, <code>kube_noob/watch.py</code>.</p>
+<h2 id="what-the-chart-grants">What the chart grants</h2>
+<p><code>deploy/helm/kube-noob/templates/rbac.yaml</code> renders one read-only Role per namespace (<code>rbac.scope: namespace</code>, the default: the release namespace plus <code>rbac.namespaces</code>) or one ClusterRole (<code>rbac.scope: cluster</code>), for the ServiceAccount the chart creates, with verbs <code>get</code> and <code>list</code> only. Read statically from the template (no <code>helm</code>), the grants are:</p>
+<ul>
+<li>ClusterRole: 52 resources = the allowlist (51) plus <code>pods/log</code> -- <strong>identical to what the code can read</strong>.</li>
+<li>Role (namespace scope): 36 resources = the namespaced part of the allowlist (35) plus <code>pods/log</code> -- <strong>identical</strong>.</li>
+<li>Secrets: in neither, and <code>tests/test_permissions_doc.py</code> fails if <code>secrets</code> ever appears in a read rule.</li>
+</ul>
+<p>Under the namespace-scoped Role, a capability that asks for a cluster-scoped object (a Namespace's labels, ClusterRoles, the network policy tiers, StorageClasses, the ClusterVersion) gets a 403 and reports that read as not read; it never answers as if the object were absent.</p>
+<h2 id="allowlisted-but-read-only-through-cluster_get">Allowlisted, but read only through <code>cluster_get</code></h2>
+<p>These resources are on the allowlist and in the chart, and no recorded capability above asks for them. An operator who does not use <code>cluster_get</code> can leave them out of a hand-written Role:</p>
+<ul>
+<li><code>endpoints</code> (core)</li>
+<li><code>limitranges</code> (core)</li>
+<li><code>nodes</code> (core)</li>
+<li><code>persistentvolumes</code> (core)</li>
+<li><code>resourcequotas</code> (core)</li>
+<li><code>apiservers</code> (config.openshift.io)</li>
+<li><code>clusteroperators</code> (config.openshift.io)</li>
+<li><code>centrals</code> (platform.stackrox.io)</li>
+<li><code>securedclusters</code> (platform.stackrox.io)</li>
+</ul>
+<h2 id="narrowing">Narrowing</h2>
+<p>To grant one capability only, copy its row into a Role (namespaced resources) or ClusterRole (cluster-scoped ones) with <code>verbs: [get, list]</code>. The capability then reports every read it could not make, by resource name, in its result and its text view, and nothing it could not read counts as clean: the attack-path scan's headline reads <code>not determined: N resource list(s) not read (...)</code> before its counts.</p><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/permissions.md">docs/permissions.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

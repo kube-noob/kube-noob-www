@@ -1,0 +1,158 @@
+WEBVTT
+
+1
+00:00:01.200 --> 00:00:04.968
+When a pod breaks at 2 a.m.,
+the fastest command is delete.
+
+2
+00:00:04.968 --> 00:00:07.906
+It's also the one that
+destroys your evidence.
+
+3
+00:00:07.906 --> 00:00:11.099
+kube-noob makes your AI
+do it the other way round.
+
+4
+00:00:12.898 --> 00:00:15.926
+Here is a Deployment
+that works on a laptop.
+
+5
+00:00:15.926 --> 00:00:19.573
+On OpenShift 4.22, kube-noob
+scores it 41 out of 100.
+
+6
+00:00:19.573 --> 00:00:24.940
+The password is hard-coded, the UID is
+pinned, and privilege escalation is on.
+
+7
+00:00:24.940 --> 00:00:27.004
+Every finding carries its fix,
+
+8
+00:00:27.004 --> 00:00:30.720
+and the RHACS policy it would
+trip where there is one.
+
+9
+00:00:30.720 --> 00:00:36.087
+One command applies the safe fixes, and
+it tells you what it left for a human.
+
+10
+00:00:37.887 --> 00:00:39.334
+Now paste the events.
+
+11
+00:00:39.334 --> 00:00:42.847
+Pods are rejected by a
+security context constraint.
+
+12
+00:00:42.847 --> 00:00:48.014
+kube-noob gives the cause, then read-only
+steps first: get, describe, logs.
+
+13
+00:00:48.014 --> 00:00:51.046
+Anything that runs in
+a container or changes
+
+14
+00:00:51.046 --> 00:00:54.146
+the cluster comes last
+and asks for approval.
+
+15
+00:00:54.146 --> 00:00:55.662
+The crash-looping pod?
+
+16
+00:00:55.662 --> 00:00:58.004
+It's out of memory, exit code 137.
+
+17
+00:00:59.804 --> 00:01:05.924
+Describe an app for ROSA HCP, and the
+7-step protocol generates the Deployment,
+
+18
+00:01:05.924 --> 00:01:11.890
+Route, PodDisruptionBudget, autoscaler
+and NetworkPolicies, then audits them:
+
+19
+00:01:11.890 --> 00:01:13.052
+100 out of 100.
+
+20
+00:01:14.852 --> 00:01:16.191
+Learning Kubernetes?
+
+21
+00:01:16.191 --> 00:01:20.143
+Lessons and exercises are graded
+offline by the same rules.
+
+22
+00:01:30.210 --> 00:01:32.765
+When your team confirms a fix, save it.
+
+23
+00:01:32.765 --> 00:01:37.679
+Next time, search finds your team's
+note next to the docs, with a citation.
+
+24
+00:01:37.679 --> 00:01:40.365
+Secrets, logs and manifests are rejected.
+
+25
+00:01:45.642 --> 00:01:47.747
+There's no AI inside kube-noob.
+
+26
+00:01:47.747 --> 00:01:50.327
+Claude or Lightspeed does the talking;
+
+27
+00:01:50.327 --> 00:01:55.624
+kube-noob supplies the rules and the
+citations, or you use the CLI on its own.
+
+28
+00:01:55.624 --> 00:02:00.173
+It makes no network calls and reads
+no cluster unless you allow it,
+
+29
+00:02:00.173 --> 00:02:03.093
+and doctor shows exactly
+what it can reach.
+
+30
+00:02:04.892 --> 00:02:06.305
+Don't trust me.
+
+31
+00:02:06.305 --> 00:02:13.556
+Run the self-test: 63 real questions
+across Kubernetes, Helm, OpenShift 4.22,
+
+32
+00:02:13.556 --> 00:02:15.345
+ROSA HCP and RHACS.
+
+33
+00:02:17.395 --> 00:02:22.089
+Install it with uv tool install
+kube-noob, then run kube-noob demo.
+
+34
+00:02:22.089 --> 00:02:24.051
+Get it at kube-noob dot com.

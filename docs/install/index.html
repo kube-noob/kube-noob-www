@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Install kube-noob · kube-noob</title>
+<meta name="description" content="kube-noob needs Python 3.11.4 or newer. macOS&#x27;s built-in python3 (from the Xcode Command Line Tools) is 3.9, so a plain pip install there fails. Homebrew…">
+<link rel="canonical" href="https://kube-noob.com/docs/install/">
+<meta property="og:title" content="Install kube-noob · kube-noob">
+<meta property="og:description" content="kube-noob needs Python 3.11.4 or newer. macOS&#x27;s built-in python3 (from the Xcode Command Line Tools) is 3.9, so a plain pip install there fails. Homebrew…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/install/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/" aria-current="page">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="install-kube-noob">Install kube-noob</h1>
+<p>kube-noob needs Python 3.11.4 or newer. macOS's built-in <code>python3</code> (from the Xcode Command Line Tools) is 3.9, so a
+plain <code>pip install</code> there fails. Homebrew and uv bring their own Python (uv downloads one when yours is too old), and
+pipx installed with Homebrew uses Homebrew's.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Commands</th>
+<th>Upgrade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homebrew (Apple silicon macOS, Linux)</td>
+<td><code>brew tap kube-noob/kube-noob https://github.com/kube-noob/kube-noob</code>, then <code>brew trust --formula kube-noob/kube-noob/kube-noob</code>, then <code>brew install kube-noob</code></td>
+<td><code>brew update &amp;&amp; brew upgrade kube-noob</code></td>
+</tr>
+<tr>
+<td>uv (downloads a Python if yours is too old)</td>
+<td><code>uv tool install kube-noob</code></td>
+<td><code>uv tool upgrade kube-noob</code></td>
+</tr>
+<tr>
+<td>pipx</td>
+<td><code>pipx install kube-noob</code></td>
+<td><code>pipx upgrade kube-noob</code></td>
+</tr>
+<tr>
+<td>pip, in a virtual environment</td>
+<td><code>python3.13 -m venv ~/.venvs/kube-noob</code>, then <code>~/.venvs/kube-noob/bin/pip install kube-noob</code></td>
+<td><code>~/.venvs/kube-noob/bin/pip install -U kube-noob</code></td>
+</tr>
+<tr>
+<td>Container</td>
+<td><code>podman run --rm ghcr.io/kube-noob/kube-noob:0.11 --version</code></td>
+<td>pull the new tag</td>
+</tr>
+<tr>
+<td>Claude Code plugin</td>
+<td><code>/plugin marketplace add kube-noob/kube-noob</code>, then <code>/plugin install kube-noob@kube-noob</code></td>
+<td><code>/plugin marketplace update kube-noob</code></td>
+</tr>
+<tr>
+<td>Claude Code plugin, CLI-driven</td>
+<td><code>/plugin marketplace add kube-noob/kube-noob</code>, then <code>/plugin install kube-noob-skills@kube-noob</code>, plus the CLI by any method above</td>
+<td><code>/plugin marketplace update kube-noob</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>kube-noob-skills</code> is the same seven skills with <strong>no MCP server and no code in the plugin at all</strong>. Its skills run
+the kube-noob CLI you installed, through Claude's Bash tool, with <code>--format json</code>. It exists because the Claude plugin
+directory accepts a plugin carrying a local MCP server only from a Verified organization, and there is no way to
+apply to become one. See <a href="#which-install-and-what-can-run">which install, and what can run</a>.</p>
+<h2 id="which-install-and-what-can-run">Which install, and what can run</h2>
+<p>kube-noob is one engine. What changes from one place to another is how Claude, or you, reach it.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Where you are</th>
+<th>What you install</th>
+<th>What can run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Code, from this repository's marketplace</td>
+<td><code>/plugin marketplace add kube-noob/kube-noob</code>, then <code>/plugin install kube-noob@kube-noob</code></td>
+<td>The full plugin: its own stdio MCP server, bundled as readable source and started with <code>uv run --frozen</code>, and seven skills that call its tools. Needs uv</td>
+</tr>
+<tr>
+<td>Claude Code, from the Claude plugin directory (once <code>kube-noob-skills</code> is listed)</td>
+<td><code>kube-noob-skills</code>, and the CLI: <code>pipx install 'kube-noob&gt;=0.9.3'</code> (0.9.3 is the first release the skills work with)</td>
+<td>The seven skills check <code>kube-noob --version</code>, then run the CLI through the Bash tool on a private folder, offline, under your permission settings, with <code>KUBE_NOOB_FOR_MODEL=1</code> so the output is cleaned for Claude. With no CLI they say nothing was audited and give the install command</td>
+</tr>
+<tr>
+<td>Claude Desktop</td>
+<td><code>{"mcpServers": {"kube-noob": {"command": "uvx", "args": ["--from", "kube-noob==0.11.1", "kube-noob", "mcp"]}}}</code> in its MCP server configuration</td>
+<td>The MCP server over stdio, every tool</td>
+</tr>
+<tr>
+<td>claude.ai chat</td>
+<td>The <a href="#agent-skill">Agent Skill</a> zip, uploaded under <strong>Customize &gt; Skills</strong></td>
+<td>The tools in claude.ai's code sandbox, offline. The directory plugin's skills load in chat too, but chat has no shell on your machine: they give you the command and read the output you paste</td>
+</tr>
+<tr>
+<td>Any MCP client</td>
+<td>The CLI by any method above, then the client pointed at <code>kube-noob mcp</code></td>
+<td>The MCP server over stdio, every tool</td>
+</tr>
+<tr>
+<td>Plain kubectl</td>
+<td><code>kubectl-noob</code> on your <code>PATH</code>: <a href="#kubectl-without-krew">kubectl, without krew</a> today, and through krew once the krew-index pull request (<a href="https://github.com/kube-noob/kube-noob/blob/main/krew/SUBMIT.md">krew/SUBMIT.md</a>) merges</td>
+<td><code>kubectl noob</code> passes every argument to the kube-noob CLI unchanged (<code>kubectl noob audit -f k8s/</code> is <code>kube-noob audit -f k8s/</code>), and, when kube-noob is not on <code>PATH</code> but uv is, downloads the pinned release through <code>uvx</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The directory plugin cannot carry the engine itself: the directory accepts Markdown, JSON and images from an
+organization that is not Verified, and refuses a local MCP server and every other file type. A remote MCP server
+pointed at your own <code>kube-noob serve</code> would be admissible, and is not shipped; <a href="/docs/security/#the-directory-plugin-and-a-remote-server">SECURITY.md</a>
+says why.</p>
+<h2 id="kubectl-without-krew">kubectl, without krew</h2>
+<p><code>kubectl</code> runs any executable on your <code>PATH</code> named <code>kubectl-&lt;name&gt;</code> as <code>kubectl &lt;name&gt;</code>, so the krew plugin works
+before it is in krew-index. Download the release asset, check it against the digest in that release's krew manifest,
+and put the script on your <code>PATH</code> (<code>~/.local/bin</code> here; use any directory on yours):</p>
+<pre><code class="language-bash">curl -fsSLO https://github.com/kube-noob/kube-noob/releases/download/v0.11.1/kubectl-noob-v0.11.1.tar.gz &amp;&amp; want=$(curl -fsSL https://raw.githubusercontent.com/kube-noob/kube-noob/v0.11.1/krew/noob.yaml | sed -n 's/^ *sha256: //p') &amp;&amp; test -n &quot;$want&quot; &amp;&amp; if command -v sha256sum &gt;/dev/null 2&gt;&amp;1; then echo &quot;$want  kubectl-noob-v0.11.1.tar.gz&quot; | sha256sum -c -; else echo &quot;$want  kubectl-noob-v0.11.1.tar.gz&quot; | shasum -a 256 -c -; fi &amp;&amp; mkdir -p ~/.local/bin &amp;&amp; tar -xzf kubectl-noob-v0.11.1.tar.gz -C ~/.local/bin kubectl-noob &amp;&amp; kubectl noob --version
+</code></pre>
+<p>It is one line so that a failed step stops it: the archive is extracted only after the digest check printed <code>OK</code>, with
+<code>sha256sum</code> where it exists and <code>shasum</code> (macOS) where it does not. What the check proves is narrow: the asset you
+downloaded is the one the manifest at that release tag names, so a swapped or corrupted release asset is refused. It
+does not prove anything about the repository itself, or about a tag that was moved, because the digest comes from the
+same place. The manifest is read at the release's own tag because the one on <code>main</code> describes the archive the next
+release will build. The script needs kube-noob on <code>PATH</code> or uv installed, and says so when it has neither; with only uv,
+it downloads the pinned kube-noob release through <code>uvx</code> the first time it runs.</p>
+<p>The tap is needed because kube-noob is not in Homebrew's main catalogue; after <code>brew tap</code>, <code>brew install kube-noob</code>
+finds it. Homebrew 6 and later also refuse formulae from third-party taps until you trust them; <code>brew trust
+--formula</code> trusts only this one formula (<a href="https://docs.brew.sh/Tap-Trust">Homebrew: Tap Trust</a>). Get uv or pipx with <code>brew install uv</code> or <code>brew install pipx</code>.</p>
+<p>Every method installs two commands: <code>kube-noob</code> and its short form <code>noob</code> (from 0.2.3). The PyPI package named
+<code>noob</code> is an unrelated graph library that also installs a <code>noob</code> command; if you have it, use <code>kube-noob</code>.</p>
+<p>Check what you are running:</p>
+<pre><code class="language-bash">kube-noob --version
+which -a kube-noob
+</code></pre>
+<p><code>which -a</code> lists every <code>kube-noob</code> on your <code>PATH</code>. If it prints more than one, an older install is shadowing the new
+one: remove it with the tool that installed it (<code>pipx uninstall kube-noob</code>, <code>uv tool uninstall kube-noob</code> or
+<code>brew uninstall kube-noob</code>).</p>
+<p>The README's first commands name files under <code>examples/</code>. They ship inside kube-noob; write them to a folder a
+command line can name, then run the README's commands from the folder that holds it:</p>
+<pre><code class="language-bash">kube-noob examples copy examples
+</code></pre>
+<h2 id="agent-skill">Agent Skill</h2>
+<p>The same tools as the MCP server, as an <a href="https://claude.com/docs/skills/how-to">Agent Skill</a>: a folder with
+<code>SKILL.md</code>, a runner (<code>scripts/kn.py</code>, one tool per call, JSON out) and the readable server source the Claude plugin
+ships. Use it where no MCP server runs: chat on claude.ai (the plugin's local MCP server runs in Claude Code and
+Cowork only) and the Claude API's code execution. It runs with the offline lock on and needs Python 3.11 or later
+with pydantic, PyYAML and jsonschema; <code>kn.py check</code> says which are missing. The runner in a built skill is
+<code>skill/kube-noob/scripts/kn.py</code> (the folder the zip unpacks as <code>kube-noob/</code>).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Where</th>
+<th>Install</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>claude.ai (Pro, Max, Team, Enterprise, with code execution on)</td>
+<td>Download <code>kube-noob-skill-&lt;version&gt;.zip</code> from the GitHub release (from 0.7.0), then upload it under <strong>Customize &gt; Skills</strong> and turn it on</td>
+</tr>
+<tr>
+<td>Claude Code</td>
+<td>Unzip it into <code>~/.claude/skills/</code> (so the file is <code>~/.claude/skills/kube-noob/SKILL.md</code>), or install the plugin instead, which also gives the MCP tools</td>
+</tr>
+<tr>
+<td>From a checkout</td>
+<td><code>python scripts/build_skill.py --zip kube-noob-skill.zip</code> or <code>--out ~/.claude/skills/kube-noob</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Run it yourself to see what Claude sees:</p>
+<pre><code class="language-bash">python3 -I -B skill/kube-noob/scripts/kn.py check
+python3 -I -B skill/kube-noob/scripts/kn.py tools
+python3 -I -B skill/kube-noob/scripts/kn.py insight '{&quot;text&quot;: &quot;0/3 nodes are available: 3 Insufficient memory&quot;}'
+python3 -I -B skill/kube-noob/scripts/kn.py audit_manifests --text-file manifests=app.yaml
+</code></pre>
+<h2 id="offline-install-verified">Offline install, verified</h2>
+<p>Installing and running without a network is a transcript in this repository's CI, not a sentence here. Every run of
+<code>ci.yml</code> has an <code>airgap</code> job that takes the wheel the <code>publishable</code> job just built, downloads the dependency wheels
+that <code>requirements.lock</code> pins (hashes checked; this is the one step with network), and then, inside a network
+namespace with no interface and no route (<code>unshare -rn</code>), installs from that directory only (<code>pip install
+--no-index --find-links &lt;dir&gt; --require-hashes -r requirements.lock</code>, then the kube-noob wheel with <code>--no-deps</code>) and
+runs the network proof and four checks with their exit codes asserted: <code>kube-noob doctor</code> (0), <code>kube-noob audit -f
+insecure-deployment.yaml</code> (1: findings at high, from the copy the wheel carries), <code>kube-noob must-gather analyze</code> on
+the bundled sample (0), and one <code>tools/list</code> request to <code>kube-noob mcp</code> over stdio (0). Before the four, the namespace
+is proved on itself: a DNS lookup and a TCP connect must both fail, or the run stops without a verdict. The same
+script, <code>scripts/airgap_check.sh</code>, runs the four checks against the locally built wheel in <code>scripts/check.sh</code>.</p>
+<p>To repeat it at your site, with a mirrored index or a directory of wheels you carried in:</p>
+<pre><code class="language-bash">scripts/airgap_check.sh prepare /path/to/wheels
+scripts/airgap_check.sh verify /path/to/wheels
+</code></pre>
+<p><code>prepare</code> needs network (or point <code>pip</code> at your mirror with <code>PIP_INDEX_URL</code>); <code>verify</code> needs none and refuses to run
+outside a namespace it can create (<code>unshare -rn</code>, else <code>sudo unshare -n</code>), with exit 2 and a message rather than a
+pass. Exit 0 is the proof and every check passed (<code>PASS: network proof + 4 checks</code>); 1 names the check that failed and
+keeps its output; 2 is a run that could not start (no namespace, no wheel, or two kube-noob wheels in the
+directory, named).</p>
+<p>What this establishes: with the wheels already on local disk, the install and these four workflows need no network
+and make no network attempt that could succeed. What it does not establish: how the wheels got there -- the mirrored
+index, the signed bundle, and <code>gh attestation verify dist/kube_noob-*.whl --repo kube-noob/kube-noob</code> before the
+wheel is trusted (see <a href="/docs/security/">SECURITY.md</a>) are the operator's steps; anything the four checks do not
+exercise (live cluster access, the HTTP service, web access when enabled); and, without <code>strace</code>, a network attempt
+that was made, failed in the namespace and was tolerated silently -- the namespace makes every attempt fail, it does
+not see one that the code chose to ignore.</p>
+<h2 id="errors-and-fixes">Errors and fixes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You see</th>
+<th>Why</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>No available formula with the name "kube-noob"</code></td>
+<td>The tap is not added</td>
+<td><code>brew tap kube-noob/kube-noob https://github.com/kube-noob/kube-noob</code>, then <code>brew trust --formula kube-noob/kube-noob/kube-noob</code>, then <code>brew install kube-noob</code></td>
+</tr>
+<tr>
+<td><code>Refusing to load formula kube-noob/kube-noob/kube-noob from untrusted tap</code></td>
+<td>Homebrew 6 requires trust for third-party taps</td>
+<td><code>brew trust --formula kube-noob/kube-noob/kube-noob</code>, then <code>brew install kube-noob</code></td>
+</tr>
+<tr>
+<td><code>brew tap</code> lists <code>aashishmahajan/kube-noob</code></td>
+<td>You tapped it under the name these instructions used before the project moved into the <code>kube-noob</code> organisation, so two taps carry the same formula</td>
+<td><code>brew uninstall kube-noob</code>, then <code>brew untap aashishmahajan/kube-noob</code>, then the three commands in the first row</td>
+</tr>
+<tr>
+<td><code>Requires-Python &gt;=3.11.4</code> and <code>No matching distribution found for kube-noob</code></td>
+<td>Your <code>python3</code> is older than 3.11.4 (3.11.0 through 3.11.3 are not enough)</td>
+<td>Use Homebrew, uv or pipx above, or a virtual environment made with Python 3.11.4+</td>
+</tr>
+<tr>
+<td><code>error: externally-managed-environment</code></td>
+<td>Homebrew's or the system's Python refuses packages installed into it (PEP 668)</td>
+<td>Use pipx, uv or a virtual environment; do not add <code>--break-system-packages</code></td>
+</tr>
+<tr>
+<td><code>zsh: command not found: pip</code></td>
+<td>macOS has no <code>pip</code> command, only <code>pip3</code></td>
+<td>Use pipx or uv, or <code>python3 -m pip</code> inside a virtual environment</td>
+</tr>
+<tr>
+<td><code>command not found: kube-noob</code> after pipx or uv</td>
+<td>Their bin folder is not on your <code>PATH</code> yet</td>
+<td><code>pipx ensurepath</code> or <code>uv tool update-shell</code>, then open a new terminal</td>
+</tr>
+<tr>
+<td>An old version after upgrading</td>
+<td>Another install comes first on <code>PATH</code></td>
+<td><code>which -a kube-noob</code> and remove the older one</td>
+</tr>
+</tbody>
+</table></div><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/install.md">docs/install.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

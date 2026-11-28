@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Blast radius · kube-noob</title>
+<meta name="description" content="kube-noob posture reach: what one workload can reach if it is compromised, as five legs that are reached, none, or not determined.">
+<link rel="canonical" href="https://kube-noob.com/blast-radius/">
+<meta property="og:title" content="Blast radius · kube-noob">
+<meta property="og:description" content="kube-noob posture reach: what one workload can reach if it is compromised, as five legs that are reached, none, or not determined.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/blast-radius/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Blast radius</span>
+<h1>If this workload is compromised, what can it reach?</h1>
+<p class="lead"><code>posture scan</code> starts at what is exposed. <code>posture reach</code> starts at the other
+end: the one workload a scanner just flagged, or the one an incident is about. The answer is five legs -- exposure,
+token, RBAC, Secrets, node -- and each leg is <b>reached</b>, <b>none</b>, or <b>not determined</b>, with the object
+and field that prove it.</p></div>
+<section class="band"><h2>Run on two files, it determines little -- and says so</h2>
+<p class="sub">This is <code>examples/insecure-deployment.yaml</code>: one Deployment and one Service. 4 of the five
+legs come back not determined, because a set of files cannot show the RoleBindings, Services, Routes or Ingresses it
+leaves out.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob posture reach deployment/orders-api -n shop -f examples/</code></pre><pre class="out"><code>Deployment/shop/orders-api: if compromised, reaches no capability the input shows; exposure not determined; 4 leg(s) not determined
+
+  exposure  not determined  no Service, Route, Ingress, HTTPRoute, GRPCRoute or VirtualService in these files reaches it; one outside them cannot be ruled out
+  token     not determined  ServiceAccount/shop/default: spec.serviceAccountName unset, so default; token mounted (automount not turned off)
+  rbac      not determined  no ClusterRoleBinding is in the input: cluster-wide grants to ServiceAccount/shop/default, including through the groups system:serviceaccounts and system:authenticated, are not known; no RoleBinding is in the input: what RoleBindings grant ServiceAccount/shop/default, in any namespace, is not known
+  secrets   not determined  the RBAC leg is not determined
+  node      none            none of: securityContext.privileged; capabilities.add against the audit&#x27;s dangerous list (ALL, BPF, DAC_OVERRIDE, DAC_READ_SEARCH, LINUX_IMMUTABLE, MAC_ADMIN, MAC_OVERRIDE, NET_ADMIN, NET_RAW, PERFMON, SETFCAP, SYSLOG, SYS_ADMIN, SYS_BOOT, SYS_CHROOT, SYS_MODULE, SYS_PTRACE, SYS_RAWIO, SYS_TIME); hostPath volumes; hostPID, hostNetwork, hostIPC; procMount Unmasked; windowsOptions.hostProcess (pod and container)
+
+  Deployment/shop/orders-api --uses token of--&gt; ServiceAccount/shop/default
+      spec.serviceAccountName unset, so default; token mounted (automount not turned off)  [Deployment/shop/orders-api spec.template.spec.serviceAccountName]
+
+not determined: no ClusterRoleBinding is in the input: cluster-wide grants to ServiceAccount/shop/default, including through the groups system:serviceaccounts and system:authenticated, are not known
+
+not determined: no RoleBinding is in the input: what RoleBindings grant ServiceAccount/shop/default, in any namespace, is not known
+
+not determined: ServiceAccount shop/default is not in the input: whether it turns off automountServiceAccountToken is not known, so the token is assumed mounted, as posture scan assumes
+
+limitation: File input: a set of files cannot show the bindings, Services, Routes or Ingresses it leaves out, so &#x27;none&#x27; is said only of what the pod spec decides and the answer is not complete. Pass --whole-bundle (whole_bundle) to assert the files are everything that applies to this workload.
+limitation: NetworkPolicies on the entry edge are not applied: check a path with `kube-noob policy reach`.
+limitation: Cloud IAM and admission-time mutation are not modelled.
+limitation: Roles that are not in the input are reported in notRead; cluster-admin, admin, edit, view, system:auth-delegator and kube-system/extension-apiserver-authentication-reader stand in by their documented rules, and admin, edit and view aggregate rules the input may not carry.
+limitation: Exposure is read from Services, OpenShift Routes, Ingresses, Gateway API HTTPRoutes and Istio VirtualServices; other routing objects in files are named in notRead, and a live scan does not list them.
+limitation: One token per pod is followed: the automounted one, else a projected one, else a mounted token Secret; a token passed in an environment variable or by a CSI driver&#x27;s tokenRequests is not followed.
+limitation: hostPort is not a node escape: it opens the pod on the node&#x27;s network, which is an exposure.
+limitation: Only the escalation rights the Kubernetes RBAC good-practices page names are ranked. A short named list is known to grant nothing ranked (self and access reviews, token reviews, leases, events, status writes); any other bound resource and verb that is not a plain read is reported as not classified.</code></pre></div>
+<div class="table-wrap"><table><thead><tr><th>Leg</th><th>Verdict</th><th>Why</th></tr></thead>
+<tbody><tr><td><code>exposure</code></td><td class="unknown"><b>not determined</b></td><td>no Service, Route, Ingress, HTTPRoute, GRPCRoute or VirtualService in these files reaches it; one outside them cannot be ruled out</td></tr><tr><td><code>token</code></td><td class="unknown"><b>not determined</b></td><td>ServiceAccount/shop/default: spec.serviceAccountName unset, so default; token mounted (automount not turned off)</td></tr><tr><td><code>rbac</code></td><td class="unknown"><b>not determined</b></td><td>no ClusterRoleBinding is in the input: cluster-wide grants to ServiceAccount/shop/default, including through the groups system:serviceaccounts and system:authenticated, are not known; no RoleBinding is in the input: what RoleBindings grant ServiceAccount/shop/default, in any namespace, is not known</td></tr><tr><td><code>secrets</code></td><td class="unknown"><b>not determined</b></td><td>the RBAC leg is not determined</td></tr><tr><td><code>node</code></td><td class="ok"><b>none</b></td><td>none of: securityContext.privileged; capabilities.add against the audit&#x27;s dangerous list (ALL, BPF, DAC_OVERRIDE, DAC_READ_SEARCH, LINUX_IMMUTABLE, MAC_ADMIN, MAC_OVERRIDE, NET_ADMIN, NET_RAW, PERFMON, SETFCAP, SYSLOG, SYS_ADMIN, SYS_BOOT, SYS_CHROOT, SYS_MODULE, SYS_PTRACE, SYS_RAWIO, SYS_TIME); hostPath volumes; hostPID, hostNetwork, hostIPC; procMount Unmasked; windowsOptions.hostProcess (pod and container)</td></tr></tbody></table></div>
+<p class="note">This is the point of the command, not a shortcoming of it. A tool that answered "no RBAC reach" from
+these two files would be telling you something it cannot know.</p></section>
+<section class="band"><h2>Assert the files are everything, and the absences become answers</h2>
+<p class="sub"><code>--whole-bundle</code> says: these files are the whole bundle that applies to this workload. Now
+an absence is evidence, and 1 leg remains open.
+<code>--require-complete</code> exits 5 until the answer is complete, so a pipeline cannot read "not determined" as
+a pass.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob posture reach deployment/orders-api -n shop -f examples/ --whole-bundle</code></pre><pre class="out"><code>Deployment/shop/orders-api: if compromised, reaches no capability the input shows; not reached by any exposure in the input; 1 leg(s) not determined
+
+  exposure  none            no Service, Route, Ingress, HTTPRoute, GRPCRoute or VirtualService read reaches it, and the pod is not on the node&#x27;s network
+  token     not determined  ServiceAccount/shop/default: spec.serviceAccountName unset, so default; token mounted (automount not turned off)
+  rbac      none            no binding read names ServiceAccount/shop/default or a group it is in
+  secrets   none            no rule bound to it reaches a Secret
+  node      none            none of: securityContext.privileged; capabilities.add against the audit&#x27;s dangerous list (ALL, BPF, DAC_OVERRIDE, DAC_READ_SEARCH, LINUX_IMMUTABLE, MAC_ADMIN, MAC_OVERRIDE, NET_ADMIN, NET_RAW, PERFMON, SETFCAP, SYSLOG, SYS_ADMIN, SYS_BOOT, SYS_CHROOT, SYS_MODULE, SYS_PTRACE, SYS_RAWIO, SYS_TIME); hostPath volumes; hostPID, hostNetwork, hostIPC; procMount Unmasked; windowsOptions.hostProcess (pod and container)
+
+  Deployment/shop/orders-api --uses token of--&gt; ServiceAccount/shop/default
+      spec.serviceAccountName unset, so default; token mounted (automount not turned off)  [Deployment/shop/orders-api spec.template.spec.serviceAccountName]
+
+not determined: ServiceAccount shop/default is not in the input: whether it turns off automountServiceAccountToken is not known, so the token is assumed mounted, as posture scan assumes
+
+limitation: File input asserted to be the whole bundle: an absence in it is taken as an answer.
+limitation: NetworkPolicies on the entry edge are not applied: check a path with `kube-noob policy reach`.
+limitation: Cloud IAM and admission-time mutation are not modelled.
+limitation: Roles that are not in the input are reported in notRead; cluster-admin, admin, edit, view, system:auth-delegator and kube-system/extension-apiserver-authentication-reader stand in by their documented rules, and admin, edit and view aggregate rules the input may not carry.
+limitation: Exposure is read from Services, OpenShift Routes, Ingresses, Gateway API HTTPRoutes and Istio VirtualServices; other routing objects in files are named in notRead, and a live scan does not list them.
+limitation: One token per pod is followed: the automounted one, else a projected one, else a mounted token Secret; a token passed in an environment variable or by a CSI driver&#x27;s tokenRequests is not followed.
+limitation: hostPort is not a node escape: it opens the pod on the node&#x27;s network, which is an exposure.
+limitation: Only the escalation rights the Kubernetes RBAC good-practices page names are ranked. A short named list is known to grant nothing ranked (self and access reviews, token reviews, leases, events, status writes); any other bound resource and verb that is not a plain read is reported as not classified.</code></pre></div>
+</section>
+<section class="band"><h2>Paste the graph into a pull request</h2>
+<p class="sub"><code>--format json</code> prints the graph against the schema
+<code>kube-noob/blast-radius</code> v1 (nodes, edges with their evidence, the
+not-determined legs, and what was withheld at a cap). <code>--format mermaid</code> draws the same graph, with the
+undetermined legs dashed and the limitations as notes.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob --format mermaid posture reach deployment/orders-api -n shop -f examples/</code></pre><pre class="out"><code>flowchart LR
+  %% kube-noob blast radius (kube-noob/blast-radius v1); every label is escaped input
+  n1[&quot;Deployment/shop/orders-api&quot;]
+  n2[&quot;not determined: no ClusterRoleBinding is in the input: cluster-wide grants to ServiceAccount/shop/default, including through the groups system:serviceaccounts and system:authenticated, are not known&quot;]
+  n3[&quot;not determined: no RoleBinding is in the input: what RoleBindings grant ServiceAccount/shop/default, in any namespace, is not known&quot;]
+  n4[&quot;not determined: ServiceAccount shop/default is not in the input: whether it turns off automountServiceAccountToken is not known, so the token is assumed mounted, as posture scan assumes&quot;]
+  n5[&quot;ServiceAccount/shop/default&quot;]
+  n1 --&gt;|uses token of| n5
+  n1 -. not determined .-&gt; n4
+  n5 -. not determined .-&gt; n2
+  n5 -. not determined .-&gt; n3
+  classDef undetermined stroke-dasharray: 5 5
+  class n2,n3,n4 undetermined
+  t0[&quot;not determined: exposure (Deployment/shop/orders-api)#59; rbac (Deployment/shop/orders-api)#59; secrets (Deployment/shop/orders-api)#59; token (Deployment/shop/orders-api)&quot;]
+  t1[&quot;File input: a set of files cannot show the bindings, Services, Routes or Ingresses it leaves out, so &#x27;none&#x27; is said only of what the pod spec decides and the answer is not complete. Pass --whole-bundle (whole_bundle) to assert the files ...&quot;]
+  t2[&quot;NetworkPolicies on the entry edge are not applied: check a path with #96;kube-noob policy reach#96;.&quot;]
+  t3[&quot;Cloud IAM and admission-time mutation are not modelled.&quot;]
+  t4[&quot;Roles that are not in the input are reported in notRead#59; cluster-admin, admin, edit, view, system:auth-delegator and kube-system/extension-apiserver-authentication-reader stand in by their documented rules, and admin, edit and view aggre...&quot;]
+  t5[&quot;Exposure is read from Services, OpenShift Routes, Ingresses, Gateway API HTTPRoutes and Istio VirtualServices#59; other routing objects in files are named in notRead, and a live scan does not list them.&quot;]
+  t6[&quot;One token per pod is followed: the automounted one, else a projected one, else a mounted token Secret#59; a token passed in an environment variable or by a CSI driver&#x27;s tokenRequests is not followed.&quot;]
+  t7[&quot;hostPort is not a node escape: it opens the pod on the node&#x27;s network, which is an exposure.&quot;]
+  t8[&quot;Only the escalation rights the Kubernetes RBAC good-practices page names are ranked. A short named list is known to grant nothing ranked (self and access reviews, token reviews, leases, events, status writes)#59; any other bound resource an...&quot;]
+  classDef note stroke-dasharray: 2 2
+  class t0,t1,t2,t3,t4,t5,t6,t7,t8 note</code></pre></div>
+</section>
+<section class="band"><h2>What it does not do</h2>
+<p class="sub">From the answer itself, every time -- not from this page.</p>
+<ul class="trust"><li>File input: a set of files cannot show the bindings, Services, Routes or Ingresses it leaves out, so &#x27;none&#x27; is said only of what the pod spec decides and the answer is not complete. Pass --whole-bundle (whole_bundle) to assert the files are everything that applies to this workload.</li><li>NetworkPolicies on the entry edge are not applied: check a path with `kube-noob policy reach`.</li><li>Cloud IAM and admission-time mutation are not modelled.</li><li>Roles that are not in the input are reported in notRead; cluster-admin, admin, edit, view, system:auth-delegator and kube-system/extension-apiserver-authentication-reader stand in by their documented rules, and admin, edit and view aggregate rules the input may not carry.</li><li>Exposure is read from Services, OpenShift Routes, Ingresses, Gateway API HTTPRoutes and Istio VirtualServices; other routing objects in files are named in notRead, and a live scan does not list them.</li><li>One token per pod is followed: the automounted one, else a projected one, else a mounted token Secret; a token passed in an environment variable or by a CSI driver&#x27;s tokenRequests is not followed.</li><li>hostPort is not a node escape: it opens the pod on the node&#x27;s network, which is an exposure.</li><li>Only the escalation rights the Kubernetes RBAC good-practices page names are ranked. A short named list is known to grant nothing ranked (self and access reviews, token reviews, leases, events, status writes); any other bound resource and verb that is not a plain read is reported as not classified.</li></ul>
+<p class="note">Reading a live cluster is opt-in and read-only (<code>--cluster-enabled ... --live</code>), and a list
+the cluster did not answer leaves its leg not determined -- a refusal and a 404 alike. Attack paths from the other
+direction are <code>posture scan</code>; see <a href="/docs/use-cases/">use cases</a>.</p></section>
+<section class="band"><h2>One question each</h2><p class="sub">Every page below shows the command and the output this build got from it, including what the command said it could not determine.</p><div class="grid features"><a class="card feature" href="/start/"><h3>Start here</h3><p>Install it, then the first five minutes: the example files, the text views, and what it says when it cannot answer.</p><span class="more">Read it</span></a><a class="card feature" href="/operators/"><h3>Which operators are installed, and are any reported broken?</h3><p>What OLM installed, from manifests or a must-gather, and what the OpenShift release notes say about it.</p><span class="more">Read it</span></a><a class="card feature" href="/evidence/"><h3>What does a reviewer actually open?</h3><p>One self-contained HTML file, an alert turned into a stored evidence report, SARIF and OSCAL.</p><span class="more">Read it</span></a><a class="card feature" href="/testing/"><h3>How do you know it is not quietly passing?</h3><p>The defect classes the adversarial reviews keep finding, and the tests that hold each one.</p><span class="more">Read it</span></a></div></section>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

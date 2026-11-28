@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Security Policy · kube-noob</title>
+<meta name="description" content="Please report vulnerabilities privately through GitHub&#x27;s &quot;Report a vulnerability&quot; button on the repository&#x27;s Security tab (private vulnerability…">
+<link rel="canonical" href="https://kube-noob.com/docs/security/">
+<meta property="og:title" content="Security Policy · kube-noob">
+<meta property="og:description" content="Please report vulnerabilities privately through GitHub&#x27;s &quot;Report a vulnerability&quot; button on the repository&#x27;s Security tab (private vulnerability…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/security/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/" aria-current="page">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="security-policy">Security Policy</h1>
+<h2 id="reporting-a-vulnerability">Reporting a vulnerability</h2>
+<p>Please report vulnerabilities privately through GitHub's <strong>"Report a vulnerability"</strong> button on the repository's
+Security tab (private vulnerability reporting). Do not open a public issue. Expect an acknowledgement within 3 business
+days and a fix or mitigation plan within 30 days for confirmed issues.</p>
+<h2 id="supported-versions">Supported versions</h2>
+<p>The latest minor release receives security fixes.</p>
+<h2 id="default-posture">Default posture</h2>
+<p>kube-noob makes no outbound connections and touches no cluster unless you enable it. This is tested in CI and was
+verified end to end inside a network namespace with no route (docs/release-readiness.md). With web access enabled it
+only performs HTTPS GETs to allowlisted documentation domains, refuses non-text content types (archives, binaries,
+scripts), streams at most <code>web.maxBytes</code>, never writes the content to disk and never executes it. The admin lock
+(<code>offline: true</code> / <code>KUBE_NOOB_OFFLINE=1</code>) overrides <code>webEnabled</code>, blocks corpus downloads and allows only loopback or
+in-cluster model endpoints; no later configuration source can lift it. <code>kube-noob doctor</code> reports the effective
+posture. The local learning file stores only user-confirmed summaries and ids, never logs, manifests or credentials. With <code>alertReports.store</code> the HTTP server keeps an evidence report for each Alertmanager payload posted to <code>POST /v1/alert-reports</code> in its own data directory (owner-only, bounded by count, age and size, never written through a link), built from the payload and local knowledge alone: the receiver reads no cluster, fetches nothing and runs nothing a payload names, and one post gets <code>alertReports.budgetSeconds</code> (30) of work at most, counted from receipt, off the event loop; at most two reports are built at once by the receiver and the MCP tool together, a report slot is taken only once the body has been read and is held only while the report is built, and a post that waits more than 5 s for a slot is answered 503 with <code>Retry-After</code>. Every request body must arrive within 10 s (else 408), so a sender that trickles holds neither a slot nor memory for long. The MCP server's only subprocesses are read-only <code>oc</code>/<code>kubectl</code> calls (argv, no shell)
+when cluster access is enabled; the maintainer CLI commands <code>corpus build --online</code> and <code>helm-audit</code> run <code>git</code> and
+<code>helm template</code> locally.</p>
+<p>The Agent Skill (<code>skill/kube-noob</code>) cannot be configured out of this posture: its runner forces the offline lock,
+web and cluster off and no model on every call, ignoring the config file and <code>KUBE_NOOB_*</code> variables, imports the
+bundled server source only (it refuses another installed kube-noob), and its tools start no other program and
+open no connection (a test runs them with both refused).</p>
+<h2 id="security-design">Security design</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Network</td>
+<td><code>webEnabled: false</code> by default; all outbound HTTP goes through one guarded client; web requests (and every redirect) must be HTTPS to an allowlisted domain.</td>
+</tr>
+<tr>
+<td>Cluster access</td>
+<td>Opt-in (<code>cluster.enabled</code>), read-only verbs on an allowlist of resources, Secrets never readable, ConfigMap values / sensitive env values / token-like log content redacted, strict argument validation, no shell. A read that failed is never taken for "nothing there" (G279): absence is recognised only in the backend's own words, and a list answer must name its kind, its items and their namespace and be complete. Known limitation: on the in-cluster backend a resource counts as not served when the answer is a 404 whose body is exactly <code>404 page not found</code>, the API server's own text, but Go reverse proxies (Traefik, kube-rbac-proxy) send the same body, so a proxy in front of the API server that does not route a group reads as that group not being served.</td>
+</tr>
+<tr>
+<td>HTTP server</td>
+<td>Refuses to bind non-loopback without a bearer token (constant-time compare, and two <code>Authorization</code> headers are refused rather than resolved last-wins) unless explicitly overridden; DNS-rebinding protection with a Host allowlist; health endpoints are the only unauthenticated paths. The body limit is 1.5 MiB, below the 1,000,000-character argument cap so no valid request is refused, and a body on the public health paths is refused with 405 before it is buffered, so an unauthenticated caller cannot make the server hold memory. The REST routes (<code>/v1/...</code>) are behind the same token and body limit, pass the same Host and Origin checks, accept only <code>application/json</code> posts, and exist only for the tools the shared server offers (none that writes). <code>/metrics</code> is inside the same token check unless <code>server.metrics.allowUnauthenticated</code> opens it, answers GET and HEAD only, and carries counters whose every label value comes from a fixed set -- an exception type a caller can provoke collapses to <code>error</code> rather than becoming a new Prometheus label.</td>
+</tr>
+<tr>
+<td>Input parsing</td>
+<td>YAML SafeLoader only, 5 MB / 1000-document caps, alias-expansion budget against billion-laughs.</td>
+</tr>
+<tr>
+<td>Suggested commands</td>
+<td>Steps a diagnosis prints are read-only and copy-paste safe: a name taken from the input (pod, Service, label selector, namespace) is pasted into a command only when it is made of letters, digits and <code>@._:/=+#%,-</code> and does not start with <code>#</code>, otherwise its placeholder stays; a Service selector is used only when every key and value is a valid label; no step prints a Secret's values. Every validator ends with <code>\Z</code>, not <code>$</code> (Python's <code>$</code> also matches before a final newline, so a must-gather namespace <code>"shop\n"</code> once split a printed step into two shell lines); a test fails on any new validator anchored with <code>$</code>.</td>
+</tr>
+<tr>
+<td>Must-gathers</td>
+<td>Opened as a stream or a walk with no links followed; nothing extracted or run; Secrets-named files never read; YAML pre-scanned for aliases, documents and depth before libyaml loads it. The <code>analyze_must_gather</code> MCP tool is offered by the HTTP server only with <code>mustGather.allowedDir</code> and reads only paths that resolve inside it (links resolved first); it is not in the Claude plugin.</td>
+</tr>
+<tr>
+<td>Prompt injection</td>
+<td>Every MCP tool result and the knowledge resource is cleaned before it leaves the server. Removed: invisible Unicode (tags, bidi overrides, zero-width characters other than a ZWJ or ZWNJ after non-ASCII text, where emoji and scripts such as Persian and Devanagari need them, soft hyphens and other word splitters), chat-template and role markers, tool-call markup, instructions aimed at a model (matched on a normalised copy: full-width and mathematical letters folded, Cyrillic and Greek look-alikes mapped, entities and colour codes decoded, hyphenated line breaks joined; English, Spanish, French, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean; inside base64), every remote image address and a link's query when it can carry data. Flagged but kept: phrases that are operations as often as attacks ("send the credentials to vault.example.com"). The result carries <code>untrusted: true</code> and the signals. Evals: 66 of 66 and 25 of 25 with no finding on 148 benign lines; the red team's 50 new attacks 48 caught and its 55 adversarial benign lines 1 altered (a remote badge image), 8 flagged; these sets were used to tune, RT2 measures blind. Terminal and file output is cleaned too (G279): every CLI TEXT write to stdout or stderr -- the text view, <code>--compact</code>, errors -- passes through <code>sanitize.visible_lines</code> at one boundary, and the HTML report and the Markdown writers use the same helper; MCP text content goes through the same rule (<code>clean</code> and <code>visible</code> are one implementation), so a name in a structured result reads <code>openshift&lt;U+200B&gt;-etcd</code>; the injection matcher reads past markers as it reads past the characters. Terminal escape sequences (CSI, OSC 8 links, OSC 52 clipboard writes) are removed; other control characters, line and paragraph separators, private-use characters, noncharacters and the Braille blank become a space; format and default-ignorable characters (bidi overrides and marks, tag characters, soft hyphen, BOM, zero-width spaces, Hangul fillers, CGJ, Mongolian and stray variation selectors) are removed, and shown as <code>&lt;U+XXXX&gt;</code> when they sit between two identifier characters, so <code>web&lt;U+3164&gt;x</code> is not read as <code>webx</code>; combining marks are capped at four in a row; ZWJ and ZWNJ are kept after non-ASCII text, where scripts and emoji need them. Documents are not cleaned but escaped by their encoder, losslessly: JSON by <code>json.dumps</code>, YAML by a dumper that double-quotes and escapes any string that would not print, so what is printed equals what <code>-o</code> writes and loads back to the same data. The servers <code>serve</code>, <code>mcp</code> and <code>admission serve</code> are not wrapped: their stdout is a protocol stream or a server log built from messages made safe where they are built. <code>watch</code> prints text views and is wrapped. An escape sequence between two identifier characters is shown as <code>&lt;ESC&gt;</code> (<code>web&lt;ESC&gt;x</code> is not <code>webx</code>, <code>api&lt;ESC&gt;.internal</code> is not <code>api.internal</code>) and removed in prose. No caller can remove a character from inside a name without a trace: marking is the default of every variant, the MCP cleaner included, and a caller that asks for no markers gets a space there, never nothing; a test runs every call site in <code>src</code> with its own arguments (fourth review). A document written to a closed pipe exits 141, like text: each document writer flushes inside the command, where the error is caught. An error kube-noob did not anticipate is one cleaned line on stderr with exit 4; <code>KUBE_NOOB_DEBUG=1</code> adds the traceback, through the same boundary.</td>
+</tr>
+<tr>
+<td>CI logs</td>
+<td>A GitHub Actions runner reads a workflow command from every line a step writes: <code>::name::</code> at the start of a line and the legacy <code>##[name]</code> anywhere in it (actions/runner v2.321.0 <code>ActionCommand.TryParseV2</code> / <code>TryParse</code>); Azure Pipelines reads <code>##vso[</code> and TeamCity <code>##teamcity[</code> anywhere in a line. Every text kube-noob writes, stdout and stderr, every command but the three servers, goes through <code>sanitize.CommandGuard</code> at the output boundary, always -- not only under <code>GITHUB_ACTIONS</code> and not only off a terminal, because a log is replayed and the same input must give the same bytes: the bracket of <code>##[</code>, <code>##vso[</code> or <code>##teamcity[</code> (one rule: <code>##</code>, letters, <code>[</code>) is shown as <code>&lt;U+005B&gt;</code> and the first colon of a line-leading <code>::</code> as <code>&lt;U+003A&gt;</code>, the marker style <code>visible</code> uses, so the change is visible and cannot be mistaken for text. Comment and header lines kube-noob composes into a document (the <code>policy generate</code> header, which echoes the exceptions file) get the same treatment; Markdown reports too. Documents stay lossless: JSON writes the bracket as <code>\u005b</code>; YAML double-quotes on one line, with <code>\x5B</code>, only a string that holds such a prefix or a <code>::</code> a line could start with (<code>listen [::]:80;</code>, <code>fe80::1</code> and <code>std::io</code> keep their style); the SARIF, Code Quality and HTML files <code>gate</code> writes, the AdmissionReview <code>admission review</code> prints, the debug bundle and the chart files are escaped the same way. The only commands kube-noob emits are the annotations <code>gate --github-annotations</code> builds: their text is cleaned, then escaped per the toolkit's rules, with service messages broken. <code>tests/test_workflow_commands.py</code> ports the runner's two parsers; it and <code>tests/test_g279_third_review.py</code> find no other command in any output (G279).</td>
+</tr>
+<tr>
+<td>HTML report</td>
+<td>One file with nothing the browser fetches and nothing it runs: no script, stylesheet, font or image, and the charts are inline SVG rather than a plotting library. Every value from a manifest is escaped before it is written, inside the SVG as well as in the page, because a <code>&lt;title&gt;</code> or a label is as good a place to run a script as a table cell is; a test parses what is produced and fails on any <code>src</code>, <code>&lt;link href&gt;</code>, inline handler, <code>&lt;script&gt;</code>, <code>&lt;use&gt;</code>, <code>&lt;image&gt;</code> or <code>&lt;foreignObject&gt;</code>.</td>
+</tr>
+<tr>
+<td>Pre-action hook</td>
+<td><code>kube-noob hook claude-code</code> (and the plugin's hook, off until its <code>verify_cluster_commands</code> option is on) runs <code>kube-noob verify</code> before a Bash command that changes cluster state: an <code>allow</code> passes, a <code>deny</code> is blocked with exit 2, a <code>not-determined</code> asks the user with the reasons (PreToolUse <code>ask</code>; in a <code>-p</code> run nobody can answer, so Claude Code denies it), and the hook's own errors and an exhausted 20-second budget block -- the check runs in a child process that is killed at the budget, because a thread cannot stop a regular expression running in C (a Makefile line built for it held the old hook 62 seconds, past Claude Code's timeout). It reads the command as data and never runs it; it reads files only inside the working directory the hook input names, follows no link (a chart with a link in it is not rendered), fetches nothing, and runs only a <code>helm</code> found in an absolute PATH entry outside the project tree (its git root; a tree that is $HOME or <code>/</code> excludes nothing). A file an earlier command on the same line may have written (<code>cp</code>, <code>sed -i</code>, <code>cat &gt;</code>, <code>git checkout</code>, any program it does not know) makes the verdict not determined; command substitutions are followed in <code>${...}</code>, <code>$((...))</code> and unquoted here-documents; <code>cd</code> is followed to read the script the shell will run. A program the reader does not model is opaque, not transparent: a kube command in its arguments (<code>aws-vault exec prod -- kubectl delete ...</code>, <code>npx kubectl ...</code>, <code>nix-shell --run '...'</code>) or text naming a kube tool on its standard input (<code>echo '...' | at now</code>, <code>ssh host &lt; cmds.txt</code>, <code>make -f -</code>) makes the line not determined whatever the program is called; one that names no kube command passes. <code>make</code> is read through <code>-f</code>, <code>-C</code>, <code>include</code>, <code>$(shell ...)</code>, inline and continued recipes, and a kube tool in a command-line variable or <code>--eval</code> is not determined; npm, pnpm, yarn and bun scripts are read in the package <code>--prefix</code>, <code>-C</code>, <code>--dir</code>, <code>--cwd</code> or <code>-w</code> names, and <code>npm exec</code>, <code>npx</code>, <code>pnpm dlx</code>, <code>yarn dlx</code> and <code>bunx</code> are opaque programs. Every name, path, command and message from the repository in its messages is quoted between « », one printable line, capped; text shaped like an instruction is flagged. A kubectl command line is read the way cobra reads it (cobra v1.10.2 command.go stripFlags): before the subcommand an unknown flag takes the next word as its value, so <code>kubectl -o yaml delete ns prod</code> is a delete; a root flag kubectl does not define, a <code>--</code> before the subcommand, and a subcommand only known at run time (<code>$SUB</code>, <code>$(...)</code>, a glob or a brace) are not determined. <code>sudo -s</code>/<code>-i</code>/<code>--shell</code>/<code>--login</code> and <code>doas -s</code> run the rest as a shell command line; xargs and GNU parallel are read with their input (<code>-a FILE</code>, <code>::::</code>, here-strings, pipes from echo, cat, tee or <code>base64 -d</code>); project runners are read where their file can be (justfile, Taskfile, deno.json) and otherwise not determined when it names a kube tool (tox.ini, noxfile.py, Earthfile, compose files, .pre-commit-config.yaml); <code>go run</code>, <code>cargo run</code>, <code>bazel run</code> and a script that starts other programs are not determined; git's program-running options (<code>bisect run</code>, <code>rebase -x</code>, <code>--upload-pack</code>, <code>config alias</code>, <code>--ext-diff</code>) are read; cluster lifecycle tools (kind, minikube, k3d, kops, talosctl, clusterctl, openshift-install, crc, microk8s) and the cluster operations of gcloud, aws, az and doctl ask unless they only read or update the local kubeconfig. <strong>Where it fails open:</strong> Claude Code lets a tool call through when a hook cannot start, exits with a code other than 0 or 2, or outlives its timeout, unless the entry sets <code>"onFailure": "block"</code> (Claude Code v2.1.295 or later; older versions ignore it). The entry <code>hook install</code> writes -- only for a user who asked for it -- sets it, so there a missing <code>kube-noob</code>, a crash or a timeout blocks. The plugin's entry, which every plugin user gets, does not set it; instead its command is a POSIX <code>sh</code> guard that reads the opt-in from <code>CLAUDE_PLUGIN_OPTION_VERIFY_CLUSTER_COMMANDS</code> (the variable Claude Code exports to plugin hooks; exact match, ASCII case ignored, nothing stripped, the same rule as the Python side). Off, it exits 0 without starting any program. On, it blocks by itself with exit 2 and one line on stderr when <code>uv</code> cannot be found or its run exits with anything but 0 or 2, and passes the bundled hook's answer through otherwise -- on any Claude Code version. The guard also kills a <code>uv</code> run that has not finished in 45 seconds and blocks (exit 2), so a <code>uv</code> stalled resolving on a slow network does not reach Claude Code's 60-second timeout, which would let the call through. What remains open for a plugin user who turned the check on: a system with no <code>sleep</code> program, where the 45-second watchdog cannot run; and Windows without Git Bash, where Claude Code runs a shell-form hook in PowerShell, the guard does not parse, and the error is non-blocking -- the check simply does not run, for anyone. A Windows user who wants the check uses Git Bash (or <code>CLAUDE_CODE_GIT_BASH_PATH</code>) or <code>kube-noob hook install</code>. The PowerShell case has not been run. <strong>What it does not stop:</strong> it is a check in the agent's own harness, not a security boundary. An agent with a shell can bypass any client-side hook: Python, Node or another language building a command at run time (<code>"kube"+"ctl"</code>), the Kubernetes API with <code>curl</code> and a token, a kubectl copied or linked under another name, a compiled program, a Makefile target built from make variables, a dependency's install script, an environment variable exported by an earlier call (<code>KUBECTL_EXTERNAL_DIFF</code>, <code>PATH</code>), a kubectl placed in a virtualenv's <code>bin</code>, editing the settings that install the hook, or another tool or session. It does not judge what a day-2 change does to the running cluster. Allowed by design, because none can add a finding to a manifest: <code>rollout restart|pause|resume</code>, <code>scale</code> and <code>autoscale</code> of one named object; <code>label</code> or <code>annotate</code> of one object that is not a namespace or node, with no Pod Security, SCC, node-selector or cloud-identity key; deleting pods by name; <code>create namespace|configmap|secret|serviceaccount</code> from literals or from files in the tree; <code>oc new-project</code>; <code>expose</code> as a ClusterIP Service without <code>--external-ip</code>; <code>set env</code> without a credential, a URL with a password in it or a variable that loads code (<code>LD_PRELOAD</code>, <code>NODE_OPTIONS</code>, <code>JAVA_TOOL_OPTIONS</code> ...); a patch by name that touches only replicas, pauses, timings, labels or annotations; <code>kubectx</code>, <code>kubens</code>, <code>oc project</code> and <code>config set-context --current --namespace</code>; <code>port-forward</code> and <code>proxy</code> on loopback (they open a local port and store nothing; a non-loopback <code>--address</code>, a widened <code>--accept-hosts</code> or <code>--disable-filter</code> asks); a dry run (<code>--dry-run=client|server</code>) on any verb that defines the flag, since nothing persists -- with a note when a real run of the manifest would be denied; <code>--help</code> on a verb the tool itself defines (on a plugin word the plugin runs, so that asks); <code>oc adm node-logs</code>, <code>must-gather</code> with the default image, <code>release info</code> and the <code>upgrade</code> status, <code>status</code> and <code>recommend</code>; <code>krew list|info|search</code>, <code>neat</code> and <code>helm diff</code>; and a day-2 change with an explicit <code>--context</code>, <code>--cluster</code>, <code>--kubeconfig</code> or <code>KUBECONFIG=</code>, which is judged the same as without one (a manifest sent to an explicit cluster asks). The full table, run by a test, is in <a href="/docs/use-cases/#what-verify-allows-asks-about-and-denies">docs/use-cases.md</a>. A command longer than the reader's 20,000 characters is allowed only when it is one inert <code>echo</code>, <code>printf</code> or here-document naming no kube tool; anything else past the cap asks. Each of these asks instead: a <code>--dry-run</code> that is the value of the bare flag before it (<code>-n --dry-run=client</code> runs for real) or followed by a run-time word (the last one wins); <code>delete pod NAME --raw URI</code> (the URI is deleted, the name ignored) or with <code>-f</code> or a second kind; a day-2 change with <code>--as</code>, <code>--token</code>, <code>--server</code>, <code>--user</code>, <code>--username</code>/<code>--password</code>, client-certificate or CA flags (who it runs as or where the credential goes); a scale, restart, pod delete, label, patch or <code>set env</code> in <code>kube-system</code>, <code>kube-public</code>, <code>kube-node-lease</code> or <code>openshift-*</code>, or of <code>etcd</code>, <code>kube-apiserver</code> or <code>cluster-version-operator</code>; a day-2 word only known at run time; helm's <code>--post-renderer</code> and kustomize's <code>--enable-*</code> on any verb (a program on this machine); <code>oc adm prune</code> and every other <code>oc adm</code> outside the read list; <code>create secret docker-registry</code>; <code>set env</code> of <code>PATH</code>, a proxy or a CA-bundle variable; <code>expose --type</code> that is not a literal ClusterIP; a proxy with <code>--accept-paths</code>, <code>--reject-paths</code> or <code>--reject-methods</code>; <code>oc adm must-gather --image</code>. The printed reason never carries a credential's value (<code>--token V</code>, <code>-p V</code>, <code>-pV</code>, <code>--kube-token V</code>, <code>--env PASSWORD=V</code>, <code>://user:pw@</code>), and a hidden character in a command is shown as <code>&lt;U+200B&gt;</code>, the same under every terminal encoding. PowerShell: a command that names a kube tool, or that builds or runs a command its text does not spell (<code>&amp;</code>, <code>iex</code>, <code>Invoke-Expression</code>, <code>gcm</code>, a <code>.ps1</code>, <code>wsl</code>, <code>cmd /c</code>, string concatenation, base64), asks; verify still does not read PowerShell. a cloud-identity key on a service account (<code>eks.amazonaws.com/role-arn</code>, <code>iam.gke.io/gcp-service-account</code>, <code>azure.workload.identity/*</code>), <code>--external-ip</code> (CVE-2020-8554), <code>oc expose svc</code> (a Route), <code>--from-file</code>/<code>--from-env-file</code> outside the tree (it copies a file from this machine into the cluster), a code-loading variable in <code>set env</code>, <code>helm plugin install</code>, and <code>fc -s</code>/<code>r</code> (they re-run a command from the shell's history). It does not judge a PersistentVolume's <code>hostPath</code> (no audit rule reads it), or a namespace's Pod Security level below <code>--fail-on</code> (KN-S032 is medium). It checks changes, not reads: printing or sending away what the cluster holds (<code>kubectl get secrets -A -o yaml | curl ...</code>, <code>config view --raw</code>, <code>oc whoami -t</code>) is out of scope, as is what a container image or <code>docker build</code> does without cluster credentials, and what <code>go test</code> runs. Other deployers -- <code>helmfile</code>, <code>argocd</code>, <code>flux</code>, <code>skaffold</code>, <code>terraform</code>, <code>tofu</code>, <code>pulumi</code>, <code>istioctl</code>, <code>velero</code>, <code>kubeadm</code>, <code>kpt</code>, <code>crossplane</code>, <code>eksctl</code>, <code>ansible-playbook</code> -- are not modelled: their reading subcommands pass and the rest ask; <code>kapp deploy -f FILE</code> is checked like <code>kubectl apply</code>. PowerShell commands are not parsed: one that names a kube tool asks. The server-side control is the <a href="/docs/use-cases/#every-finding-as-a-kubectl-warning-the-admission-webhook">admission webhook</a> with <code>admission.enforce</code>, and the cluster's own RBAC. <code>KUBE_NOOB_HOOK=off</code> in the environment Claude Code starts with turns the hook off for the human; <code>KUBE_NOOB_HOOK=off kubectl ...</code> in a command does not.</td>
+</tr>
+<tr>
+<td>Container</td>
+<td>UBI 9, non-root numeric UID, works with OpenShift arbitrary UIDs, read-only root filesystem in the chart, all capabilities dropped, RuntimeDefault seccomp.</td>
+</tr>
+<tr>
+<td>Supply chain</td>
+<td>Hash-pinned dependencies (<code>requirements.lock</code>), SHA-pinned Actions, CodeQL, OpenSSF Scorecard, Dependabot, <code>pip-audit</code> in CI, PyPI Trusted Publishing, SLSA provenance attestations, SBOM, keyless cosign signatures.</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Corpus records carry license and redistributability; Jira identities and emails are scrubbed; non-redistributable content is never published unencrypted by CI. Retention and destinations: <a href="/docs/privacy/">PRIVACY.md</a>.</td>
+</tr>
+<tr>
+<td>Private Jira seed</td>
+<td>Sealed with the organisation's key: AES-256-GCM per 1 MiB chunk with counter nonces and a last-chunk flag, a per-file key from PBKDF2-HMAC-SHA256 (600,000 iterations, random salt); any edit, reorder, drop, truncation or wrong key fails and nothing is written. The key comes from a mounted Secret file only (mode 0440, the server container alone). The <code>jira-db-image</code> workflow refuses a repository anyone can list and an image anyone can pull, and refuses a copy whose anonymiser self-check finds a person.</td>
+</tr>
+<tr>
+<td>Public data image</td>
+<td><code>kube-noob-db</code> holds one archive that <code>corpus db-check</code> gates twice in CI (before the build and on the image's own copy) and again on the pushed digest: redistributable records on allow-listed licenses only, no Jira data, every file listed with its checksum, no links or special files. Published only when the maintainer enables it, attested and keyless-signed; the chart accepts it by digest only, copies it with <code>cp</code> in a read-only, capability-free init container, and <code>corpus import</code> re-validates the whole archive before copying anything.</td>
+</tr>
+<tr>
+<td>Red Hat Jira sync</td>
+<td>REST API only (no page scraping, per Atlassian's Acceptable Use Policy); one request per second or slower (robots.txt crawl delay) plus random jitter, a request budget per run, the in-cluster sync's first run after a random 30 s to 10 min and every interval +/- 10%, clones from GitHub spaced by a random pause, the scheduled refresh started at a random offset, backoff on 429 with <code>Retry-After</code>; the client can only GET from the Jira host (plus POST to its search endpoint) over HTTPS; project and issue keys are validated before they reach a query; the local ticket index is mode 0600.</td>
+</tr>
+<tr>
+<td>Claude plugin</td>
+<td>Runs the readable stdio server bundled in the plugin with <code>uv run --frozen --isolated</code>; every dependency is pinned by version and sha256 in <code>uv.lock</code>; no LLM SDK is installed and no package-manager variable is set; only the modules the stdio server imports ship, so nothing in the plugin reads a credential; web, cluster and model calls are off.</td>
+</tr>
+<tr>
+<td>Directory plugin</td>
+<td><code>kube-noob-skills</code> ships Markdown and JSON only: no server, script, hook or <code>bin/</code>, and it downloads nothing. Its skills run the CLI the user installed (<code>kube-noob</code> on the <code>PATH</code>, never <code>kubectl noob</code> or a package launcher, both of which can fetch it) through Claude's Bash tool, under the user's own permission settings; the plugin pre-approves no tool and runs nothing as a skill loads. Pasted text is written into a private per-session folder (<code>umask 077</code>, <code>mktemp -d</code>) with Claude's file-writing tool, never a heredoc, and the folder is removed after. Every command runs with <code>KUBE_NOOB_FOR_MODEL=1</code>, so text from the input shaped like instructions is neutralised by <code>kube_noob.sanitize</code> and flagged before Claude reads it, and with <code>KUBE_NOOB_LEARNING_ENABLED=false</code>; output goes to a file with the exit code printed, and only exit 0 or 1 with a complete JSON document counts as a result. No command it runs carries <code>--cluster-enabled</code>, <code>--web-enabled</code>, <code>--live</code> or <code>--online</code>. Tests parse every command line against the real argument parser, and run every command a skill names on a fixture to check the fields its table cites.</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>A burst of idle or slow connections starves the HTTP server's connection pool: uvicorn counts connections towards <code>limit_concurrency</code> and nothing reclaims one that never sent a request (<code>timeout_keep_alive</code> applies between requests on a keep-alive connection), so every request including the kubelet's probes answers 503 until they close. kube-noob cannot close this in process. Buffered-body memory is bounded -- the limit is 1.5 MiB, a body must arrive within 10 s, and at most eight bodies over 256 KiB wait in memory for their tool (or, for an alert report, for a report slot) at once; one more waits for room until its read deadline and is then answered 503. 64 worst-case MCP alert reports at once peaked at 217 MB against a 512Mi container -- and the liveness probe is four times more forgiving than readiness, so sustained overload sheds traffic instead of restarting the pod. <strong>Expose the port through a reverse proxy, ingress or service mesh that enforces a header-read and idle timeout.</strong> The default sidecar deployment binds 127.0.0.1, where only containers in the same pod can reach it.</td>
+</tr>
+<tr>
+<td>Sidecar</td>
+<td>Binds 127.0.0.1 only, so only containers in the same pod can call it (the pod is the trust boundary); no Service port, no token, no egress needed. CI proves the port is closed on the pod IP.</td>
+</tr>
+<tr>
+<td>Egress on OpenShift</td>
+<td>Chart NetworkPolicy allows DNS only by default; optional OVN-Kubernetes EgressFirewall allows only the API server and allowlisted HTTPS domains, then denies all.</td>
+</tr>
+<tr>
+<td>Homebrew</td>
+<td>The formula installs the release wheel and wheels-only dependencies pinned by hash from the release's <code>requirements.lock</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Workflows run only reviewed code with write-capable tokens or caches: no checkout takes a ref typed into a workflow
+input, and the videos workflow renders only a release tag and a pipeline commit that are on the default branch.
+CodeQL (<code>security-extended</code>, Python and Actions) runs on every pull request and on main.</p>
+<h2 id="the-directory-plugin-and-a-remote-server">The directory plugin and a remote server</h2>
+<p>The Claude plugin directory accepts a remote MCP server from an organization that is not Verified, so
+<code>kube-noob-skills</code> could declare an <code>http</code> server whose URL and bearer token come from <code>userConfig</code> and point it at
+the user's own <code>kube-noob serve</code>. It does not, for now. What the documentation says, read 2026-11-12:</p>
+<ul>
+<li>A <code>sensitive</code> value "masks input and stores the value in secure storage instead of <code>settings.json</code>", and
+  <code>${user_config.KEY}</code> is substituted into an MCP server's <code>url</code> and <code>headers</code>
+  (<a href="https://code.claude.com/docs/en/plugins-reference#user-configuration">plugins reference</a>). The
+  token would not be written into the plugin's files.</li>
+<li>But a server whose URL option is unset is an error, not an absence: Claude Code reports <code>Invalid MCP server config
+  ... URL is unset or invalid</code> on the plugin's Errors tab
+  (<a href="https://code.claude.com/docs/en/plugins/troubleshooting">troubleshooting</a>). Chat ignores such a server and Cowork
+  ignores one whose option has no default (<a href="https://claude.com/docs/plugins/platform-support">platform support</a>).
+  Most people installing from the directory will never run <code>kube-noob serve</code>, so the default state of every install
+  would be an error, and a skill would have to name <code>kubenoob_*</code> tools that exist only on some installs.</li>
+<li><code>kube-noob serve</code> on a laptop is a local process presented as a remote one. That is the thing the directory gates on
+  Verified status, reached by a side door; a reviewer could fairly read it that way.</li>
+</ul>
+<p>The CLI path covers the same commands with no credential at all. If it is ever shipped, the server is optional, the
+token is a <code>sensitive</code> option and the URL has no default; <code>tests/test_plugin.py::test_bundle_names_no_credential_variables</code>
+does not cover it (it scans <code>plugin/kube-noob/server/</code>), so a test for the directory plugin has to refuse any literal
+header value. That decision is the maintainer's.</p>
+<h2 id="capability-tiers">Capability tiers</h2>
+<p>kube-noob reads by default and changes nothing. Everything else is a tier, off by default; every action in a tier
+needs a person's approval for exactly that action, valid for 15 minutes and usable once. <code>kube-noob doctor</code> prints
+each tier and what it needs.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Switch</th>
+<th>Allows</th>
+<th>Needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R</td>
+<td><code>cluster.enabled</code></td>
+<td>get, list and logs on the allowlisted resources (including Roles, RoleBindings, ClusterRoles and ClusterRoleBindings for the attack-path scan, OLM ClusterServiceVersions and Subscriptions for the operator inventory, and Gateway API HTTPRoutes and GRPCRoutes and Istio VirtualServices for the attack-path scan and the blast radius, with every header and query-parameter value a route sets or matches masked, as are Route header actions, Ingress snippets and haproxy annotations that set credential headers, and credentials in annotation values); Secrets never. Which resources each live capability reads, recorded from the code, and that the chart's Role/ClusterRole grants exactly that set: <a href="/docs/permissions/">docs/permissions.md</a> (G293)</td>
+<td>get/list/watch RBAC</td>
+</tr>
+<tr>
+<td>R</td>
+<td><code>ci.githubEnabled</code></td>
+<td>GET of a repository's GitHub Actions runs, attempts and jobs, to <code>ci.githubApiUrl</code> only, no redirects</td>
+<td>a token with <code>actions: read</code> in <code>$GITHUB_TOKEN</code></td>
+</tr>
+<tr>
+<td>R</td>
+<td><code>rhacs.enabled</code></td>
+<td>GET of RHACS Central's policies (<code>/v1/policies</code>) and of the image scans you name (<code>/v1/images/&lt;digest&gt;</code>, <code>vuln report --rhacs-image</code>), to <code>rhacs.endpoint</code> only, no redirects</td>
+<td>an RHACS API token that can read policies and images (for example the Analyst role) in <code>$ROX_API_TOKEN</code></td>
+</tr>
+<tr>
+<td>P</td>
+<td><code>probe.enabled</code></td>
+<td>an ephemeral debug container or a probe Job</td>
+<td>patch on <code>pods/ephemeralcontainers</code>; create and delete on Jobs (chart Role only when enabled)</td>
+</tr>
+<tr>
+<td>D</td>
+<td><code>dryRun.enabled</code></td>
+<td>server-side dry-run (<code>?dryRun=All</code>) of a manifest</td>
+<td>create and patch on <code>dryRun.rules</code> resources, never Secrets: Kubernetes authorizes a dry-run exactly like the real request</td>
+</tr>
+<tr>
+<td>W</td>
+<td><code>itsm.writeEnabled</code>, <code>notify.enabled</code></td>
+<td>attach evidence to a ticket; forward a report</td>
+<td>the external system's token; refused under the offline lock</td>
+</tr>
+<tr>
+<td>G</td>
+<td><code>gate.enabled</code></td>
+<td>forward a tool call a person approved to an upstream MCP server</td>
+<td>nothing from kube-noob; the upstream keeps its own access</td>
+</tr>
+<tr>
+<td>M</td>
+<td><code>llm.provider</code></td>
+<td><code>kube-noob ask</code>, <code>train bench</code> and the eval judge call a model; no MCP tool and no other command does</td>
+<td>the key named in <code>llm.apiKeyEnv</code> (only <code>*_API_KEY</code> variables, so never the server's own <code>KUBE_NOOB_HTTP_TOKEN</code>), or <code>$ANTHROPIC_API_KEY</code> for <code>provider: anthropic</code> -- which is that provider's default and is sent nowhere else. An <code>openai-compatible</code> endpoint with no <code>apiKeyEnv</code> is called with no <code>Authorization</code> header. Endpoint error bodies are redacted before kube-noob quotes them. Refused under the offline lock unless the endpoint is loopback or <code>*.svc</code></td>
+</tr>
+<tr>
+<td>A</td>
+<td><code>admission.enforce</code> (chart <code>admission.enabled</code> runs the webhook)</td>
+<td><code>kube-noob admission serve</code> denies a create or update for a listed rule, and on an update only a finding the old object did not have; otherwise it only warns; it never mutates, and <code>failurePolicy: Ignore</code> means a dead webhook blocks nothing -- which KN-S030 reports as a HIGH finding, correctly: a policy gate whose purpose is to deny should set <code>Fail</code>. For this webhook the trade-off is deliberate and accepted on the record in <code>.github/kube-noob-exceptions.yaml</code>, because an audit webhook that is down must not stop a cluster admitting objects. If you audit your own kube-noob install you will see the same finding; accept it the same way rather than lowering the rule. The object's name is <code>&lt;release&gt;-kube-noob-admission.&lt;namespace&gt;.kube-noob.io</code>, so it embeds your release name and namespace, and a cluster-scoped exception must name it exactly -- copy the shape of our entry, not its name</td>
+<td>a serving certificate (OpenShift service CA, cert-manager or your Secret); with <code>admission.lookups</code>, a ClusterRole with get and list on PodDisruptionBudgets, NetworkPolicies, PersistentVolumeClaims, HorizontalPodAutoscalers and StorageClasses</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tier A is configuration rather than an action: whoever lists a rule in <code>admission.enforce</code> approves every denial of
+that rule, so it has no per-action approval. The read-only backends have no method that writes. Code that changes something exists only while its tier is on.
+kube-noob's own audit flags what the P and D Roles allow (KN-S017, medium): pods started by Jobs or added as
+ephemeral containers can act as any ServiceAccount in the namespace, so enable them only in namespaces that enforce
+Pod Security <code>restricted</code>.</p>
+<h2 id="compliance">Compliance</h2>
+<p>Audit findings name the NIST SP 800-53 Rev. 5 controls they are evidence about, and <code>kube-noob doctor</code> reports FIPS
+mode. How to deploy kube-noob inside a FedRAMP High boundary, and what is not covered yet:
+<a href="/docs/compliance/">docs/compliance.md</a>.</p>
+<h2 id="verdict-receipts-prove-integrity-not-authenticity">Verdict receipts prove integrity, not authenticity</h2>
+<p><code>kube-noob audit --receipt PATH</code> and <code>kube-noob gate --receipt PATH</code> write a document that binds every input by
+SHA-256, the tool version, the meaning of every rule, the settings that changed the verdict and the verdict itself,
+and <code>kube-noob receipt verify PATH</code> re-runs those inputs. It is <strong>not</strong> a signature and not an attestation:</p>
+<ul>
+<li>there is no key, no signing and no <code>cryptography</code> dependency. Anyone who can run kube-noob can write a receipt
+  for any input they hold, so a receipt says nothing about who produced it. The document states that in its own
+  text (<code>integrity.statement</code>), the command says it on stderr when it writes one, and <code>receipt verify</code> repeats it
+  with every answer. Do not treat a receipt as provenance, and do not accept one as evidence that a particular
+  party ran a particular scan;</li>
+<li>what it does prove is worth having on its own: that these exact input bytes, under these exact settings, with
+  these exact rule meanings, give this exact verdict -- and that anybody holding the files can re-derive it
+  offline. Check the inputs with <code>sha256sum</code> and the verdict with <code>receipt verify</code>;</li>
+<li><code>receipt verify</code> exits <strong>5</strong> and names what it could not get whenever it cannot reach that conclusion: a missing
+  input, a digest that moved, a receipt from another kube-noob version, a rule set that has changed, a file added
+  to a directory since, standard input, or a gate run that also read a Containerfile, a scanner report, a SARIF
+  report, VEX, KEV or a rendered Helm chart. Exit 5 is not a pass, and a pipeline that treats it as one has no
+  check at all. A payload that does not match the digest the document carries is refused (exit 4), not checked;</li>
+<li>signing would be an adapter over this document rather than a change to it: the payload digest is the seam. No
+  key handling exists in kube-noob today, and <code>gh attestation</code> and <code>cosign</code> below are how the released artefacts
+  are verified.</li>
+</ul>
+<h2 id="verifying-releases">Verifying releases</h2>
+<p><strong>Both commands below need a network, and this section used to say nothing about that.</strong> <code>gh attestation verify
+--repo</code> asks GitHub's attestations API for the bundle; keyless <code>cosign verify</code> needs Sigstore's trust root
+(Fulcio and Rekor). kube-noob is offline-first, its airgap job proves the install and four workflows run with no
+interface and no route, and the operators it is built for are behind an air gap -- so the one instruction this
+file gives them could not be carried out where they are, and nothing here said so. That is the product's own
+rule turned on its own supply chain: a precondition that is absent, presented as though it holds.</p>
+<p>On a machine with a network:</p>
+<pre><code class="language-bash">gh attestation verify dist/kube_noob-*.whl --repo kube-noob/kube-noob
+cosign verify ghcr.io/kube-noob/kube-noob:&lt;version&gt; \
+  --certificate-identity-regexp 'https://github.com/kube-noob/kube-noob/.github/workflows/release.yml@.*' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+</code></pre>
+<p>Across an air gap, carry the material in and verify against it. <code>gh attestation verify</code> takes <code>--bundle</code> for
+"offline verification using attestations stored on disk", and <code>cosign verify</code> takes <code>--offline</code> with the bundle
+beside the image. Fetch both on a connected machine:</p>
+<pre><code class="language-bash">gh attestation download dist/kube_noob-*.whl --repo kube-noob/kube-noob
+cosign download signature ghcr.io/kube-noob/kube-noob:&lt;version&gt; &gt; cosign.sig
+</code></pre>
+<p>then carry the artefact and its bundle across and verify with <code>--bundle</code>. <strong>What is missing today, and is the
+reason this is written as a limitation rather than a recipe: the release publishes no bundle as an asset.</strong> Its
+assets are the wheel, the sdist, the chart, the krew archive, the skill zip, <code>sbom.spdx.json</code> and the demo GIFs
+-- measured on v0.10.0, where a query for any asset whose name contains <code>bundle</code>, <code>sigstore</code>, <code>intoto</code> or <code>att</code>
+returns zero. So an operator with no network has the artefact, the SBOM and no way to check either, and the
+offline commands above depend on someone having run the download on a connected machine first. Publishing the
+bundles as release assets is the fix and is owed; until it lands, the honest statement is that <strong>an air-gapped
+operator cannot verify a kube-noob release from the release alone</strong>, and the digests in <code>sbom.spdx.json</code> plus
+<code>sha256sum</code> are what they have.</p>
+<p>Two things this does not say. The evidence receipts are a different claim and are unaffected: they are
+digest-bound and replayable, they are not signatures, and <code>receipt verify</code> needs no network (see above). And
+nothing here is a reason to skip verification where a network exists -- the commands work, they are the right
+ones, and the gap is the air-gapped case they never mentioned.</p>
+<p>Those commands verify what was built after the project moved into the <code>kube-noob</code> organisation: the image for
+0.9.0 and later, and the wheel for 0.9.1 and later. There is no 0.8.0 or 0.9.0 wheel: neither release reached
+PyPI (the 0.8.0 run failed before publishing and the 0.9.0 run failed at the PyPI step), so PyPI goes from 0.7.1
+to 0.9.1.
+0.7.1 and earlier were published from the previous account, and a signature cannot be moved: their images are at <code>ghcr.io/aashishmahajan/kube-noob</code>, their certificates name that repository, and
+<code>gh attestation verify --repo kube-noob/kube-noob</code> finds no attestation for their wheels. For one of those images:</p>
+<pre><code class="language-bash">cosign verify ghcr.io/aashishmahajan/kube-noob:&lt;version&gt; \
+  --certificate-identity-regexp 'https://github.com/aashishmahajan/kube-noob/.github/workflows/release.yml@.*' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+</code></pre>
+<p>For one of those wheels, PyPI's own provenance names the publisher it was built by (<code>"repository":
+"aashishmahajan/kube-noob"</code>):</p>
+<pre><code class="language-bash">curl -fsS https://pypi.org/integrity/kube-noob/&lt;version&gt;/kube_noob-&lt;version&gt;-py3-none-any.whl/provenance
+</code></pre><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/SECURITY.md">SECURITY.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

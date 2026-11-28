@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Evidence · kube-noob</title>
+<meta name="description" content="One self-contained HTML report a reviewer opens offline, an Alertmanager alert turned into a stored evidence report, and SARIF, OSCAL and KSI output.">
+<link rel="canonical" href="https://kube-noob.com/evidence/">
+<meta property="og:title" content="Evidence · kube-noob">
+<meta property="og:description" content="One self-contained HTML report a reviewer opens offline, an Alertmanager alert turned into a stored evidence report, and SARIF, OSCAL and KSI output.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/evidence/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Evidence</span>
+<h1>What does a reviewer actually open?</h1>
+<p class="lead">Not a console. One file, on a laptop, often with no network: an attachment on a change ticket, or the
+artefact a pipeline kept. So <code>gate</code>, <code>posture report</code>, <code>posture diff</code> and
+<code>ksi</code> all take <code>--html</code> and write a single self-contained page -- inline SVG, no script, no
+stylesheet, nothing fetched -- that prints to paper as it stands. The posture pages carry charts: findings by
+severity, open findings per control, the five standing buckets, and open against excepted over the snapshots
+kept.</p></div>
+<section class="band"><h2>It opens with the number no other scanner prints</h2>
+<p class="sub">This is the masthead of a real report, built from <code>examples/insecure-deployment.yaml</code> when this site was
+built. Above a numbered section 1, "Limits of this examination".</p>
+<div class="masthead"><h3>The gate failed.</h3><p>15 findings at <code>--fail-on high</code> for platform <code>openshift</code>. 3 checks never ran because no input was given for them: that is not a pass, and section 1 says what they would have covered.</p><div class="stats"><div class="stat"><div class="n">15</div><div class="l">findings · Findings<br><span class="muted">worst is high</span></div></div><div class="stat absence"><div class="n">3</div><div class="l">checks · Not run<br><span class="muted">no input was given for them</span></div></div><div class="stat"><div class="n">0</div><div class="l">excepted · Excepted<br><span class="muted">accepted, and still listed</span></div></div></div></div>
+<p class="note">Every other scanner reports only what failed. A reader who sees only that number cannot tell a clean
+cluster from an unexamined one -- so what reached no verdict is a number of its own, beside the findings, not a
+column in a table thirty rows down. The <code>ksi</code> page counts <b>indicators</b> the same way, including how
+many have no kube-noob rule behind them at all.</p>
+<div class="run"><pre class="out"><code>$ kube-noob gate -f examples/insecure-deployment.yaml --platform openshift --version 4.22 --html report.html</code></pre></div>
+</section>
+<section class="band"><h2>An alert becomes a report before anyone opens a console</h2>
+<p class="sub">Point an Alertmanager webhook receiver at <code>POST /v1/alert-reports</code> on the in-cluster service
+and each notification becomes an evidence report per alert: the signals it carries, the playbook diagnosis, the
+reported OpenShift bugs for the release the alert's own <code>openshift_version</code> label names, fixes your team
+confirmed, and the read-only checks to run first. With <code>alertReports.store</code> the server keeps it and
+on-call reads it back by id. The same report comes from a payload file with no server at all.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob alerts report -f examples/alertmanager-etcd.json</code></pre><pre class="out"><code>Alert evidence report: 0 alert(s)
+verdicts: 
+version: not named by the payload
+caveats:</code></pre></div>
+<p class="note">Every section says what it could not determine -- no version label, a release outside the issues
+kube-noob carries, no playbook, no team memory repository -- and an alert it recognises nothing in says exactly that
+instead of looking healthy. The receiver configuration is on the <a href="/docs/operations/">operations page</a>,
+with the Prometheus metrics, the alert rules and the Grafana dashboard the chart can install.</p></section>
+<section class="band"><h2>Formats something else already reads</h2>
+<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+  <div class="card"><h3>SARIF 2.1.0</h3><p><code>audit --format sarif</code> and <code>gate --sarif</code>: findings
+  in GitHub code scanning, with the NIST controls on the rules and the blind spots in the same file.</p></div>
+  <div class="card"><h3>OSCAL 1.2.3</h3><p><code>audit --oscal</code> and <code>gate --oscal</code> write
+  <code>assessment-results</code>, validated against NIST's own schema in the product's CI.</p></div>
+  <div class="card"><h3>FedRAMP 20x KSI</h3><p><code>kube-noob ksi</code> projects one audit onto the key security
+  indicators, and reports how many have no kube-noob evidence at all.
+  <a href="/docs/fedramp-ksi/">The crosswalk</a>.</p></div>
+  <div class="card"><h3>Pull-request annotations</h3><p><code>gate --github-annotations</code> and the Action's
+  <code>annotations</code> input put findings on the diff; nine per kind, and the tenth says how many are not
+  shown.</p></div>
+</div>
+<p class="note">Exceptions are a file, not a flag: an accepted risk carries an owner and an expiry
+(<code>--exceptions</code>), and the report lists what was excepted rather than hiding it.</p></section>
+<section class="band"><h2>One question each</h2><p class="sub">Every page below shows the command and the output this build got from it, including what the command said it could not determine.</p><div class="grid features"><a class="card feature" href="/start/"><h3>Start here</h3><p>Install it, then the first five minutes: the example files, the text views, and what it says when it cannot answer.</p><span class="more">Read it</span></a><a class="card feature" href="/blast-radius/"><h3>If this pod is compromised, what can it reach?</h3><p>Five legs -- exposure, token, RBAC, Secrets, node -- each reached, none, or not determined.</p><span class="more">Read it</span></a><a class="card feature" href="/operators/"><h3>Which operators are installed, and are any reported broken?</h3><p>What OLM installed, from manifests or a must-gather, and what the OpenShift release notes say about it.</p><span class="more">Read it</span></a><a class="card feature" href="/testing/"><h3>How do you know it is not quietly passing?</h3><p>The defect classes the adversarial reviews keep finding, and the tests that hold each one.</p><span class="more">Read it</span></a></div></section>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

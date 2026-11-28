@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Start · kube-noob</title>
+<meta name="description" content="Install kube-noob, then the first five minutes: the example files, the diagnose text view and what it says when it cannot answer.">
+<link rel="canonical" href="https://kube-noob.com/start/">
+<meta property="og:title" content="Start · kube-noob">
+<meta property="og:description" content="Install kube-noob, then the first five minutes: the example files, the diagnose text view and what it says when it cannot answer.">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/start/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/" aria-current="page">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+
+<div class="prose" style="max-width:900px"><span class="eyebrow">Start</span>
+<h1>Install it, then the first five minutes</h1>
+<p class="lead">kube-noob is a command-line tool and an MCP server. It calls no model, and by default it makes no
+network request at all: everything below runs on files you already have. Version 0.11.1, Apache-2.0,
+Python 3.11.4 or newer.</p></div>
+<section class="band"><h2>Install</h2><p class="sub">Taken from the product's own
+<a href="/docs/install/">install page</a> at this build, not retyped here.</p><div class="tabbed"><div class="tablist" role="tablist" aria-label="Install"><button type="button" role="tab" id="tab-brew" aria-controls="panel-brew" aria-selected="true">Homebrew</button><button type="button" role="tab" id="tab-uv" aria-controls="panel-uv" aria-selected="false">uv</button><button type="button" role="tab" id="tab-pipx" aria-controls="panel-pipx" aria-selected="false">pipx</button><button type="button" role="tab" id="tab-container" aria-controls="panel-container" aria-selected="false">Container</button><button type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="false">Claude Code</button><button type="button" role="tab" id="tab-mcp" aria-controls="panel-mcp" aria-selected="false">Any MCP client</button></div><div role="tabpanel" id="panel-brew" aria-labelledby="tab-brew"><pre><code>brew tap kube-noob/kube-noob https://github.com/kube-noob/kube-noob
+brew trust --formula kube-noob/kube-noob/kube-noob
+brew install kube-noob
+kube-noob demo --list
+kube-noob audit -f your-manifests/ --platform openshift --version 4.22
+kube-noob insight &#x27;paste anything&#x27;
+kube-noob doctor</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-uv" aria-labelledby="tab-uv" hidden><pre><code>uv tool install kube-noob</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-pipx" aria-labelledby="tab-pipx" hidden><pre><code>pipx install kube-noob</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-container" aria-labelledby="tab-container" hidden><pre><code>podman run --rm ghcr.io/kube-noob/kube-noob:0.11 --version</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" hidden><pre><code>/plugin marketplace add kube-noob/kube-noob
+/plugin install kube-noob@kube-noob</code></pre><button class="copy" type="button">Copy</button></div><div role="tabpanel" id="panel-mcp" aria-labelledby="tab-mcp" hidden><pre><code>{&quot;mcpServers&quot;: {&quot;kube-noob&quot;: {&quot;command&quot;: &quot;uvx&quot;, &quot;args&quot;: [&quot;--from&quot;, &quot;kube-noob==0.11.1&quot;, &quot;kube-noob&quot;, &quot;mcp&quot;]}}}</code></pre><button class="copy" type="button">Copy</button></div></div>
+<p class="note">Every method installs two commands: <code>kube-noob</code> and its short form <code>noob</code>.
+<a href="/docs/install/">The install page</a> has pip-in-a-virtualenv, the Helm chart, the Agent Skill for
+chat on claude.ai, and what to do when an older install shadows the new one.</p></section>
+<section class="band"><h2>1. Get the example files</h2><p>The commands in the README name files under <code>examples/</code>. They ship inside the package; write them somewhere a command line can name:</p><div class="run"><pre class="out"><code>$ kube-noob examples copy examples</code></pre></div><p class="run-note">It never replaces a file without <code>--force</code>, never writes through a symbolic link, and checks every target before it writes any, so running it twice is safe. <code>kube-noob examples list</code> prints the table below.</p><div class="table-wrap"><table><thead><tr><th>File</th><th>What it is for</th></tr></thead><tbody><tr><td><code>alertmanager-etcd.json</code></td><td>an Alertmanager webhook for etcd leader changes (diagnose, insight, memory match)</td></tr><tr><td><code>blueprint.yaml</code></td><td>an application blueprint for the 7-step protocol (protocol --blueprint)</td></tr><tr><td><code>denial-multi.txt</code></td><td>one Deployment rejected by five admission systems, each in its own words (policy explain)</td></tr><tr><td><code>events-crashloop.txt</code></td><td>describe output of a pod killed for memory (diagnose, insight)</td></tr><tr><td><code>events-scc.txt</code></td><td>events of pods rejected by OpenShift SecurityContextConstraints (diagnose, policy explain)</td></tr><tr><td><code>exercise-answer.yaml</code></td><td>a first attempt at a graded exercise (learn submit)</td></tr><tr><td><code>insecure-deployment.yaml</code></td><td>a Deployment that runs on a laptop but not on OpenShift (audit, fix)</td></tr><tr><td><code>kube-noob-exceptions.yaml</code></td><td>a risk-acceptance list with owners and expiry dates (exceptions check, gate)</td></tr><tr><td><code>netpol-admin-tiers.yaml</code></td><td>AdminNetworkPolicy, NetworkPolicy and BaselineAdminNetworkPolicy tiers (policy reach)</td></tr><tr><td><code>netpol-shop.yaml</code></td><td>NetworkPolicies and Deployments for a small shop (policy reach)</td></tr><tr><td><code>problems.yaml</code></td><td>your own problems as test cases with expected answers (selftest --cases)</td></tr><tr><td><code>verify-web.yaml</code></td><td>a Deployment a check before an action denies, and `kube-noob fix` clears (verify)</td></tr></tbody></table></div></section>
+<section class="band"><h2>2. Paste an error and read the ten lines you act on</h2>
+<p class="sub">Read-only steps first. Anything that runs inside a container or changes the cluster comes last and is
+labelled as needing approval. <code>--format json</code> or <code>--format yaml</code> gives the whole structured
+answer to a program.</p>
+<div class="run"><pre class="cmd"><code>$ kube-noob diagnose -f examples/events-crashloop.txt --platform openshift --version 4.22</code></pre><pre class="out"><code>DBG-OOM · Container killed for exceeding memory (OOMKilled / exit 137) · confidence 1.0
+  evidence: signal pod_reason OOMKilled; Reason: OOMKilled; Exit Code: 137
+  likely cause: Memory limit lower than the working set (JVM/Node heaps sized for the host, not the container).
+  other possible causes: 2 (--format yaml lists them)
+  1. read-only first:
+     oc describe pod orders-api-7c4b9d6f5-x2lqp -n shop
+       why: Last State: Terminated, Reason: OOMKilled
+     oc adm top pod orders-api-7c4b9d6f5-x2lqp -n shop --containers
+     oc get events -A --field-selector reason=OOMKilling
+  2. change, only after the evidence (needs approval):
+     - Set limits from observed p99 usage plus headroom; keep requests ~= steady-state usage.
+     - JVM: -XX:MaxRAMPercentage=75 (container-aware); Node.js: --max-old-space-size below the limit.
+     (3 proposed changes in all: --format yaml lists every one)
+  caught before deploy by: KN-C004, KN-C005 (kube-noob audit)
+  docs: k8s-resources (kube-noob search)
+also possible: DBG-CRASHLOOP Container keeps crashing (CrashLoopBackOff) (0.9); DBG-IMAGEPULL Image cannot be pulled (ImagePullBackOff / ErrImagePull) (0.3). Their steps: --format yaml
+
+known issues: not determined: No reported issue in the OpenShift release notes matches this text closely. The index covers OpenShift 4.20, 4.21, 4.22 as of 2026-10-27.
+
+exit code 137: killed with SIGKILL - OOMKilled or forced kill after grace period
+signals: event_reason BackOff, pod_reason CrashLoopBackOff, pod_reason OOMKilled, component kubelet
+context: ns=shop, pod=orders-api-7c4b9d6f5-x2lqp, name=orders-api-7c4b9d6f5-x2lqp
+
+Run the read-only steps first (get, describe, logs, events). Commands that execute in a container or change the cluster are listed separately and require explicit approval. Here they are marked (needs approval).</code></pre></div>
+</section>
+<section class="band"><h2>3. The answer you should distrust, and why it tells you</h2>
+<p class="sub">An empty list is the most dangerous output a checker can produce. The reported-issue lookup holds the
+OpenShift release notes it has, and it says in every format whether your release is one of them, so "no match" and
+"not checked" are never the same answer.</p>
+<div class="table-wrap"><table><thead><tr><th>Asked about</th><th>Coverage</th><th>What it says</th></tr></thead>
+<tbody><tr><td><code>--version 4.21.5</code></td><td><b>determined</b></td><td>OpenShift 4.21 is in the index (4.20, 4.21, 4.22 as of 2026-10-27): issues that cannot affect 4.21.5 are left out, so no match means none of its reported issues matches.</td></tr><tr><td><code>--version 4.16.20</code></td><td><b>not-determined</b></td><td>Known issues NOT DETERMINED for OpenShift 4.16.20: the index holds the release notes of 4.20, 4.21, 4.22 as of 2026-10-27, and 4.16 is not one of them. No match here does not mean no reported issue. Read the OpenShift 4.16 release notes, or refresh the index (kube-noob corpus known-issues --online).</td></tr></tbody></table></div>
+<p class="note">A release the index cannot answer for does not change an exit code: it changes the sentence. The same
+statement travels with <code>diagnose</code>, <code>insight</code>, the must-gather report and
+<code>kube-noob gate</code>, which lists the lookup under "Not run".</p></section>
+<section class="band"><h2>4. One command for "here, look at this"</h2>
+<p class="sub"><code>kube-noob insight</code> takes a paste -- events, logs, a YAML file, an Alertmanager payload, a
+question in words -- classifies what kind of input it is, and runs the commands that answer that kind. It is a
+<b>table of shapes and keywords</b>, not a reader: no model is involved, here or anywhere else in kube-noob, and
+nothing about your wording is understood. Given text it recognises nothing in, it lists what it does recognise and
+a bundled sample that works, rather than guessing.</p>
+<div class="table-wrap"><table><thead><tr><th>What was pasted</th><th>Kinds it recognised</th>
+<th>Commands it ran</th></tr></thead><tbody><tr><td>examples/events-crashloop.txt</td><td>event lines (Normal or Warning with a reason), pod status or describe output</td><td>diagnose</td></tr><tr><td>A sentence naming no Kubernetes object</td><td>a question or symptom in words</td><td>diagnose, search</td></tr></tbody></table></div>
+<p class="note">And it says what the paste did not give it. On the second row above, from the same answer:
+&ldquo;Read-only first: every step listed here only reads; changes come from the playbook or rule with a person&#x27;s approval. The text names no Kubernetes or OpenShift object, so no cluster steps are suggested: paste the error, events or logs from the cluster, or give the platform.&rdquo;</p></section>
+<section class="band"><h2>Try it without installing anything</h2><p class="sub">The same code runs in your browser on
+the <a href="/playground/">playground</a> -- no model, no account, nothing uploaded. <a href="/journey/">See it
+run</a> shows every <code>kube-noob demo</code> transcript from this build.</p></section>
+<section class="band"><h2>One question each</h2><p class="sub">Every page below shows the command and the output this build got from it, including what the command said it could not determine.</p><div class="grid features"><a class="card feature" href="/blast-radius/"><h3>If this pod is compromised, what can it reach?</h3><p>Five legs -- exposure, token, RBAC, Secrets, node -- each reached, none, or not determined.</p><span class="more">Read it</span></a><a class="card feature" href="/operators/"><h3>Which operators are installed, and are any reported broken?</h3><p>What OLM installed, from manifests or a must-gather, and what the OpenShift release notes say about it.</p><span class="more">Read it</span></a><a class="card feature" href="/evidence/"><h3>What does a reviewer actually open?</h3><p>One self-contained HTML file, an alert turned into a stored evidence report, SARIF and OSCAL.</p><span class="more">Read it</span></a><a class="card feature" href="/testing/"><h3>How do you know it is not quietly passing?</h3><p>The defect classes the adversarial reviews keep finding, and the tests that hold each one.</p><span class="more">Read it</span></a></div></section>
+
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

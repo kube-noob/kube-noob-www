@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Open questions, for an external reviewer · kube-noob</title>
+<meta name="description" content="ideation-review.md records what three external reviews proposed and what this project decided. This file is its forward-facing twin: the decisions that…">
+<link rel="canonical" href="https://kube-noob.com/docs/open-questions/">
+<meta property="og:title" content="Open questions, for an external reviewer · kube-noob">
+<meta property="og:description" content="ideation-review.md records what three external reviews proposed and what this project decided. This file is its forward-facing twin: the decisions that…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/open-questions/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/" aria-current="page">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="open-questions-for-an-external-reviewer">Open questions, for an external reviewer</h1>
+<p><a href="/docs/ideation-review/">ideation-review.md</a> records what three external reviews proposed and what this project
+decided. This file is its forward-facing twin: the decisions that are <strong>still open</strong>, written so a reader with no
+prior context can argue with them.</p>
+<p>It is written to be pasted whole into another model or handed to a person. Every number in it was read off the
+code or the repository on 2026-11-08 at <code>v0.9.2</code>, not recalled.</p>
+<p><strong>How to answer usefully.</strong> Disagree with the sequence, the trade-offs or the framing. Do not propose a list of
+new checks: about 250 were proposed in the last round, five survived, and the refusals are recorded with reasons
+in <a href="/docs/ideation-review/">ideation-review.md</a>. The useful contribution is judgement on the five numbered questions
+at the end, not coverage.</p>
+<h2 id="what-the-thing-is-in-ten-lines">What the thing is, in ten lines</h2>
+<p>kube-noob is an offline-first rulebook for Kubernetes, OpenShift, ROSA HCP, Helm and RHACS that an AI calls as
+tools. It has <strong>no AI inside</strong>: the model does the talking, kube-noob supplies the rules, the read-only steps and
+the sources, and returns the same answer every time. It ships as a CLI, an MCP server, a Claude Code plugin, an
+Agent Skill, a kubectl plugin, a Helm chart, an admission webhook and a container image. Apache-2.0.</p>
+<p>The single defect class it exists to refuse: <strong>an absence, an unknown, or an unrecognised shape read as a pass, a
+zero, or "every port".</strong> Verdicts are three-valued. A wrong ALLOW is far worse than a wrong DENY. The HTML report
+is the one artifact that leaves the terminal, and it opens with how much of the run reached <em>no</em> verdict, because
+every other scanner reports only what failed and a reader who sees only that cannot tell a clean cluster from an
+unexamined one.</p>
+<h2 id="the-non-negotiables">The non-negotiables</h2>
+<p>These are not up for review. They are listed so a reviewer does not spend effort on proposals that will be
+refused, and the reasons are in <a href="/docs/ideation-review/">ideation-review.md</a>.</p>
+<ul>
+<li>No credential this tool has promised not to hold. It never reads Secrets' contents.</li>
+<li>No runtime telemetry claimed by a static reader.</li>
+<li>No writes to anyone's cluster. Read-only, always.</li>
+<li>No AI inside. A bundled model would make answers non-deterministic and the tool unauditable.</li>
+<li>Offline by default. Network and cluster access are opt-in, per-surface.</li>
+</ul>
+<h2 id="the-plan-as-it-stands">The plan as it stands</h2>
+<p><strong>Correctness first, moat second.</strong> Between 2026-11-02 and 2026-11-08 nothing moved a moat item: it was all
+correctness, four adversarial passes, 49 defects, and eight guidance rows (G259-G266). The roadmap's own principle
+says that is the right order, but it means the differentiating work has not started.</p>
+<p>The queue, reconciled against the code on 2026-11-11: <strong>24 shipped, 6 partial, 27 not started.</strong></p>
+<p>Sequence, with what each already has:</p>
+<ol>
+<li><strong>GOV3</strong> three missing: a named <code>corpus pack</code> entry point, <code>corpus import --verify</code>, signing instructions.</li>
+<li><strong>I1</strong> Alertmanager receiver, the forwarders. The per-alert report, its storage and the receipt-to-report clock
+   shipped on 2026-11-11 (G274), so <em>alert to evidence pack in a minute</em> is now a measured number (p95 23 ms for the
+   bundled payload here, 5.7 s for the review's worst 500-alert payload, a 30 s budget per post). Left: posting the report on to chat or ITSM (tier W), and whether a
+   report should ever read the cluster.</li>
+</ol>
+<p>I2 (CI surfaces) shipped on 2026-11-11: <code>audit --format sarif</code>, NIST controls on the SARIF rules, and both SARIF
+outputs validated against the vendored OASIS schema. E2 (installed-operator inventory) shipped the same day:
+<code>operators inventory</code> over manifests, a must-gather or the cluster, which unblocks E1, R5 and the upgrade pre-mortem.</p>
+<p>V3 (blast radius) shipped on 2026-11-11: <code>posture reach</code> anchors on the one workload object named, <code>--format json|yaml</code> is a capped,
+schema-held graph whose undetermined legs are nodes, <code>--format mermaid</code> draws it, and <code>posture_reach</code> /
+<code>cluster_posture_reach</code> serve it over MCP (G273).</p>
+<h2 id="the-proposals-with-what-exists-today">The proposals, with what exists today</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Proposal</th>
+<th>What already exists</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>R2</strong></td>
+<td>Certificate expiry from TLS Secrets and Routes in a bundle</td>
+<td>Nothing reads a <code>notAfter</code>. Needs <code>cryptography</code> as a <strong>new runtime dependency</strong></td>
+</tr>
+<tr>
+<td><strong>N13</strong></td>
+<td>Caller identity in audit records, and reading as the caller</td>
+<td>Authorization is one shared bearer token; the server keeps no per-request audit record</td>
+</tr>
+<tr>
+<td><strong>N1</strong></td>
+<td>Compliance Operator results reader</td>
+<td><strong>Shipped</strong> as <code>kube-noob compliance results</code> (G323), and without the live read this row assumed: it reads files and must-gathers only, so it needs no credential. See <a href="/docs/roadmap/">roadmap.md</a></td>
+</tr>
+<tr>
+<td><strong>N2</strong></td>
+<td>Must-gather node configuration</td>
+<td>A standard must-gather carries every rendered <code>MachineConfig</code>: <code>kubelet.conf</code>, kernel arguments, <code>fips</code>, CRI-O config, signature policy</td>
+</tr>
+<tr>
+<td><strong>N8</strong></td>
+<td>API-server configuration from a must-gather</td>
+<td>TLS profile, audit policy, effective arguments. Field stability across 4.x needs a real bundle first</td>
+</tr>
+<tr>
+<td><strong>N10</strong></td>
+<td>DRA: a <code>deviceClassName</code> naming no known class</td>
+<td>Four rules already cover what a manifest proves</td>
+</tr>
+<tr>
+<td><strong>R5</strong></td>
+<td>Operator and add-on vulnerability surface</td>
+<td>Shipped as a lookup (G278): <code>operators issues</code> lists the release-note issues that name or mention each operator for the cluster's release, for Red Hat's builds, and never decides whether the installed version has the fix. It is not a gate. Open: the join through the local Jira copy (components, fix and affects versions per ticket, <code>tickets.py</code>; projects in <code>jira_catalog.DEFAULT_PROJECTS</code>), which is the step that would answer for operator versions</td>
+</tr>
+<tr>
+<td><strong>R6</strong></td>
+<td>Admission sees pod specs inside operator CRDs -- policies half</td>
+<td>The webhook runs the audit and finds them; the generated policies do not. Needs a kind job</td>
+</tr>
+<tr>
+<td><strong>R8</strong></td>
+<td>A permissive SCC whose own <code>users</code>/<code>groups</code> name everyone</td>
+<td><code>KN-S019</code> reports the SCC, <code>KN-S028</code> RBAC bindings to everyone, attack paths one ServiceAccount at a time; no single audit finding for the SCC's own subject list</td>
+</tr>
+<tr>
+<td><strong>P10</strong></td>
+<td>Host-networked pods selected by policies the spec says cannot select them</td>
+<td>Found red-teaming P4. Changes shared v1alpha1 primitives, so deliberately not folded in</td>
+</tr>
+<tr>
+<td><strong>M6</strong></td>
+<td><code>net verify</code>: policy says allowed, packets say dropped</td>
+<td>The roadmap calls this "the insurance on the policy wedge". Needs an OVN cluster to validate</td>
+</tr>
+</tbody>
+</table></div>
+<p>Release-pipeline hardening, found by an adversarial pass over <code>release.yml</code>, none blocking but each makes the
+next failure worse: <code>demos</code> sits in <code>github-release.needs</code>, so a recording flake after PyPI has published leaves
+no release page -- and from 0.10.0 that release page is also where krew's archive lives, so the krew-index manifest
+points at nothing; <code>image</code> pushes before it attests, the opposite order from PyPI; <code>homebrew</code> checks out <code>main</code>
+rather than the tag, which is what that job needs (it commits the formula onto <code>main</code>) and which also means it runs
+<code>scripts/brew_formula.py</code> from <code>main</code> rather than from the tag. <code>publish-pypi</code> lacking <code>skip-existing: true</code> is
+fixed: it is set, so a rerun after a partial upload is a no-op rather than the failure that skips every job behind
+it.</p>
+<h2 id="the-five-questions">The five questions</h2>
+<p><strong>1. Is <code>cryptography</code> worth it?</strong> R2 (certificate expiry) was asked for by all three external reviews and
+nothing in the codebase reads a <code>notAfter</code>. It needs a C-extension crypto dependency in a tool whose pitch is
+offline-first, auditable and small. Is there a stdlib-only path that is honest about what it can parse, or is the
+dependency simply the right call? What would you weigh?</p>
+<p><strong>2. Should N13 outrank the entire moat queue?</strong> Caller identity is ranked first by the FedRAMP High requirements
+and by every multi-tenant reviewer. Today authorization is one shared bearer token and the HTTP server keeps no
+per-request audit record at all. The counter-argument is that the moat items are what make the product
+<em>different</em>, and identity is what makes it <em>adoptable</em>. Which failure is worse: a differentiated tool nobody can
+deploy in a regulated environment, or a deployable tool with no moat?</p>
+<p><strong>3. Is I1 the right north-star proof, or a distraction?</strong> The claim is <em>alert to evidence pack in a minute</em>, and
+I1 (Alertmanager receiver; its report and clock shipped 2026-11-11) is what makes it measurable. But the roadmap itself calls M6 (<code>net verify</code> -- policy
+says allowed, packets say dropped) "the insurance on the policy wedge", and M6 is the harder, more defensible
+thing. Which should be built first, and does proving the north-star claim matter if the wedge is unproven?</p>
+<p><strong>4. Where is the line on "an unknown must not read as a pass"?</strong> Today it costs real usability: three-valued
+verdicts everywhere, a report that opens with what was <em>not</em> evaluated, a chart guard that refuses to skip. Is
+there a point where this becomes noise a reader learns to ignore -- and if so, what is the signal that it has
+been crossed?</p>
+<p><strong>5. What is missing that is not on any list?</strong> The last round produced 250 proposals and five survivors, which
+suggests the lists are not the constraint. If you were to kill one shipped feature to fund one unbuilt thing,
+which pair, and why?</p>
+<h2 id="answered-from-outside-2026-11-21">Answered from outside, 2026-11-21</h2>
+<p><strong>Question 4 got an answer, and it was the same answer twice.</strong> Two external reviews were run independently on the
+same summary of this product. Both located the same gap, and both located it where the code was, not where the
+prose was.</p>
+<ul>
+<li>One argued that three-valued verdicts cannot survive contact with the tooling that consumes them: "every
+  commercial platform and most open-source aggregators collapse results to pass/fail/severity. An 'undetermined'
+  state has no column. It is either dropped or mapped to 'pass' or 'info.' The honest signal is destroyed at the
+  first hop."</li>
+<li>The other, reviewing the repository, wrote a release blocker in the same words from the other direction: "No
+  evidence laundering: SARIF, OSCAL, HTML, MCP, and agent summaries cannot upgrade an incomplete result into a
+  pass."</li>
+</ul>
+<p>Checked against the code rather than argued with, and they were right about <code>audit --format sarif</code>: the
+unevaluated rules reached <code>toolExecutionNotifications</code> and never <code>runs[].results</code>, so a code-scanning upload read
+<code>12 alerts</code> and nothing about fifty-five rules that had no verdict (G328, fixed). So the answer to question 4 is
+not "is three-valued output noise" -- it is that <strong>the line is not at the verdict, it is at every hop the verdict
+takes</strong>, and each hop has to be checked by running it rather than by reading the renderer. The remaining hops that
+have not been checked this way: OSCAL, the HTML report, the Markdown job summary, the GitHub Action's own outputs,
+and what an MCP client's model does with <code>undetermined</code> in its final answer to the user.</p>
+<p>The market claims in both reviews (which scanners dominate, how large the air-gapped segment is, what a given
+acquisition proved) are unverified here and are not treated as findings.</p>
+<p><strong>Two <code>kind</code> conventions now live in <code>gate.py</code>, and one of them should probably change.</strong> The gate's undetermined
+result omits <code>kind</code>, which SARIF defaults to <code>fail</code>, so an incomplete gate reads as a failure result; <code>notAudited</code>
+and the two coverage rules added in G328 use <code>kind: "review"</code>. The second is the more correct reading of the
+format, but changing the first would lower the severity an existing consumer sees for an incomplete gate, which is
+a deliberate decision and not a tidy-up. Related and unresolved: SARIF's prose on whether <code>level</code> must be <code>none</code>
+whenever <code>kind</code> is not <code>fail</code> was not read (the spec page was not fetched), and the vendored schema does not
+encode the constraint, so <code>kind: "review"</code> with <code>level: "note"</code> validates. If the prose does require it, every
+<code>kind: review</code> result in this file is non-conforming and a strict validator in someone's pipeline would reject the
+document -- which would be the same class of first-hop failure all over again.</p>
+<h2 id="proposed-and-not-built-2026-11-22-one-file-per-guidance-row">Proposed and not built, 2026-11-22: one file per guidance row</h2>
+<p>This one is about the repository's own record rather than the product, and it is here because it is a decision
+and not a tidy-up. <strong>Nothing below is implemented.</strong> Every number was read off the tree at <code>981cd9f</code> on 2026-11-22.</p>
+<p><strong>What it is today.</strong> <a href="/docs/guidance/">guidance.md</a> is one append-only table: 310 rows, G01 to G343, 542 KB, the
+longest single row 29,712 characters. Every behaviour change appends one row to its end.</p>
+<p><strong>What that has cost, four separate ways.</strong></p>
+<ul>
+<li><em>Every open branch conflicted on it whenever another merged</em>, because each appends at the same line. That was
+  fixed by <code>merge=union</code> in <code>.gitattributes</code> (G297).</li>
+<li><em>The fix writes rows twice.</em> Union cannot conflict, so when both sides carry the same row in differing hunks it
+  keeps both and reports nothing. Twice in one session: G335 once, then six rows at a time with three changelog
+  bullets. Now named by a test (G347), which is a detector for a defect the format keeps producing.</li>
+<li><em>Two branches take the same number.</em> The next number is "the highest one there, plus one", read from whatever
+  <code>main</code> the branch was cut from, so concurrent branches pick the same one by arithmetic. On 2026-11-21 G340 went
+  to two branches at once and the later became G345, in a follow-up commit, because a number is cited from test
+  names, changelog bullets and commit messages, and a citation that resolves to two rows resolves to neither.</li>
+<li><em>A row in the wrong shape is not read.</em> <code>tests/test_guidance.py</code> finds rows with a three-column expression. Six
+  rows (G279, G319-G322, G325) are written in two columns with their citations inline, so no citation in them has
+  been checked since they were written. They happen to resolve today. Nothing would say if they stopped.</li>
+</ul>
+<p><strong>The proposal.</strong> One file per row, <code>docs/guidance/G0346.md</code>, each holding the rule, the prose and an
+<code>Enforced by</code> list. A twelfth generator, <code>scripts/guidance_table.py</code>, writes the table in <code>docs/guidance.md</code> from
+those files and has a <code>--check</code> form like the other eleven.</p>
+<ul>
+<li><em>Allocation.</em> The filename is the claim on the number. Two branches that both create <code>G0346.md</code> with different
+  contents produce an add/add conflict: git stops, and the pull request reads <code>dirty</code>. That is the same collision
+  as today, made loud at the merge instead of silent through it. It does not stop two branches choosing the same
+  number, and the later one still has to renumber everywhere the number is cited; what it removes is the case
+  where nobody is told.</li>
+<li><em>Duplicates.</em> A stacked branch that carries a row <code>main</code> already has carries an identical file, which merges to
+  one file. The repeated-row defect stops being detected and starts being impossible.</li>
+<li><em>The table.</em> Generated, sorted by number, so its lines are rewritten rather than appended and it would have to
+  leave the union list (<code>tests/test_merge_attributes.py</code> holds that list to exactly the append-only files). It
+  would then conflict on every merge the way <code>docs/roadmap.md</code> does, resolved by running the script. The
+  alternative is to stop committing the table and leave <code>docs/guidance.md</code> as a page that points at the directory,
+  which costs the one-page read that the README links to.</li>
+<li><em>The existing check.</em> <code>test_every_rule_has_existing_checks</code> would read the files instead of matching lines: one
+  id per file, taken from the filename and required to match the heading inside; a file with no <code>Enforced by</code>
+  entry fails by name instead of being skipped as a line that did not match. The duplicate-id assertion and the
+  guidance half of <code>tests/test_append_only_duplicates.py</code> would go; the changelog half stays, because
+  <code>CHANGELOG.md</code> is still merged by union.</li>
+</ul>
+<p><strong>What the migration costs.</strong></p>
+<ul>
+<li>One commit that splits 310 rows into 310 files. It has to be mechanical and provable: the acceptance test is
+  that the generator, run on the new files, reproduces today's table byte for byte before anything is reordered.
+  The six two-column rows have to be given an <code>Enforced by</code> list by hand, and some of what they cite is shorthand
+  (<code>::test_name</code> with the file implied) that has never had to resolve.</li>
+<li>Every pull request open at that moment (5 on 2026-11-22) conflicts once and has its row moved into a file. So it
+  is done with the queue empty or not at all.</li>
+<li>Citations. Inside this repository the table is cited by number, not by line: 1,661 mentions of a <code>G&lt;n&gt;</code> in 224
+  files outside the table, and those survive. One link names the file by URL (the README, to
+  <code>blob/main/docs/guidance.md</code>), and survives if the table stays committed. No link in this repository carries a
+  line anchor. Links from outside it were not measured and cannot be from here: anything that points at a line of
+  <code>guidance.md</code> on <code>main</code> -- the site, an issue, a review comment -- breaks once, when rows that are in merge order
+  today (G320 sits above G319) become sorted. A permalink to a commit is unaffected.</li>
+<li><code>git blame</code> on a row restarts at the migration commit. The history before it is in the old file.</li>
+</ul>
+<p><strong>The case against.</strong></p>
+<ul>
+<li>310 small files today, and the table grew by 46 rows between <code>v0.9.2</code> (2026-11-08) and 2026-11-22. A directory
+  that gains three files a day is its own cost: GitHub's listing truncates at 1,000 entries, which at that rate is
+  about seven months away.</li>
+<li><code>git log -p docs/guidance.md</code> currently reads as this project's lessons in the order they were learned, in one
+  place. Across several hundred files the same question needs <code>git log -- docs/guidance/</code>, and the answer is
+  interleaved with every edit to every row.</li>
+<li>A twelfth generator is a twelfth thing to re-run. <code>sync_plugin_server</code> and <code>doc_numbers</code> are already the two
+  that a change most often leaves stale, and this one would be stale after <em>every</em> change, by construction.</li>
+<li>The cheaper position is the current one. Three of the four costs above now have a test standing on them
+  (G297, G347), the fourth is a six-row repair, and what remains is renumbering when two branches collide -- which
+  the proposal makes louder and does not prevent. "One pull request at a time", which <a href="https://github.com/kube-noob/kube-noob/blob/main/AGENTS.md">AGENTS.md</a>
+  already asks for, prevents it outright and costs nothing to build.</li>
+</ul>
+<p><strong>What would decide it.</strong> Whether more than one branch is going to be open at a time as a matter of course. If
+the rule is one pull request at a time and it holds, this is a migration to fix a problem the rule already
+prevents. If several agents are going to work in parallel worktrees -- which is what happened on 2026-11-21, and
+is how all four costs were found in two days -- then the table is a single line every one of them writes to, and
+a detector per failure mode is the more expensive design.</p>
+<h2 id="reading-list-for-a-reviewer">Reading list for a reviewer</h2>
+<ul>
+<li><a href="/docs/roadmap/">roadmap.md</a> -- the program, the moat backlog reconciliation, the riskiest assumptions</li>
+<li><a href="/docs/ideation-review/">ideation-review.md</a> -- 250 proposals, five survivors, the refusals with reasons</li>
+<li><a href="/docs/guidance/">guidance.md</a> -- every defect this project has made, what it cost and the test that holds it</li>
+<li><a href="/docs/limits/">limits.md</a> -- what it refuses to claim</li>
+<li><a href="/docs/editions/">editions.md</a> -- what is enterprise-candidate rather than core</li>
+<li><a href="/docs/safety-contract/">safety-contract.md</a> -- the invariants, checked by a script on every run</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/open-questions.md">docs/open-questions.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

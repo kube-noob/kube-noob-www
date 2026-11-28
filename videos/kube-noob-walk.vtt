@@ -1,0 +1,78 @@
+WEBVTT
+
+1
+00:00:00.450 --> 00:00:04.000
+An Ingress, a Service, a
+Deployment, a network policy.
+
+2
+00:00:04.000 --> 00:00:05.447
+Every object is there.
+
+3
+00:00:05.447 --> 00:00:07.682
+Does a request ever reach the pod?
+
+4
+00:00:08.883 --> 00:00:10.032
+So walk the path.
+
+5
+00:00:10.032 --> 00:00:12.126
+kube-noob grades it hop by hop.
+
+6
+00:00:13.383 --> 00:00:16.725
+6 hops hold, and each names
+the rules that read it.
+
+7
+00:00:16.725 --> 00:00:20.068
+The last hop, across the
+node, no manifest records.
+
+8
+00:00:20.068 --> 00:00:23.410
+It is not checked, and it
+is not counted as passed.
+
+9
+00:00:24.616 --> 00:00:28.784
+Point the Ingress at a retired
+controller, and that hop is broken.
+
+10
+00:00:28.784 --> 00:00:32.573
+The walk names the rule, still
+reaches the end, and exits 1.
+
+11
+00:00:33.783 --> 00:00:36.967
+Now pass one file instead
+of the whole namespace.
+
+12
+00:00:36.967 --> 00:00:41.450
+The policy hop cannot be judged, so
+the walk stops there and exits 5.
+
+13
+00:00:41.450 --> 00:00:43.724
+The 2 hops after it are not walked.
+
+14
+00:00:44.916 --> 00:00:46.216
+That is the whole rule.
+
+15
+00:00:46.216 --> 00:00:49.439
+A hop nothing read is never
+reported as a hop that works.
+
+16
+00:00:52.416 --> 00:00:55.040
+Walk the path your own manifests describe.
+
+17
+00:00:55.040 --> 00:00:56.789
+Get it at kube-noob dot com.

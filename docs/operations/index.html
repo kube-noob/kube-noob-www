@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Operations: weekly risk review and releases · kube-noob</title>
+<meta name="description" content="The risk review opens or updates one GitHub issue per ISO week titled Weekly risk review &lt;year&gt;-W&lt;week&gt; with the label risk-review , plus release-needed…">
+<link rel="canonical" href="https://kube-noob.com/docs/operations/">
+<meta property="og:title" content="Operations: weekly risk review and releases · kube-noob">
+<meta property="og:description" content="The risk review opens or updates one GitHub issue per ISO week titled Weekly risk review &lt;year&gt;-W&lt;week&gt; with the label risk-review , plus release-needed…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/operations/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/" aria-current="page">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="operations-weekly-risk-review-and-releases">Operations: weekly risk review and releases</h1>
+<h2 id="when-this-runs">When this runs</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>When (UTC)</th>
+<th>What</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily 05:17 UTC, every other day by default</td>
+<td>Red Hat Jira main copy. <code>JIRA_EVERY_DAYS=1</code> runs it daily. A run that cannot decrypt the previous copy fails and does not replace it</td>
+<td><code>corpus-refresh.yml</code></td>
+</tr>
+<tr>
+<td>Sunday 03:41 UTC</td>
+<td>Corpus refresh also ingests Git docs and release history</td>
+<td><code>corpus-refresh.yml</code></td>
+</tr>
+<tr>
+<td>Monday 04:23</td>
+<td>CodeQL</td>
+<td><code>codeql.yml</code></td>
+</tr>
+<tr>
+<td>Monday 06:41</td>
+<td>Risk review: dependency CVEs, released-image CVEs, upstream drift, SDK drift</td>
+<td><code>risk-review.yml</code></td>
+</tr>
+<tr>
+<td>Monday 04:37 US Central (09:37 or 10:37 UTC)</td>
+<td>Agent review: reads the issue and open Dependabot PRs, verifies facts, fixes, pushes a patch and hands back the tag command</td>
+<td>Claude scheduled task "kube-noob weekly risk review"</td>
+</tr>
+<tr>
+<td>Tuesday 03:41</td>
+<td>OpenSSF Scorecard</td>
+<td><code>scorecard.yml</code></td>
+</tr>
+<tr>
+<td>Weekly</td>
+<td>Dependabot PRs for pip, Actions and the base image</td>
+<td><code>dependabot.yml</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The risk review opens or updates one GitHub issue per ISO week titled <code>Weekly risk review &lt;year&gt;-W&lt;week&gt;</code> with the
+label <code>risk-review</code>, plus <code>release-needed</code> when a patch release is recommended. It then closes every other open
+<code>risk-review</code> issue as superseded, so the open list holds the current week only: an open issue is a claim that
+something wants doing, and a report that has been replaced is not making that claim. The run fails rather than
+closing anything if it cannot establish this week's issue number, because closing on an unknown number would
+close the week it had just written.</p>
+<h3 id="the-red-hat-jira-copy-where-it-lives">The Red Hat Jira copy: where it lives</h3>
+<p>Ticket text is not on kube-noob.com and is not in the public <code>kube-noob-db</code> image. Red Hat's issue content is not redistributable. The website's known-issues pages are the release-note bugs, which are a different, smaller set.</p>
+<p>The main copy is the encrypted artifact <code>jira-main-copy-encrypted</code> from the last successful <code>corpus-refresh</code> run. Import it locally (the passphrase is the <code>CORPUS_PASSPHRASE</code> Actions secret, not something to paste into a chat):</p>
+<pre><code class="language-bash"># after decrypting the artifact to jira-snapshot.tgz with that passphrase
+kube-noob corpus import jira-snapshot.tgz
+kube-noob ticket OCPBUGS-1234
+kube-noob corpus jira-changes --since 2d
+</code></pre>
+<p>A sync only adds or refreshes tickets. It will not write a shard smaller than the one it loaded. The scheduled pull runs every other day, newest updates first (<code>ORDER BY updated DESC</code>). Set the repository variable <code>JIRA_EVERY_DAYS</code> to <code>1</code> for a daily pull. Do not rotate <code>CORPUS_PASSPHRASE</code> until the current artifact has been re-encrypted with the new value: a mismatch now fails the workflow instead of discarding the copy, and <code>fresh=true</code> is the only way to start over on purpose.</p>
+<h2 id="when-the-corpus-refresh-refuses-the-copy">When the corpus refresh refuses the copy</h2>
+<p>The privacy audit exits 1 rather than keep a copy that still has person-shaped text in it, which is the right
+way round. Each finding now reads <code>&lt;TICKET&gt; &lt;field&gt;: &lt;kind&gt; &lt;shape&gt;</code>, where the shape is the match with its
+content removed -- <code>spelled-out email A at A.A</code>, <code>account id 9A9A9A9</code> -- so a failure can be triaged from the CI
+log without decrypting the copy and without the log carrying anyone's details.</p>
+<p>Two known false-positive shapes, both from patterns that are deliberately broad because missing real personal
+data is worse than over-matching:</p>
+<ul>
+<li><code>account id 9A9A9A9</code> on a <code>sha256:</code> image digest. <code>BARE_ACCOUNT_ID</code> matches any 24-character hex run starting
+  with <code>5</code>, which a digest fragment satisfies. The anonymiser replaces it with <code>&lt;account&gt;</code>, so the ticket text
+  loses a digest; it is not a leak. Do not narrow the pattern to fix the cosmetics.</li>
+<li><code>spelled-out email A at A.A</code> on text like "ping Commenter A at quay.io", which is what a labelled commenter
+  name followed by a hostname looks like. <code>anonymise</code> scrubs again after labelling for exactly this reason, so a
+  surviving one means the text reached the audit by another path.</li>
+</ul>
+<p>A finding whose shape is neither of those is a real leak: fix the anonymiser, do not raise the gate.</p>
+<h2 id="risk-vectors-and-the-release-rule">Risk vectors and the release rule</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Vector</th>
+<th>Signal</th>
+<th>Release?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python dependency CVE with a fix</td>
+<td><code>pip-audit</code> on <code>requirements.lock</code></td>
+<td>yes, patch</td>
+</tr>
+<tr>
+<td>Fixable HIGH/CRITICAL CVE in the released image</td>
+<td>Trivy on <code>ghcr.io/kube-noob/kube-noob:&lt;latest&gt;</code></td>
+<td>yes, patch (rebuild)</td>
+</tr>
+<tr>
+<td>Upstream release newer than verified knowledge</td>
+<td>Kubernetes, OpenShift, Helm, StackRox vs <code>scripts/risk_baseline.json</code></td>
+<td>yes, after re-verifying facts</td>
+</tr>
+<tr>
+<td>New <code>mcp</code> or <code>anthropic</code> SDK</td>
+<td>PyPI vs lock pins</td>
+<td>review; release only if behaviour changes</td>
+</tr>
+<tr>
+<td>Unfixed CVE (no fix yet)</td>
+<td>pip-audit / Trivy</td>
+<td>review, document, no release</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="procedure">Procedure</h2>
+<ol>
+<li>Open the latest <code>risk-review</code> issue (or run <code>gh workflow run risk-review.yml</code>).</li>
+<li>For each reason, make the fix on <code>main</code>:
+   - dependency: <code>uv pip compile pyproject.toml --generate-hashes --python-version 3.12 --universal --upgrade-package &lt;pkg&gt; -o requirements.lock</code>
+   - image: no code change needed; the release rebuilds on the current UBI digest
+   - drift: re-verify the affected facts against the source, update knowledge, catalog and tests, then bump
+     <code>scripts/risk_baseline.json</code></li>
+<li>Verify locally: <code>scripts/check.sh</code> (plugin copy, lint, types, tests, self-test).</li>
+<li>Bump and changelog: <code>python scripts/bump_version.py &lt;next&gt; "&lt;one-line reason&gt;"</code>.</li>
+<li>Commit, push, and wait for CI to pass on <code>main</code>.</li>
+<li>Tag and push: <code>git tag v&lt;next&gt; &amp;&amp; git push origin v&lt;next&gt;</code>. The release workflow publishes to PyPI (trusted
+   publishing), pushes the signed multi-arch image and the signed OCI Helm chart to GHCR, publishes to the MCP
+   Registry and creates the GitHub release with the chart <code>.tgz</code> and demo GIFs.</li>
+<li>After PyPI shows the version: <code>python scripts/brew_formula.py &lt;next&gt; --write</code>, commit and push; the brew workflow
+   installs it on macOS and Linux.</li>
+<li>Close the weekly issue with the release link.</li>
+</ol>
+<p>Tags must be pushed by a person or the scheduled agent: tags pushed with the workflow <code>GITHUB_TOKEN</code> do not trigger
+other workflows.</p>
+<h2 id="which-plugin-the-directory-can-publish">Which plugin the directory can publish</h2>
+<p><strong>Submit the folder <code>plugin/kube-noob-skills</code>. Not the repository root, and not <code>plugin/kube-noob</code>.</strong></p>
+<p><code>plugin/kube-noob</code> cannot be published by an organization the directory has not Verified, and no edit to it changes
+that. Every one of its distinguishing parts is Verified-only by policy, not by defect: a <code>command</code> hook
+(<code>hooks/hooks.json</code>), an MCP server that runs on the user's computer (<code>.mcp.json</code>, stdio), and files that are not
+Markdown, text, JSON, YAML or an allowed image -- its 118 <code>.py</code> files, <code>uv.lock</code>, <code>pyproject.toml</code>, the <code>.svg</code> and the
+<code>.tmpl</code> files. Its <code>uv run</code> launcher can be held by directory policy even pinned to an exact version. Submitting it
+earns one refusal per category and the findings cannot be cleared by fixing anything, which is what repeated
+rejections of that folder mean.</p>
+<p><code>plugin/kube-noob-skills</code> is the same seven skills driving the CLI the user installs themselves, and it is eleven
+files: seven <code>SKILL.md</code>, <code>README.md</code>, <code>LICENSE</code>, <code>.claude-plugin/plugin.json</code> and a 512x512 <code>icon.png</code>. It carries no
+hook, no MCP server, no package-manager file, no lockfile and no code. <code>claude plugin validate</code> passes on it with
+nothing to report. What that command does not check, and what was checked by hand (G380): every text file is ASCII or
+UTF-8 with no NUL byte, no file begins <code>#!</code>, the icon is a real PNG and not an archive wearing the name, the largest
+file is 15,678 bytes against the 256 KiB limit and there are 11 files against the 512 limit, no file is named
+<code>CLAUDE.md</code> or <code>AGENTS.md</code>, and nothing reads an environment variable or a path on the user's machine for a
+credential. Example commands in fenced blocks use <code>NAME</code>, <code>NS</code> and <code>POD</code> rather than angle-bracket placeholders, so
+no extracted command can trip the rule that a command holds fewer than three <code>&lt;</code> characters.</p>
+<p>Keep both folders. <code>plugin/kube-noob</code> is what ships once the organization is Verified, and it is the plugin the
+<code>marketplace.json</code> at the repository root offers first to anyone who adds this repository as a marketplace directly --
+a path that has no directory policy in it at all. Submitting the root is what pulls <code>plugin/kube-noob</code> into the scan;
+submitting the subfolder is what the directory's own finding tells you to do.</p>
+<p>The directory reads the submitted folder from <code>main</code>, and its review shows the commit it last checked. Work done on another branch reaches it only after that branch is
+merged to <code>main</code> and someone presses "Check for new commits" (or sets up push updates) in the plugin portal. A version
+that is bumped on <code>main</code> but never tagged never reaches PyPI, the image or the MCP Registry: 0.5.0 (073fe80) was
+bumped on <code>main</code> and not tagged, so PyPI stopped at 0.4.0.</p>
+<h2 id="when-a-release-fails-before-anything-is-published">When a release fails before anything is published</h2>
+<p>The opposite case, and it happened on <strong>v0.8.0</strong>: the tag was pushed, the first job failed on
+<code>ModuleNotFoundError: No module named 'yaml'</code> -- a step that imported the package before the runtime
+dependencies were installed, fixed in G228 -- and nothing reached PyPI, the chart repository, the MCP
+Registry, Homebrew or a GitHub release. The website was right to keep showing the previous version: it is
+built from the latest RELEASE, and the latest release was still 0.7.1.</p>
+<p>Verify before deciding, because the two cases are repaired in opposite ways:</p>
+<pre><code class="language-bash">pip index versions kube-noob
+gh release list --repo &lt;owner&gt;/&lt;repo&gt; --limit 5
+gh run list --repo &lt;owner&gt;/&lt;repo&gt; --workflow release.yml --limit 5
+</code></pre>
+<p>If nothing published, <strong>cut the next patch version rather than re-pushing the tag</strong>. The rule above --
+never delete or re-push a tag -- is about a release that published somewhere, and the reason to keep it here
+is different and still good: a tag someone may have fetched must keep meaning one tree. So bump, land the fix
+that broke the run, and release from a commit that contains it:</p>
+<pre><code class="language-bash">python scripts/bump_version.py &lt;next patch&gt; &quot;&lt;one line for the CHANGELOG&gt;&quot;
+python scripts/sync_plugin_server.py &amp;&amp; bash scripts/check.sh
+git commit -s -am &quot;release: &lt;next patch&gt;&quot; &amp;&amp; git push
+gh release list --repo &lt;owner&gt;/&lt;repo&gt; --limit 3
+</code></pre>
+<p>The version that never published is simply skipped, which is what the record should say about it. Do not
+publish the new version under the old number: the tag for it points at a tree without the fix.</p>
+<h2 id="when-a-release-job-fails-after-the-others-have-published">When a release job fails after the others have published</h2>
+<p>The jobs publish to five places and only the last of them is the GitHub release, so a failure there leaves PyPI,
+the chart repository, the MCP Registry and Homebrew holding the version while the release carries nothing. This
+happened on v0.7.1.</p>
+<p><strong>Do not delete the release and do not delete or re-push the tag.</strong> Deleting the release destroys the assets the
+run already built, and <code>videos</code> and <code>site</code> with them; re-pushing the tag re-runs <code>publish-pypi</code>, which fails
+because PyPI versions are immutable, and <code>github-release</code> never runs because it waits on that job.</p>
+<p>Re-run the one job instead. It re-runs its dependents (<code>videos</code>, <code>site</code>) and nothing upstream, and it takes the
+artifacts from the original run, which are retained for 90 days:</p>
+<pre><code class="language-bash">gh api &quot;repos/&lt;owner&gt;/&lt;repo&gt;/actions/runs/&lt;run id&gt;/attempts/&lt;n&gt;/jobs?per_page=50&quot; \
+  --jq '.jobs[] | select(.name == &quot;github-release&quot;) | .id'
+gh api -X POST &quot;repos/&lt;owner&gt;/&lt;repo&gt;/actions/jobs/&lt;job id&gt;/rerun&quot;
+</code></pre>
+<p>The videos can also be re-rendered and re-attached on their own, against a release that already exists, which is
+what <code>videos.yml</code>'s <code>workflow_dispatch</code> is for:</p>
+<pre><code class="language-bash">gh workflow run videos.yml --repo &lt;owner&gt;/&lt;repo&gt; -f tag=v&lt;version&gt;
+</code></pre>
+<p>If the artifacts have expired, build the wheel, chart, GIFs and skill ZIP from the tag and upload them with
+<code>gh release upload</code>; the release step is idempotent, so running the job again after that is safe.</p>
+<h2 id="alert-evidence-reports-the-alertmanager-receiver">Alert evidence reports (the Alertmanager receiver)</h2>
+<p><code>kube-noob serve</code> answers <code>POST /v1/alert-reports</code> with one evidence report per alert in an Alertmanager payload
+and, with <code>alertReports.store</code>, keeps it in <code>&lt;dataDir&gt;/alert-reports</code>: owner-only, the newest
+<code>alertReports.maxReports</code> (200), none older than <code>alertReports.maxAgeDays</code> (14), each at most
+<code>alertReports.maxReportBytes</code> (1 MiB). The report is built from the payload and kube-noob's local knowledge alone; it
+reads no cluster and sends nothing anywhere. One post gets <code>alertReports.budgetSeconds</code> (30) of work; alerts not
+reached by then keep a <code>not-evaluated</code> row, are named in <code>notIncluded</code>, and the stored record says the same.</p>
+<p>The chart keeps no report by default (<code>alertReports.store: false</code>): it runs two replicas, each with its own volume,
+and a report kept by one is not found through the Service on the other. To keep them set <code>alertReports.store: true</code>
+and <code>replicaCount: 1</code> (the chart refuses the first without the second, as it does for <code>watch.enabled</code> and
+<code>posture.report.enabled</code>), and <code>persistence.enabled</code> if they should outlive the pod. Off, every POST still answers
+with the report and <code>stored: false</code>.</p>
+<p>Field names below were checked against Alertmanager v0.28.1 (<code>docs/configuration.md</code>: <code>webhook_config</code> has <code>url</code>,
+<code>url_file</code>, <code>send_resolved</code>, <code>http_config</code>, <code>max_alerts</code>, <code>timeout</code>; <code>http_config.authorization</code> has <code>type</code>, default
+<code>Bearer</code>, and <code>credentials</code> or <code>credentials_file</code>; the webhook posts <code>Content-Type: application/json</code>,
+<code>notify/util.go</code> <code>PostJSON</code>) and prometheus-operator v0.80.0 (<code>pkg/apis/monitoring/v1beta1/alertmanager_config_types.go</code>:
+<code>webhookConfigs[].url</code>, <code>sendResolved</code>, <code>maxAlerts</code>, <code>httpConfig.authorization.credentials</code> as a Secret key selector).</p>
+<p>The platform Alertmanager sees every namespace's alerts. Add a receiver to its configuration (on OpenShift, the
+<code>alertmanager.yaml</code> key of the <code>alertmanager-main</code> Secret in <code>openshift-monitoring</code>) and route to it:</p>
+<pre><code class="language-yaml">receivers:
+  - name: kube-noob
+    webhook_configs:
+      - url: http://kube-noob.kube-noob.svc:8080/v1/alert-reports
+        send_resolved: true
+        max_alerts: 500
+        http_config:
+          authorization:
+            type: Bearer
+            credentials: &lt;the token from the Secret the chart's NOTES name&gt;
+</code></pre>
+<p>A namespace's own alerts can go through an <code>AlertmanagerConfig</code> in that namespace instead. The operator adds a
+<code>namespace</code> matcher for the object's own namespace to its top route, so this one only ever sees alerts from the
+namespace it lives in; the token Secret has to be in that namespace too:</p>
+<pre><code class="language-yaml">apiVersion: monitoring.coreos.com/v1beta1
+kind: AlertmanagerConfig
+metadata:
+  name: kube-noob
+  namespace: kube-noob
+spec:
+  route:
+    receiver: kube-noob
+    groupBy: [alertname]
+  receivers:
+    - name: kube-noob
+      webhookConfigs:
+        - url: http://kube-noob.kube-noob.svc:8080/v1/alert-reports
+          sendResolved: true
+          maxAlerts: 500
+          httpConfig:
+            authorization:
+              type: Bearer
+              credentials:
+                name: kube-noob-token
+                key: token
+</code></pre>
+<p>Two chart settings decide whether the post arrives: the Alertmanager's namespace must be allowed in by the chart's
+NetworkPolicy (<code>networkPolicy.allowIngressNamespace: openshift-monitoring</code>, or <code>openshift-user-workload-monitoring</code>
+for the user-workload Alertmanager), and the server's body limit is 1.5 MiB (1,572,864 bytes). <code>max_alerts</code> bounds
+the count, not the size: 500 alerts fit only while each averages under about 3 KB of labels and annotations, so set
+it from your own alerts (a group of 900 alerts of 1.9 KB each was refused). A post above the limit gets 413 and is
+not read at all. Alertmanager does not retry it: its webhook notifier retries a 5xx answer only and drops any 4xx as
+a failed notification (<code>notify/util.go</code>, <code>Retrier.Check</code>, v0.28.1). A storage failure is not a 4xx: the POST still
+answers 200 with the report and <code>stored: false</code>.</p>
+<p>Reading them back, with the same bearer token:</p>
+<pre><code class="language-bash">curl -sH &quot;Authorization: Bearer $TOKEN&quot; http://kube-noob.kube-noob.svc:8080/v1/alert-reports?limit=20
+curl -sH &quot;Authorization: Bearer $TOKEN&quot; http://kube-noob.kube-noob.svc:8080/v1/alert-reports/&lt;id&gt;
+kubectl -n kube-noob exec deploy/kube-noob -- kube-noob alerts list
+</code></pre>
+<p>What to watch:</p>
+<ul>
+<li><code>stored: false</code> on a POST is the answer, not an error: the report is in the response and <code>notStoredReason</code> says why
+  it was not kept (storing is off, the folder is a link or belongs to another user, the disk is full). The server
+  log line <code>alert report &lt;id&gt; not stored</code> carries the same reason; the dashboard's "Reports kept, not kept" panel
+  counts them.</li>
+<li><code>kube_noob_alert_report_duration_seconds</code> is the receipt-to-report time, from the request reaching the route to the
+  report being ready (before it is written), including the time to receive the body and any wait for a slot. Every
+  request body must arrive within 10 s, or the request is answered 408 and holds nothing afterwards; a body over
+  256 KiB holds one of eight large-body places from the moment it is in memory until its tool takes it (an alert
+  report: until it holds a report slot), and a request that finds all eight taken waits for one until its read
+  deadline and is then answered 503. At most two reports are built at once, by the receiver and the <code>alert_report</code> MCP
+  tool together; a post takes a slot after its body is read, waits at most 5 s for one (half of
+  <code>alertReports.budgetSeconds</code> when that is under 10 s), and is then answered 503 with <code>Retry-After: 5</code>, which
+  Alertmanager retries like any 5xx; an MCP call gets a busy tool error (a JSON-RPC error with the same message when
+  the refusal comes before the call is parsed). The budget (30 s) counts from receipt, and no alert starts after it,
+  so a post is answered within the read deadline plus the slot wait plus the budget's remainder plus the alert in
+  progress and the time to keep the report; the histogram's buckets run to 600 s. A post whose sender has gone by the
+  time its report would start, or would be kept, is dropped and kept nowhere -- including a sender that half-closes
+  its connection after sending -- and is answered 499, which the sender never sees;
+  <code>kube_noob_alert_reports_dropped_total</code> counts those (<code>client-gone</code>) and the refusals (<code>busy</code>). Measured on the
+  2-core build machine on 2026-11-12, the server in its own process with 64 connections allowed: 20 worst-case posts
+  at once (below) gave two reports in 11.5 s and eighteen 503s, a server peak of 169 MB and <code>/healthz</code> p50 38 ms; 120
+  such posts from senders that gave up after 3 s built and kept nothing, peak 187 MB (410 MB, with four abandoned
+  reports kept, before the second review); 64 such MCP calls at once peaked at 217 MB (624 MB before) with <code>/healthz</code>
+  p50 32 ms; two senders trickling a 5 KB alert post a byte every 20 s no longer delay real posts (each answered in
+  under 0.1 s), and eight trickling 300 KB posts no longer refuse large ones; ten parallel 320 KB audits all answer.
+  <code>kube-noob demo
+  alerts</code> posts the bundled payload to an in-process server and fails over 2 s. Measured on the 2-core, 7 GB build
+  machine on 2026-11-12, idle apart from one other test run: the bundled payload 0.09 s as the first request of a
+  fresh process, then p50 22 ms and p95 23 ms over 250 posts; the review's worst in-bounds payloads 4.5 s (150 alerts,
+  five 2,000-character fields each, 1.51 MB) and 5.7 s (500 alerts of 2.8 KB, 1.49 MB). Before the redaction fix the
+  first of those took 40.4 s. With other test suites on both cores the same two took about 15 s each, which is what
+  <code>budgetSeconds</code> is for.</li>
+<li><code>kube_noob_alert_reports_evicted_total</code> rising steadily means retention is doing its job; reports you need longer
+  belong in a ticket, not in a larger <code>maxReports</code>.</li>
+<li>A stored report is read only if it is a regular file with one link, owned by the server's user: a backup made with
+  hard links to the store's files elsewhere (<code>cp -al</code>, rsnapshot) gives them a second link, and the server then refuses
+  to read them (500, "not a regular file of this server's own, with one link"). Back the folder up by copying.</li>
+<li><code>retentionNotRemoved</code> on a POST means retention could not remove an older report file: the report was stored, and
+  the log names the count. An entry under a report's name that is not a regular file (a directory, a FIFO, a link)
+  is no report: the list counts it under <code>ignored</code>, and nothing reads it or counts it toward <code>maxReports</code>. Remove it
+  by hand.</li>
+<li>To keep nothing: <code>alertReports.store: false</code>. To delete what was kept: remove <code>&lt;dataDir&gt;/alert-reports</code>.</li>
+</ul>
+<h2 id="rollback">Rollback</h2>
+<ul>
+<li>PyPI versions are immutable. Yank the bad version (<code>pypi.org/manage/project/kube-noob/releases/</code>), fix forward, and
+  release the next patch.</li>
+<li>GHCR: delete or retag the bad image version; users pinned by digest are unaffected.</li>
+<li>MCP Registry and the Claude plugin follow the next published version.</li>
+</ul>
+<h2 id="escalation">Escalation</h2>
+<ul>
+<li>Vulnerability reports arrive through GitHub private vulnerability reporting (see <code>SECURITY.md</code>); acknowledge within
+  3 business days.</li>
+<li>A failing release workflow blocks the release: fix and re-tag with the next patch version (never reuse a version).</li>
+</ul><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/operations.md">docs/operations.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Defect classes the adversarial reviews keep finding · kube-noob</title>
+<meta name="description" content="Between 2026-11-10 and 2026-11-13, eleven branches went through thirty-odd read-only adversarial review rounds before merging. The reviews confirmed…">
+<link rel="canonical" href="https://kube-noob.com/docs/review-classes/">
+<meta property="og:title" content="Defect classes the adversarial reviews keep finding · kube-noob">
+<meta property="og:description" content="Between 2026-11-10 and 2026-11-13, eleven branches went through thirty-odd read-only adversarial review rounds before merging. The reviews confirmed…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/review-classes/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/" aria-current="page">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="defect-classes-the-adversarial-reviews-keep-finding">Defect classes the adversarial reviews keep finding</h1>
+<p>Between 2026-11-10 and 2026-11-13, eleven branches went through thirty-odd read-only adversarial review rounds before
+merging. The reviews confirmed about three hundred defects. Every branch had passed the full gate and had tests;
+every defect was a shape the builder's tests had not tried. The defects fall into the classes below, which recur
+across unrelated features because they are not about the feature — they are about how a careful author tests what
+they built and not what they skipped.</p>
+<p>This file is the durable form of the brief those reviews worked from. It is for whoever changes this repository
+next, human or agent: before you call a change done, write one test per class that applies to it. The class-21 rule
+is the one that closes most rounds: after every fix, try the neighbouring input before a reviewer does.</p>
+<p>The product rule all of this serves: <strong>an absence, an unknown or an unrecognised shape must never read as a pass, a
+zero, or "complete"</strong>. Verdicts are three-valued. What was not read or not evaluated is part of the answer, in the
+text view and in JSON/YAML and in the MCP result alike.</p>
+<h2 id="the-classes">The classes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Class</th>
+<th>What it looked like</th>
+<th>The test shape that holds it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>A skipped input reads as complete</td>
+<td>A file that could not be parsed, was empty, was a symlink, was over a size cap, or held no object of the expected kind was dropped and the verdict stayed complete, exit 0; a manifest whose <code>apiVersion</code> key was spelled <code>apiversion</code> was given the answer a CI workflow gets, and a privileged pod passed the gate and was allowed before the apply (G325)</td>
+<td>Every skip, at every layer, appears in the answer; a fixture per skip reason asserts the verdict is not "complete", and a structural test fails when a new skip reason is added without deciding whether it forbids a verdict</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Truncation hides the worst item</td>
+<td>Caps applied in arrival or alphabetical order cut the most severe finding; the summary was computed after the cut</td>
+<td>Summaries from untruncated data; truncate lowest severity first; the withheld count stated in every format</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Substring matching on errors or kinds</td>
+<td>Any error containing "not found" read as "API not installed"; <code>kind</code> matched without its group</td>
+<td>Match the backend's own whole line; require the group; a foreign kind of the same name is a different kind</td>
+</tr>
+<tr>
+<td>4</td>
+<td>An unrecognised value reads as the benign default</td>
+<td>A missing <code>status</code>, an unknown phase, a YAML bool where a string was expected, a scalar where a list was expected → "healthy", "none", "no problem"</td>
+<td>Unrecognised is not determined, with the field named</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Duplicates and ordering</td>
+<td>Two objects with one kind/namespace/name: one picked silently by sort or document order; output differed under shuffle</td>
+<td>Conflicts flagged; canonical order before analysis; a shuffled-input test asserts identical bytes</td>
+</tr>
+<tr>
+<td>6</td>
+<td>The caveat exists only in JSON</td>
+<td>Limitations and not-determined reasons missing from the text view, the diagram, or the sibling command that embeds the result</td>
+<td>Parity test per format for every caveat field</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Input-derived strings forge output</td>
+<td>A newline in a path forged a row; invisible Unicode (U+061C, U+00AD, the tag block, bidi overrides) reached output</td>
+<td>Every input-derived string through the one output boundary; hidden characters marked, never spliced</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Docs claim what the code does not do</td>
+<td>CHANGELOG and guidance stated behaviours later defects contradicted</td>
+<td>Every doc sentence written after a test holds it; the guidance row cites that test</td>
+</tr>
+<tr>
+<td>9</td>
+<td>A second source of truth</td>
+<td>A private copy of a list the audit already owned was a strict subset of it</td>
+<td>Import the shared one; a test asserts there is one list</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Tests that fail only in CI</td>
+<td>Wall-clock ratios on a shared runner; a hostname substring tripping CodeQL; an identifier containing <code>secret</code> reaching print. Recurred as class 21: G263 fixed two wall-clock budgets and left thirty-four, two of which later blocked merges (G326)</td>
+<td>Count operations, not time; compare whole tokens; name fields the way the module's neighbours do. A timing assertion states the shape of the regression it guards and lets <code>tests/bounds.py</code> derive the ceiling; <code>tests/test_timing_assertions.py</code> refuses a new raw one</td>
+</tr>
+<tr>
+<td>11</td>
+<td>The object asked about is not the object answered</td>
+<td>A Pod anchor was answered from its owner's spec</td>
+<td>Score the object the user named; a test with owner and pod disagreeing</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Quadratic loops inside caps</td>
+<td>An index rebuilt per item made a within-bounds input take minutes</td>
+<td>A test at the cap with a time budget expressed as an operation count</td>
+</tr>
+<tr>
+<td>13</td>
+<td>The verdict word contradicts the counts</td>
+<td><code>complete: true, exit 0</code> with 0 of 30 items matched; <code>stored: true</code> for a record deleted in the same call; <code>satisfied</code> for a control whose only rule had nothing to look at; a score of 100 beside "containers were NOT audited"</td>
+<td>One predicate decides the headline word and every renderer calls it; a test per renderer that the word agrees with the numbers beside it</td>
+</tr>
+<tr>
+<td>14</td>
+<td>A rule about an absent kind counts as evaluated and clean</td>
+<td>No Pod in the input is not "pod security clean"</td>
+<td>No subject → not evaluated; every rule declares its subjects and a static test checks the declaration against what the rule reads</td>
+</tr>
+<tr>
+<td>15</td>
+<td>A match tier hides what it did not match</td>
+<td>"Named: 4 fixed bugs" while 17 open ones used another word for the same thing</td>
+<td>Say what the matcher cannot see, per item; never present a partial match as the list</td>
+</tr>
+<tr>
+<td>16</td>
+<td>A crash, an empty stdout or a truncated document is read as an answer</td>
+<td>Unexpected exceptions exiting 1; a reader that left mid-document getting a partial file and exit 0</td>
+<td>Unexpected exceptions exit 4; documents are written whole or not at all; a closed pipe is exit 141</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Untrusted text in fields that read as the tool's own words</td>
+<td>Titles, messages, evidence and suggested commands built from input</td>
+<td>Clean it, mark it, never build a command from it</td>
+</tr>
+<tr>
+<td>18</td>
+<td>A fixed, guessable delimiter, temp path or id</td>
+<td>Heredoc terminators, <code>/tmp/name.txt</code>, sequential ids</td>
+<td>Random delimiters; per-run directories; ids from a hash</td>
+</tr>
+<tr>
+<td>19</td>
+<td>A network-reachable endpoint with no time budget</td>
+<td>One in-bounds request took a minute and starved the health check</td>
+<td>A budget per request, enforced in a child the parent kills</td>
+</tr>
+<tr>
+<td>20</td>
+<td>A default that silently loses data across replicas or sessions</td>
+<td>Per-pod storage behind a Service; a shared temp file between sessions</td>
+<td>A test with two replicas or two sessions</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Fixing the reported shape, not its neighbours</td>
+<td>The fix covered the exact input in the report; the other wrapper, the other type, the other order still failed</td>
+<td>After every fix, list the adjacent inputs and test each before calling it done</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Parsing argv or flags without the real parser's rules</td>
+<td>A value flag swallowed the next token; <code>$(VAR)</code> was a whole token; <code>--version</code> was taken for a server</td>
+<td>Reuse the real parser's rules (pflag, cobra, the shell); test the documented corner cases of that parser</td>
+</tr>
+<tr>
+<td>23</td>
+<td>The container's own metadata is dropped while its contents are checked</td>
+<td>A duplicate key on a <code>List</code> wrapper (its items were checked for duplicate keys); the same object under two must-gather directories (each file was checked); a payload's <code>truncatedAlerts</code> count (each alert was checked)</td>
+<td>For every container shape, a test that a defect on the wrapper itself is reported</td>
+</tr>
+<tr>
+<td>24</td>
+<td>A refusal is read as an absence one layer up</td>
+<td><code>audit</code> refused an object and said so in an assumption line; <code>gate</code> read the empty result as "no pod spec in the input" and passed</td>
+<td>A refused object makes the verdict undetermined in every command that embeds the result; the phrase "not in the input" is never printed for an object that was present</td>
+</tr>
+<tr>
+<td>25</td>
+<td>A fix applied to one surface, not its siblings</td>
+<td>The score was withheld beside a declined rule, but not beside an unread pod spec or a refused group, which are the same kind of record</td>
+<td>Fix the predicate, not the call site; grep every caller of the old predicate and test each</td>
+</tr>
+<tr>
+<td>26</td>
+<td>A limit set above the resource it protects</td>
+<td>A daily cap of 80 licence mails against a quota of about 100, with a second form drawing on the same quota; a per-address hourly cap when the attacker has unlimited addresses</td>
+<td>Caps expressed as a reserve of the shared resource, tested at the edge (the request that empties it)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="how-to-use-this-file">How to use this file</h2>
+<ul>
+<li>Before pushing: for each class that applies to your change, name the test that holds it. If none applies, say so
+  in the commit message; a reviewer will check.</li>
+<li>After a review: the fix for every finding comes with its class-21 neighbours tested in the same commit.</li>
+<li>When a review finds a shape no class describes, add the class here with the one-line example and the test shape,
+  in the same change as the fix. The number is stable; append, never renumber.</li>
+</ul>
+<p>The G-rows in <code>docs/guidance.md</code> that correspond to the branches these classes came from: G270, G272, G273, G274,
+G276, G277, G278, G279, G280, G281, G282.</p><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/review-classes.md">docs/review-classes.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>

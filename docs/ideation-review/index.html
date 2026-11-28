@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self' https://api.anthropic.com; img-src 'self' data:; media-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>External ideation, reviewed · kube-noob</title>
+<meta name="description" content="Three external AI reviews of kube-noob&#x27;s FedRAMP KSI report arrived on 2026-11-05. Between them they proposed about 250 checks, a dozen modules, two…">
+<link rel="canonical" href="https://kube-noob.com/docs/ideation-review/">
+<meta property="og:title" content="External ideation, reviewed · kube-noob">
+<meta property="og:description" content="Three external AI reviews of kube-noob&#x27;s FedRAMP KSI report arrived on 2026-11-05. Between them they proposed about 250 checks, a dozen modules, two…">
+<meta property="og:image" content="https://kube-noob.com/brand/social-preview.png">
+<meta property="og:url" content="https://kube-noob.com/docs/ideation-review/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/kube-noob-icon.svg" type="image/svg+xml">
+<link rel="icon" href="/brand/kube-noob-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/brand/kube-noob-256.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/style.css">
+<script type="module" src="/assets/site.js"></script>
+
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top"><div class="top-inner">
+  <a class="logo" href="/"><img src="/brand/kube-noob-icon.svg" alt="" width="30" height="30"><span>kube-noob</span></a>
+  <button class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+  <nav class="main" id="main-nav" aria-label="Main"><a href="/start/">Start</a><a href="/journey/">See it run</a><a href="/playground/">Playground</a><a href="/learn/mechanisms/">Learn</a><a href="/ask/">Bring your own AI</a><a href="/docs/overview/">Docs</a><a href="/reference/mcp/">Reference</a><a href="/videos/">Videos</a>
+    <div class="search"><input id="site-search" type="search" placeholder="Search docs" aria-label="Search the site"
+      autocomplete="off"><div class="search-results" id="search-results" role="listbox"></div></div>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    <a href="https://github.com/kube-noob/kube-noob" rel="noopener">GitHub</a>
+  </nav>
+</div></header>
+<main id="content">
+<div class="doc-layout"><nav class="doc-nav" aria-label="Documentation"><h4>Start</h4><a href="/docs/overview/">Overview</a><a href="/docs/install/">Install kube-noob</a><a href="/docs/use-cases/">Use cases</a><a href="/docs/learning/">Learning with kube-noob</a><h4>Run it</h4><a href="/docs/openshift/">Run kube-noob on OpenShift and ROSA</a><a href="/docs/operations/">Operations: weekly risk review and releases</a><a href="/docs/helm-chart/">kube-noob Helm chart</a><a href="/docs/claude-plugin/">kube-noob plugin</a><h4>Trust</h4><a href="/docs/architecture/">Architecture</a><a href="/docs/privacy/">Privacy</a><a href="/docs/security/">Security Policy</a><a href="/docs/compliance/">Compliance: FedRAMP High and NIST SP 800-53</a><a href="/docs/guidance/">Guidance traceability</a><a href="/docs/release-readiness/">Release readiness: kube-noob 0.1.0</a><a href="/docs/third-party-notices/">Third-party notices and attribution</a><h4>Project</h4><a href="/docs/roadmap/">Roadmap: the ground truth for Kubernetes and OpenShift operations</a><a href="/docs/changelog/">Changelog</a><a href="/docs/demos/">Demo recordings</a><a href="/docs/training/">Corpus, training and the reward</a><a href="/docs/openshift-catalog/">Getting kube-noob into OpenShift&#x27;s catalogs</a><a href="/docs/contributing/">Contributing</a><a href="/docs/roadmap-0-2/">kube-noob 0.2.0: scope and acceptance criteria</a><h4>More</h4><a href="/docs/editions/">Editions: what is free and what an enterprise edition could hold</a><a href="/docs/fedramp-ksi/">FedRAMP 20x Key Security Indicators: what kube-noob&#x27;s findings are evidence for</a><a href="/docs/ideation-review/" aria-current="page">External ideation, reviewed</a><a href="/docs/limits/">What kube-noob cannot tell you</a><a href="/docs/open-questions/">Open questions, for an external reviewer</a><a href="/docs/openshift-release/">Shipping kube-noob through Red Hat&#x27;s distribution channels</a><a href="/docs/permissions/">What kube-noob reads from a cluster, and what the chart grants</a><a href="/docs/red-team-playbook/">Red-teaming a change, and ranking what comes out</a><a href="/docs/report-ir/">The report needs a coverage ledger, and the renderers should project it</a><a href="/docs/review-classes/">Defect classes the adversarial reviews keep finding</a><a href="/docs/safety-contract/">Safety contract</a><a href="/docs/scorecard/">Scorecard</a><h4>Reference</h4><a href="/reference/mcp/">MCP tools</a><a href="/reference/cli/">CLI</a><a href="/reference/rules/">Audit rules</a><a href="/reference/playbooks/">Playbooks</a><a href="/reference/knowledge/">Knowledge base</a><a href="/reference/known-issues/">Known issues index</a><a href="/reference/helm-values/">Helm values</a></nav><article class="prose"><h1 id="external-ideation-reviewed">External ideation, reviewed</h1>
+<p>Three external AI reviews of kube-noob's FedRAMP KSI report arrived on 2026-11-05. Between them they proposed
+about 250 checks, a dozen modules, two architectures and five "if I could only build five things" lists. This
+file is the durable record of what was in them and what this project decided, so the thinking is not lost in a
+chat log and nobody re-litigates it from memory.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>sha256 (first 16)</th>
+<th>Shape</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Review A</td>
+<td><code>2c07edf49120ed01</code></td>
+<td>12 control families, ~120 numbered checks (<code>IAM-001</code>...), a five-engine architecture, an evidence-contract field list</td>
+</tr>
+<tr>
+<td>Review B</td>
+<td><code>8365003f7cc3cd30</code></td>
+<td>A 6-phase roadmap, 8 rule families with detection logic and test cases (<code>KN-WRK-001</code>...), an evidence JSON schema, a KSI mapping registry, a 12-gate test matrix</td>
+</tr>
+<tr>
+<td>Review C</td>
+<td><code>a6f58a188fd6c762</code></td>
+<td>12 security modules, 8 "standout" features, a FedRAMP intelligence layer, a remediation engine, a 3-score risk model, 10 extra ideas</td>
+</tr>
+</tbody>
+</table></div>
+<p>The reviews are not quoted here. Every proposal below is restated in this project's own words, and every verdict
+was checked against the code on 2026-11-06 — the 92-rule catalogue, the 108 commands, the 48 MCP tools — not
+recalled.</p>
+<h2 id="what-they-got-right-and-what-that-is-worth">What they got right, and what that is worth</h2>
+<p>All three independently identified the same architectural point, and all three put it first: <strong>a shared NIST
+control ID must never imply that a rule proves a KSI's subject</strong>. Two of them named <code>onSubject</code> as the field to
+make mandatory. That is <a href="/docs/guidance/">G219</a>, shipped before the reviews were written, and the reviews were
+reading the report it produces — so this is confirmation rather than discovery. It is still worth recording,
+because three independent readers reaching for the same safeguard is the strongest available evidence that the
+safeguard is the right one and should never be quietly relaxed.</p>
+<p>They also converged on a second point this project had already made load-bearing: <strong>an unknown must not read as
+a pass</strong>. Review B wrote test cases for it ("a partial manifest bundle does not produce a namespace-wide pass",
+"missing seccomp on a node with unknown support returns Not evaluated, not a false pass"); Review C proposed a
+six-state verdict model; Review A asked for an <code>Evaluation status</code> field. kube-noob has three-valued verdicts,
+<code>cannot_decide</code>, <code>partial_bundle</code>, <code>notEvaluatedRules</code> and <code>notReadBeyond</code>. Same conclusion, arrived at
+independently.</p>
+<p>Where the reviews are weakest is uniform and predictable: <strong>they price every proposal at the cost of naming it</strong>.
+Review A's 120 checks include MFA enforcement, JIT access expiry, crypto-mining detection, log retention
+verification, restore-test evidence and training-effectiveness review. Each is a real control. None of them can
+be decided by a tool that holds no credential for an identity provider, a SIEM, a backup system or an HR system,
+and Review A says so itself in three separate asides — then counts them in the total anyway. A catalogue of 250
+checks of which 60 can answer is not five times better than a catalogue of 92 that all can; it is the same
+product with 190 rows that say "not evaluated", which is the coverage theatre <a href="/docs/guidance/">G226</a> exists to
+refuse.</p>
+<h2 id="verdicts">Verdicts</h2>
+<p>Verdict key: <strong>Shipped</strong> — in the product today. <strong>Shipped differently</strong> — the need is met, by a different shape,
+and the difference is the point. <strong>Taken</strong> — accepted into the backlog with an id. <strong>Refused</strong> — a deliberate no,
+with the reason. <strong>Blocked</strong> — wanted, but gated on something this project does not have.</p>
+<h3 id="already-shipped-before-the-reviews-were-written">Already shipped before the reviews were written</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proposal</th>
+<th>Where it lives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onSubject</code> as a mandatory mapping field; never derive a KSI from a shared NIST id (all three)</td>
+<td><code>audit/fedramp.py</code>, G219, G221, G226</td>
+</tr>
+<tr>
+<td>Six-state / explicit-unknown verdicts; partial bundles must not pass (A, B, C)</td>
+<td>three-valued verdicts, <code>cannot_decide</code>, <code>partial_bundle</code>, <code>notEvaluatedRules</code></td>
+</tr>
+<tr>
+<td>Versioned, hash-pinned FedRAMP ruleset rather than a copied KSI table (B)</td>
+<td><code>vendor/fedramp/fedramp-ksi.json</code>, rules <code>2026.11.02.01</code>, regenerated and <code>--check</code>ed by <code>scripts/fedramp_ksi.py</code></td>
+</tr>
+<tr>
+<td>Attack-path analysis, exposure × blast radius, every step with its evidence field (B, C — C called it the strongest differentiator)</td>
+<td><code>posture scan</code>, <code>attack_paths.py</code></td>
+</tr>
+<tr>
+<td>Privileged containers, host namespaces, hostPath, capabilities, seccomp, resource limits, pod-security enforcement (B's family A)</td>
+<td><code>KN-S001</code>, <code>KN-S009</code>, <code>KN-S010</code>, <code>KN-S005</code>/<code>KN-S006</code>, <code>KN-S008</code>, <code>KN-C004</code>/<code>KN-C005</code>, <code>KN-S032</code></td>
+</tr>
+<tr>
+<td>Wildcard RBAC, cluster-admin bindings, escalate/bind/impersonate, token automount, legacy token Secrets (B's family B)</td>
+<td><code>KN-S015</code>, <code>KN-S016</code>, <code>KN-S017</code>, <code>KN-S014</code>, <code>KN-S027</code></td>
+</tr>
+<tr>
+<td>Namespace without NetworkPolicy, allow-all ingress, a policy selecting no pods, external exposure, unenforced CNI tier (B's family C)</td>
+<td><code>KN-N001</code>, <code>KN-N007</code>, <code>KN-N012</code>, <code>KN-N004</code>/<code>KN-N008</code>, <code>KN-N014</code></td>
+</tr>
+<tr>
+<td>Credentials in env and in ConfigMaps, secret material in manifests (B's family D)</td>
+<td><code>KN-S013</code>, <code>KN-S026</code>, <code>KN-S018</code></td>
+</tr>
+<tr>
+<td>Kubernetes audit logging not configured, and event types absent for one group (B's <code>KN-LOG-001</code>/<code>002</code>, A's <code>AUD-001</code>/<code>003</code>)</td>
+<td><code>KN-S035</code>, G226 — the one logging question a credential-free tool can decide</td>
+</tr>
+<tr>
+<td>Mutable image tags / digest pinning (A, B, C)</td>
+<td><code>KN-S012</code></td>
+</tr>
+<tr>
+<td>CVEs ranked by reachability, with VEX applied rather than raw CVSS (A, C)</td>
+<td><code>vuln</code>, Red Hat VEX, VUL1</td>
+</tr>
+<tr>
+<td>GitOps / live drift against an approved state (A, B, C)</td>
+<td><code>drift.py</code>, <code>posture snapshot</code> and <code>posture diff</code></td>
+</tr>
+<tr>
+<td>Exception management with owner, reason, expiry and scope (C)</td>
+<td><code>exceptions check</code> — refuses an entry with no owner, an unknown rule, too wide a scope, or an expiry over 400 days</td>
+</tr>
+<tr>
+<td>Pre-deploy guardrails on manifests and Helm charts (C)</td>
+<td><code>gate</code>, <code>helm-audit</code>, SARIF, the GitHub action, pre-commit hooks, a Tekton task</td>
+</tr>
+<tr>
+<td>Ticket creation from findings (C)</td>
+<td><code>ticket</code></td>
+</tr>
+<tr>
+<td>Evidence export for an auditor (B, C)</td>
+<td>OSCAL export, <code>--html</code>, <code>ksi</code></td>
+</tr>
+<tr>
+<td>Multi-framework mapping without pretending similar ids mean identical requirements (C)</td>
+<td>NIST SP 800-53 Rev. 5 + FedRAMP 20x KSI, with the <code>onSubject</code> discipline between them; Docker CIS benchmark items cited on the rules that match them</td>
+</tr>
+<tr>
+<td>Historical posture and control-regression detection (C's idea 4)</td>
+<td><code>posture snapshot</code> / <code>posture diff</code>, per-control standing in <code>drift.py</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="shipped-differently-and-the-difference-is-the-point">Shipped differently, and the difference is the point</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proposal</th>
+<th>What kube-noob does instead, and why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An evidence JSON schema with ~14 provenance fields per finding, an evidence store with integrity hashes, and a reproducible six-months-later answer (B §4, C's evidence vault)</td>
+<td>Findings carry the rule, the object ref, the exact field path, the value, the controls, the severity and the platform/version the verdict was made under; the reproducibility story is the <strong>snapshot</strong>, not a vault — <code>posture snapshot</code> writes an owner-only snapshot with its own checksum manifest, and the audit is deterministic on the same bytes. A per-finding integrity hash over evidence the tool itself just read is ceremony: it proves the tool did not corrupt its own output, not that the cluster was in that state. Worth revisiting only when someone needs to hand a third party evidence they cannot re-collect.</td>
+</tr>
+<tr>
+<td>Separate <code>rules/</code> tree with JSON/YAML rule definitions and a JSON Schema per rule (B §9)</td>
+<td>Rules are Python with a declarative registry and a <code>tests/fixtures/rules/&lt;id&gt;.yaml</code> good/bad pair each, which AGENTS.md requires before a rule merges. A YAML rule DSL buys third-party rule authoring, which nobody has asked for, and costs the type checker — the thing that catches a rule bug before any test runs (G220, G223).</td>
+</tr>
+<tr>
+<td>"Three independent scores: security risk, compliance readiness, operational resilience" (C §5)</td>
+<td>Attack paths score exposure × blast radius; the KSI view counts evidence and gaps; reliability and availability rules are a separate category. Deliberately <strong>not</strong> composed into three headline numbers, for the same reason the KSI page shows no percentage: a single number invites the comparison it cannot support.</td>
+</tr>
+<tr>
+<td>A dashboard with asset, finding, coverage and unevaluated tiles (B §8, C)</td>
+<td><code>--html</code> ships a self-contained report with the caveats rendered above the findings (U1). A live dashboard is U2 and is worth nothing before N11's <code>/metrics</code> exists.</td>
+</tr>
+<tr>
+<td>Remediation: explain / prepare a patch / apply through a controlled integration (C §4)</td>
+<td><code>fix</code> and <code>generate</code> produce the manifest change and the admission policy; <strong>the third option is refused</strong> — see below.</td>
+</tr>
+<tr>
+<td>Installed-operator and resource inventory (A, B's <code>KN-SUP-006</code>, C's module A)</td>
+<td>The operator half shipped as moat item <strong>E2</strong> (<code>operators inventory</code>, G270): installed OLM operators from manifests, a must-gather or the cluster, with what could not be read stated. A general resource inventory did not. An "authoritative real-time inventory" (<code>KSI-PIY-GIV</code>) from a read-only scanner is a narrower claim than the reviews imply: the inventory says which of its inputs it could not read.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="taken-into-the-backlog">Taken into the backlog</h3>
+<p>These are the proposals that survived: a real gap, decidable from evidence kube-noob can actually reach, and not
+already queued. Each gets an id in <a href="/docs/roadmap/">roadmap.md</a>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>id</th>
+<th>What, and why it survived</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>R1</strong></td>
+<td>~~A rule for excessive RBAC access to Secret objects~~ — <strong>the claim behind this item was wrong, and the correction is the item.</strong> It said "there is no catalogue rule that reports it on its own". <code>KN-S017</code> has reported it all along, as one branch of the escalation-paths rule, which is what this file got for reading the three reviews' gap lists instead of the code. What the reviews actually asked for was finer than a new rule and the catalogue was not doing it: <code>list</code> returns the Secrets' <strong>contents</strong>, so one grant hands over every value in scope, while a <code>get</code> hands over the ones whose names the holder already knows — and both were reported identically, a namespaced <code>list</code> at LOW. Fixed in <code>KN-S017</code> (G240), along with a false positive it turns out to have had: a <code>get</code> narrowed by <code>resourceNames</code> is the least-privilege pattern upstream recommends, and the rule was calling it an escalation path.</td>
+</tr>
+<tr>
+<td><strong>R2</strong></td>
+<td><strong>Certificate expiry from TLS Secrets and Routes already in the bundle.</strong> All three reviews ask for it. Nothing in the code reads a <code>notAfter</code> today — verified against the code this time, not the reviews' gap lists. Parsing the public certificate needs no credential, no network and no private key. It does need an X.509 parser, and <code>cryptography</code> is in <code>requirements.lock</code> only <strong>transitively</strong>: building a rule on an undeclared dependency is the G228 defect, and declaring one is a decision about every install, the air-gap bundle and the plugin's own lock. <strong>Blocked on the maintainer's call</strong>, recorded rather than guessed.</td>
+</tr>
+<tr>
+<td><strong>R3</strong></td>
+<td><strong>Registry and publisher allowlist as a configurable rule.</strong> Review A (<code>IMG-006</code>), B (<code>KN-SUP-005</code>) and C all name it; nothing implements it. It is decidable from the image reference plus a policy the operator supplies, and it fails honestly when no policy is configured (not evaluated, not clean).</td>
+</tr>
+<tr>
+<td><strong>R4</strong></td>
+<td>~~A detection-coverage statement for the logging family~~ — <strong>shipped</strong> (G244). Review C's "detection coverage map", from <code>KN-S035</code>'s reading of the audit configuration: which categories of API activity this cluster's own settings can and cannot record, per group where a <code>customRules</code> entry overrides the top level. Every row is the field documentation of <code>Audit</code> in openshift/api rather than advice, an unrecognised profile is reported as undecidable instead of empty, and the block carries what no reading of that object can establish — forwarding, retention, review, and anything that is not an API request. One honest answer in place of eleven unanswerable AUD-* checks.</td>
+</tr>
+<tr>
+<td><strong>R5</strong></td>
+<td><strong>Operator Subscription and add-on vulnerability surface.</strong> Review A's <code>RA-010</code> ("vulnerable third-party operators"). <strong>Shipped narrower than proposed</strong> (G278): the shipped corpus cannot match installed CSV <em>versions</em> -- it keys issues by OpenShift release and text and states fixes as OpenShift releases -- so <code>operators issues</code> is a release-note lookup through an explicit name table, for Red Hat's builds and the cluster's release, that never decides a fix and is not a gate. Third-party operators are not in the OpenShift release notes at all, and community or certified builds are not looked up, so <code>RA-010</code>'s "third-party" half stays unanswered. The next step is the local Jira copy's components and fix versions.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Not one of the five is a new engine, an integration or a credential. That is the test they had to pass.</p>
+<h3 id="refused-with-the-reason">Refused, with the reason</h3>
+<p>Grouped by the reason, because the reasons repeat and the grouping is the argument.</p>
+<p><strong>It needs a credential this product has promised not to hold.</strong> MFA enforcement, IdP account lifecycle,
+joiner/mover/leaver evidence, dormant and orphaned accounts, OIDC issuer validation against the live issuer, JIT
+access expiry, authentication-failure monitoring (A's <code>IAM-001</code>, <code>004</code>-<code>012</code>; B's <code>KN-IAM-007</code>, <code>KN-ORG-001</code>;
+C's module C). Log forwarding health, SIEM ingestion timestamps, log retention and tamper-protection, alert-rule
+execution, log-review records (A's <code>AUD-004</code>-<code>AUD-012</code>; B's <code>KN-LOG-003</code>-<code>008</code>; C's module D). Secret rotation
+and revocation records, KMS key lifecycle (A's <code>SEC-003</code>, <code>005</code>, <code>008</code>, <code>011</code>; B's <code>KN-SEC-004</code>, <code>008</code>).
+Backup completion, restore tests, RPO/RTO, immutability (A's <code>BCP-001</code>-<code>012</code>; B's family G; C's module I).
+Training effectiveness, incident exercises, security-investment review (B's family H). Cloud IAM, security
+groups, bucket exposure, disk encryption, metadata-service reachability (A §10; C's module J). CI/CD approvals,
+branch protection, pipeline identity, separation of duties (A §11; C's module K).</p>
+<p>Every one of these is a legitimate control and kube-noob reports that it cannot evaluate it. The reviews propose
+closing the gap with read-only integrations to an IdP, a SIEM, a cloud provider, a secret manager, a backup
+system, a Git provider and a training system. That is between seven and twelve credentialed connectors, each with
+a permission model, a token lifecycle and a blast radius — in a product whose entire distribution argument is
+that it runs offline in a disconnected cluster and holds nothing. The honest gap is cheaper than the connector,
+and it is the reason a FedRAMP assessor can run this at all.</p>
+<p><strong>It needs runtime telemetry, and a static scanner must never claim to have it.</strong> Shell execution, reverse
+shells, crypto-mining, syscall anomalies, container-escape indicators, behavioural baselines (A's
+<code>RUN-001</code>-<code>012</code>; C's module E). Both reviews say plainly that a manifest scanner cannot establish these, and
+both then list them as checks to build. kube-noob's own rules are the inverse: they report the <em>configuration
+that makes an escape possible</em>, which is decidable from the manifest, and say nothing about what happened. A
+Falco or Tetragon integration is a different product with a different trust model; the <code>insight</code> router already
+recognises Falco output when a person pastes it, which is the correct depth for a tool with no agent.</p>
+<p><strong>It is a write to a customer's cluster.</strong> Review C's remediation option 3 ("apply a fix through a controlled
+integration"), auto-created pull requests, assignment and post-deploy verification. Review B states the rule
+itself better than this file could: no rule may create, patch, delete, restart or exec, and any write-capable
+capability must be a separately permissioned product rather than hidden in the scanner. kube-noob generates the
+patch and the policy and stops. The safety contract (<code>scripts/safety_contract.py</code>) proves it, per release.</p>
+<p><strong>It is an organisational artifact, and a tool that reports on it is making it up.</strong> Data-classification
+discovery, PII detection, data-removal completion, unapproved data exports, deletion requests fulfilled (A §12;
+B's <code>KN-DAT-001</code>/<code>002</code>; C's module L). <code>KSI-SVC-RUD</code> is a workflow with human sign-off. A scanner can report
+that a PersistentVolumeClaim was deleted. It cannot report that data was removed, and the gap between those two
+sentences is the whole control.</p>
+<p><strong>It is a product this project is not.</strong> "An AI-powered Continuous Security Posture, Attack-Path and Compliance
+Evidence Platform" (C §10), a security digital twin, risk prediction, an AI security analyst, multi-tenant
+architecture with its own RBAC and SSO. The product's positioning is <strong>"No AI inside. Works with yours."</strong> — the
+engine is deterministic, which is what makes its output usable as evidence and reproducible in a disconnected
+cluster. An AI analyst inside the tool would invert that. Multi-tenancy, platform SSO and a 3PAO-grade evidence
+platform also need a legal entity and an assessment this project does not have; see
+<a href="/docs/roadmap/">the honest ceiling</a> and <a href="/docs/editions/">editions.md</a>.</p>
+<p><strong>It renames things that already work.</strong> Review B's proposal to re-namespace the catalogue as <code>KN-WRK-*</code>,
+<code>KN-IAM-*</code>, <code>KN-NET-*</code>, <code>KN-SEC-*</code> while preserving the old ids. Review B also says, correctly, "keep the
+existing rule IDs: add new rule families without breaking existing reports" — those two instructions conflict,
+and the existing ids win. <code>KN-S001</code> is in published reports, SARIF uploads, exception files, generated Kyverno
+and Gatekeeper policies, the OSCAL export and six people's CI configuration. A prefix is not worth a migration.</p>
+<p><strong>It is already a release blocker here, phrased as a proposal.</strong> Review B's ten acceptance criteria (unique
+versioned rule ids, positive/negative/incomplete tests per rule, evidence provenance per finding, no KSI pass
+from a shared NIST id, no organisational KSI from configuration, redaction, demonstrably read-only, versioned
+mappings, posture separated from compliance readiness) map one-for-one onto rules already enforced by
+<code>scripts/check.sh</code>, <code>scripts/safety_contract.py</code>, the <code>tests/fixtures/rules/</code> requirement in AGENTS.md and
+G219-G226. Recorded as agreement, not as work.</p>
+<h2 id="what-the-reviews-missed">What the reviews missed</h2>
+<p>Worth writing down, because it is the measure of what external ideation is and is not good for. None of the three
+reviews found a defect. Between them they proposed about 250 checks and did not identify a single case where the
+existing engine returns a wrong answer. The four red-team passes run on 2026-11-05/06 found 49, and the two that
+mattered most are the kind no catalogue proposal would have reached:</p>
+<ul>
+<li>a rule that skipped its cross-object branch under <code>partial_bundle</code> <strong>without declining</strong>, so it counted clean
+  while the report's own caveats said otherwise;</li>
+<li>pod specs embedded in operator CRDs read as clean by every pod-level rule, because the reader looked only at
+  <code>spec.template.spec</code> (<a href="/docs/guidance/">G229</a>) — a KServe predictor running privileged, as root, with
+  <code>hostPath: /</code> produced 14 findings as a Deployment and zero as an <code>InferenceService</code>.</li>
+</ul>
+<p>Both are the same failure the reviews correctly named in the abstract — an absence reading as a pass — found in
+the place the reviews could not see, which is inside the code. Breadth proposals come from reading the output;
+defects come from attacking the engine. Keep asking for both, and do not mistake one for the other.</p>
+<h2 id="external-review-d-gpt-2026-11-11">External review D (GPT), 2026-11-11</h2>
+<p>A fourth external review proposed fifteen checks on the control plane and the trust boundaries around it: who
+the aggregator, the API server, etcd and the OAuth server verify, and who can reach them. Each verdict below was
+checked against the code on 2026-11-11, and the claim that five of them are absent was checked by searching the
+source rather than the catalogue: before G272 no file read <code>insecureSkipTLSVerify</code>, <code>anonymous-auth</code>,
+<code>authorization-mode</code>, <code>AlwaysAllow</code>, <code>identityProviders</code>, <code>spec.encryption</code> or <code>listen-client-urls</code>. As above, the
+review is restated in this project's words and not quoted. The verdict key is the one at the top of this file.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Proposal</th>
+<th>Verdict</th>
+<th>What, precisely</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An APIService whose aggregator does not verify the extension API server</td>
+<td><strong>Taken and shipped</strong> as <code>KN-S037</code> (G272)</td>
+<td><code>insecureSkipTLSVerify: true</code> with a <code>spec.service</code>. A local APIService (no service) is out of scope, and an absent <code>caBundle</code> is not a finding: upstream uses the API server's system roots, and OpenShift's service CA fills it. Generated as a ValidatingAdmissionPolicy; not for Kyverno, whose default resourceFilters exclude APIService</td>
+</tr>
+<tr>
+<td>A kube-apiserver that accepts anonymous requests or authorizes every request</td>
+<td><strong>Taken and shipped</strong> as <code>KN-S038</code> (G272)</td>
+<td>Read from the argv of a container whose <code>command</code> runs the binary (or <code>hyperkube kube-apiserver</code>). An absent flag is the upstream default, named with the releases it was checked at; a mode the API server does not accept declines. A named <code>--authorization-config</code> or <code>--authentication-config</code> file declines the half it governs, and the whole OpenShift family declines with the reason. Every other way of starting it -- a shell script, a wrapper, <code>hyperkube apiserver</code>, k3s, rke2, k0s, an image entrypoint, <code>$(VAR)</code> anywhere in argv, a flag that may swallow the next -- declines with the reason; an input with no API server declines quietly</td>
+</tr>
+<tr>
+<td>etcd serving clients or peers in plaintext, or without client certificates</td>
+<td><strong>Taken and shipped</strong> as <code>KN-S039</code> (G272)</td>
+<td>Network-address <code>http://</code> in <code>--listen-client-urls</code>, <code>--listen-client-http-urls</code>, <code>--advertise-client-urls</code>, <code>--listen-peer-urls</code> and <code>--initial-advertise-peer-urls</code>, and client certificates off beside a network TLS listener -- off meaning neither the switch nor a trusted CA file, either of which makes etcd require a certificate. Loopback and sockets are not findings. Flags, then <code>ETCD_*</code> variables, then defaults, as etcd reads them; <code>--config-file</code> and <code>envFrom</code> decline the container, and one undecidable setting declines that setting and keeps what was decided. Launch shapes not read directly decline as for <code>KN-S038</code>, OpenShift's own shell-wrapped etcd pod among them</td>
+</tr>
+<tr>
+<td>OpenShift encryption at rest switched off</td>
+<td><strong>Taken and shipped</strong> as <code>KN-S040</code> (G272)</td>
+<td>The same <code>APIServer</code> singleton and reader as <code>KN-S035</code>. Unset or <code>identity</code> is a finding; a type openshift/api does not define declines; ROSA with HCP declines, because a hosted control plane's encryption is the <code>HostedCluster</code>'s <code>spec.secretEncryption</code></td>
+</tr>
+<tr>
+<td>An OpenShift identity provider that does not verify its server</td>
+<td><strong>Taken and shipped</strong> as <code>KN-S041</code> (G272), for the one switch the API defines</td>
+<td>Only LDAP has an explicit insecure switch: <code>insecure: true</code> with an <code>ldap://</code> URL is plaintext, <code>ldaps://</code> always uses TLS, <code>insecure: false</code> upgrades with StartTLS. A missing <code>ca</code> is the system roots, not a finding; an unknown provider type declines; ROSA with HCP declines (<code>spec.configuration.oauth</code> on the <code>HostedCluster</code>). <code>HTPasswd</code> is not flagged: no primary source says a local htpasswd provider is insecure</td>
+</tr>
+<tr>
+<td>The same, for an <code>http://</code> URL on a BasicAuth, Keystone, GitLab or RequestHeader provider</td>
+<td><strong>Blocked</strong> on a primary source</td>
+<td>Whether the authentication operator accepts an <code>http://</code> URL there, or refuses to honour the provider, could not be verified on 2026-11-11. A finding that says passwords cross in plaintext about a provider the platform refuses would be wrong in the direction that matters, so it is not shipped until the operator's validation is read</td>
+</tr>
+<tr>
+<td>Helm hook resources skipped by the chart audit</td>
+<td><strong>Shipped</strong></td>
+<td><code>helm template</code> writes hooks unless <code>--no-hooks</code> and test hooks unless <code>--skip-tests</code> (helm/helm <code>pkg/cmd/template.go</code> at v4.0.0, <code>cmd/helm/template.go</code> at v3.19.0); <code>helm-audit</code> and <code>gate --chart</code> pass neither, and nothing downstream filters an annotation. <code>tests/test_helm_hooks.py</code> holds that a privileged <code>pre-install</code> Job and its ClusterRole get exactly the findings of the same objects without the annotation, and that the gate points them at the hook's own template</td>
+</tr>
+<tr>
+<td>A validating or mutating webhook that fails open</td>
+<td><strong>Shipped</strong> as <code>KN-S030</code></td>
+<td>Every webhook in a Validating- or MutatingWebhookConfiguration whose <code>failurePolicy</code> is <code>Ignore</code>, and any value that is neither <code>Fail</code> nor <code>Ignore</code> (the API server refuses it, so the check does not exist). Absent is <code>Fail</code>, the default, and clean. It does not read <code>timeoutSeconds</code>, <code>sideEffects</code>, <code>matchPolicy</code>, the selectors, or whether the service behind the webhook exists</td>
+</tr>
+<tr>
+<td>ServiceAccount tokens exposed to workloads that do not need them</td>
+<td><strong>Shipped</strong> as <code>KN-S014</code>, with <code>KN-S027</code></td>
+<td>Every pod template that automounts its token: unless the pod sets <code>automountServiceAccountToken: false</code>, or its ServiceAccount in the bundle does and the pod does not override it with <code>true</code>. LOW, because whether the token matters is what the RBAC rules (<code>KN-S015</code>-<code>KN-S017</code>) and the attack-path scan decide. <code>KN-S027</code> reports long-lived token Secrets. Neither reads a token mounted by hand through a projected volume, nor whether the application calls the API</td>
+</tr>
+<tr>
+<td>Routes and Ingresses that serve plain HTTP</td>
+<td><strong>Shipped</strong> as <code>KN-N002</code> and <code>KN-N003</code></td>
+<td>A Route without <code>spec.tls</code> (HIGH) or with <code>insecureEdgeTerminationPolicy: Allow</code> (MEDIUM); an Ingress with no <code>spec.tls</code> (MEDIUM). Neither checks that the TLS hosts cover every rule host, that an Ingress controller redirects HTTP, that an edge Route's backend leg is encrypted, a certificate's expiry (R2), or Gateway API listeners</td>
+</tr>
+<tr>
+<td>An admission webhook whose selectors let some objects bypass it</td>
+<td><strong>Refused</strong></td>
+<td>Whether a bypass is a defect turns on which webhooks are mandatory, and no manifest states that. Excluding namespaces is how webhooks are meant to be scoped -- <code>KN-S030</code>'s own remediation says to. A configurable list of mandatory webhooks would be the <code>KN-S036</code> pattern (a policy from the configuration file, declining without one) and can be Taken when someone asks for it</td>
+</tr>
+<tr>
+<td>A webhook <code>caBundle</code> that is not a valid certificate</td>
+<td><strong>Blocked</strong> on R2</td>
+<td>Reading a certificate is the X.509 parser decision R2 is waiting on; this is one more reader of the same dependency</td>
+</tr>
+<tr>
+<td>Kubelet authentication and authorization</td>
+<td><strong>Taken</strong> already, as N2</td>
+<td>The kubelet's configuration is in the rendered <code>MachineConfig</code>s a must-gather carries, which is N2. No manifest kube-noob audits states it</td>
+</tr>
+<tr>
+<td>A privileged SCC granted to a subject that should not have it</td>
+<td><strong>Taken</strong> as <strong>R8</strong></td>
+<td><code>KN-S019</code> reports an SCC that allows privileged containers, host namespaces, host directories, host ports, privilege escalation or <code>RunAsAny</code> UIDs, whoever may use it; it does not read the SCC's <code>users</code> or <code>groups</code>. <code>KN-S028</code> reports RBAC bindings to everyone (<code>system:authenticated</code>, <code>system:serviceaccounts</code>, <code>system:unauthenticated</code> ...) for any role, including one with <code>use</code> on an SCC, but not an SCC's own subject list. The attack-path scan does read <code>users</code> and <code>groups</code> -- for one ServiceAccount at a time, and only as a path when that account can also create workloads. So an SCC whose own <code>groups</code> hand a permissive SCC to every authenticated user is never one audit finding. That is the gap R8 takes</td>
+</tr>
+<tr>
+<td>A CRD conversion webhook that can break or alter objects</td>
+<td><strong>Refused</strong></td>
+<td>A conversion webhook that is down makes the resource unavailable, which is an availability question rather than a trust boundary, and the API server already refuses most malformed conversion configurations itself. There is no decidable setting to report</td>
+</tr>
+</tbody>
+</table></div>
+<p>Four of the fifteen were already in the product (Helm hooks now held by a test), two are refused with the reason,
+two are blocked on a fact or a decision this project does not have yet, two are taken into the backlog (N2 was
+already there, R8 is new), and five are new rules. The new ones share one property the review did not ask for and
+the code had to supply: each <strong>declines with a stated reason</strong> where the manifest does not say -- a flag that names
+a file on the node, a hosted control plane, a shell script or wrapper, a value behind <code>$(VAR)</code> -- and with none
+where there is nothing of its kind to read. The first version did not hold that everywhere: an adversarial review
+found fifteen shapes that still read as clean or that declined invisibly, each now held by a test in
+<code>tests/test_control_plane_review.py</code>. The same review found that most of the older catalogue counts as evaluated
+and clean when the input holds nothing of its kind -- 91 rules do on a single ConfigMap -- which inflates the
+coverage record for every control; that is recorded as a finding about the catalogue, not fixed here.</p><p class="edit-link">Source: <a href="https://github.com/kube-noob/kube-noob/blob/main/docs/ideation-review.md">docs/ideation-review.md</a></p></article></div>
+</main>
+<footer class="bottom"><div class="inner">
+  <span>kube-noob 0.11.1 · Apache-2.0 · No AI inside. Works with yours.</span>
+  <span>One question each: <a href="/start/">Start</a> · <a href="/blast-radius/">Blast radius</a> · <a href="/operators/">Operators</a> · <a href="/evidence/">Evidence a reviewer opens</a> · <a href="/testing/">How it is tested</a> · <a href="/journey/">See it run</a></span>
+  <span><a href="/contact/">Contact</a> · <a href="/feedback/">Feedback</a> · <a href="/licensing/">Licensing</a> ·
+    <a href="/insights/">Insights</a> · <a href="/docs/privacy/">Privacy</a> · <a href="/docs/security/">Security</a> ·
+    <a href="https://github.com/kube-noob/kube-noob">Source</a> · <a href="https://pypi.org/project/kube-noob/">PyPI</a> · © 2026</span>
+  <span>Kubernetes, Helm, OpenShift, ROSA, RHACS, StackRox, OpenShift Lightspeed, Claude, Anthropic, GitHub and AWS
+    are trademarks of their respective owners; kube-noob is independent and not endorsed by them.
+    <a href="/notices/">Website notices</a></span>
+</div></footer>
+</body>
+</html>
